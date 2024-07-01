@@ -6,15 +6,112 @@
     ;; dgos: TODO
 
 
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; What is this file for.
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;
+  
+  (defskelgroup skel-rift-ring-ingame rift-ring-in-game rift-ring-in-game-lod0-jg rift-ring-in-game-idle-ja
+              ((rift-ring-in-game-lod0-mg (meters 999999)))
+              :bounds (static-spherem 0 0 0 40)
+              )
 
-    #| This file contains function defenitions that are pre placed in the mod base,
-    so if you place custom code inside of these functions, it will exectue based on
-    the name of the function, for example, if you place (set! (-> *game-info* fuel) (+ (-> *game-info* fuel) 1))
-    to the function named runs-on-orb-pickup, then jaks powercell count will increase each time you collect
-    an orb |#
+(deftype rift-ring-ingame (process-drawable)
+  ((anim-speed          delayed-rand-float  :inline)
+   (stutter             symbol)
+   (spin-sound          sound-id)
+   (spin-sound-playing  symbol)
+   )
+  (:state-methods
+    idle
+    )
+  )
+
+
+(defstate idle (rift-ring-ingame)
+  :virtual #t
+  :event (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
+    (case message
+      (('stutter)
+       (set! (-> self stutter) (the-as symbol (-> block param 0)))
+       (set-params! (-> self anim-speed) 3 15 0.25)
+       (reset! (-> self anim-speed))
+       (set! (-> self anim-speed value) -0.25)
+       )
+      )
+    )
+  :trans (behavior ()
+    (cond
+      ((-> self stutter)
+       (update! (-> self anim-speed))
+       (ja :num! (loop! (+ 0.125 (-> self anim-speed value))))
+       )
+      (else
+        (ja :num! (loop!))
+        )
+      )
+    (sound-play "warp-ring" :id (-> self spin-sound) :position (-> self root trans))
+    (set! (-> self spin-sound-playing) #t)
+    )
+  :code sleep-code
+  :post (behavior ()
+    (spawn (-> self part) (-> self root trans))
+    (ja-post)
+    )
+  )
+
+(defmethod deactivate ((this rift-ring-ingame))
+  (if (-> this spin-sound-playing)
+      (sound-stop (-> this spin-sound))
+      )
+  ((method-of-type process-drawable deactivate) this)
+  (none)
+  )
+
+;; WARN: Return type mismatch object vs none.
+(defmethod init-from-entity! ((this rift-ring-ingame) (arg0 entity-actor))
+  "Typically the method that does the initial setup on the process, potentially using the [[entity-actor]] provided as part of that.
+This commonly includes things such as:
+- stack size
+- collision information
+- loading the skeleton group / bones
+- sounds"
+  (set! (-> this root) (new 'process 'trsqv))
+  (process-drawable-from-entity! this arg0)
+  (initialize-skeleton
+    this
+    (the-as skeleton-group (art-group-get-by-name *level* "skel-rift-ring-ingame" (the-as (pointer uint32) #f)))
+    (the-as pair 0)
+    )
+  (set! (-> this part) (create-launch-control (-> *part-group-id-table* 1236) this))
+  (set! (-> this draw light-index) (the-as uint 10))
+  (set! (-> this stutter) #f)
+  (set! (-> this spin-sound) (new-sound-id))
+  (set! (-> this spin-sound-playing) #f)
+  (go (method-of-object this idle))
+  (none)
+  )
+
+  (defbehavior rift-ring-ingame-init-by-other rift-ring-ingame ((vec vector))
+  (set! (-> self root) (new 'process 'trsqv))
+  (vector-copy! (-> self root trans) vec)
+  (quaternion-identity! (-> self root quat))
+  (vector-identity! (-> self root scale))
+    (initialize-skeleton
+    self
+    (the-as skeleton-group (art-group-get-by-name *level* "skel-rift-ring-ingame" (the-as (pointer uint32) #f)))
+    (the-as pair 0)
+    )
+  (set! (-> self part) (create-launch-control (-> *part-group-id-table* 1236) self))
+  (set! (-> self draw light-index) (the-as uint 10))
+  (set! (-> self stutter) #f)
+  (set! (-> self spin-sound) (new-sound-id))
+  (set! (-> self spin-sound-playing) #f)
+  (set! (-> self event-hook) (-> (method-of-object self idle) event))
+  (go (method-of-object self idle))
+  (set! (-> self root scale x) 10.0)
+  (set! (-> self root scale y) 10.0)
+  (set! (-> self root scale z) 10.0)
+  (none)
+  )
+
+  (define *rift-tracker* (the (pointer rift-ring-ingame) #f))
 
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -22,15 +119,53 @@
     ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     (defun runs-every-frame ()
-      ;; (increase-power-cell-by-one) This is a call to increase-power-cell-by-one defined in mod-common-functions.gc
+      
+      (when ;spawn rift ring in port
+(and
+*target*
+(not *scene-player*)
+(= (pause-allowed?) #t)
+(not (ppointer->process *rift-tracker*))
+(or 
+(= (-> (level-get-target-inside *level*) name) 'ctyport)
+(= (-> (level-get-target-inside *level*) name) 'ctypal)
+)
+)
+  (let 
+    ((v1-0 (new 'static 'vector :x (meters 183.9417) :y (meters 48.5856) :z (meters 1546.0906))))
+      (process-spawn rift-ring-ingame v1-0)
+      (set! *rift-tracker* (process-spawn rift-ring-ingame v1-0))
+        (format #t "
+spawned process rift-ring-ingame
+")
+    )
+)
 
-      ;; Sample code to turn jak pink whenever he's doing the jetboard hover glitch
-      ;; (when *target* 
-      ;;   (if (board-hovering?)
-      ;;     (draw-pink *target*)
-      ;;     (draw-normal *target*)
-      ;;     )
-      ;;   )
+(when ;despawn rift ring in port
+(and
+(ppointer->process *rift-tracker*)
+  (and 
+    (!= (-> (level-get-target-inside *level*) name) 'ctyport)
+    (!= (-> (level-get-target-inside *level*) name) 'ctypal)
+  )
+)
+  (kill-by-name "rift-ring-ingame" *default-pool*)
+  (set! *rift-tracker* #f)
+  (format #t "
+killed rift-ring-ingame
+")
+)
+
+
+
+
+
+
+
+
+
+
+
 
       (if *show-input-display* 
         (input-display-on)

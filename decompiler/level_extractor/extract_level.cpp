@@ -253,6 +253,21 @@ level_tools::BspHeader extract_bsp_from_level(const ObjectFileDB& db,
  * Even though GAME.CGO isn't technically a level, the decompiler/loader treat it like one,
  * but the bsp stuff is just empty. It will contain only textures/art groups.
  */
+void extract_single_ag(const std::string& dgo_name,
+                       const std::string& ag_name,
+                       const ObjectFileDB& db,
+                       const TextureDB& tex_db,
+                       tfrag3::Level& lvl) {
+  auto dgo = db.obj_files_by_dgo.at(dgo_name);
+  for (const auto& file : dgo) {
+    if (file.name == ag_name) {
+      const auto& ag_file = db.lookup_record(file);
+      extract_merc(ag_file, tex_db, db.dts, extract_tex_remap(db, dgo_name), lvl, false,
+                   db.version());
+    }
+  }
+}
+
 void extract_common(const ObjectFileDB& db,
                     const TextureDB& tex_db,
                     const std::string& dgo_name,
@@ -274,6 +289,27 @@ void extract_common(const ObjectFileDB& db,
   std::map<std::string, level_tools::ArtData> art_group_data;
   add_all_textures_from_level(tfrag_level, dgo_name, tex_db);
   extract_art_groups_from_level(db, tex_db, {}, dgo_name, tfrag_level, art_group_data);
+
+  extract_single_ag("RUI.DGO", "fodder-ag", db, tex_db, tfrag_level);
+  extract_single_ag("RUI.DGO", "grenadier-ag", db, tex_db, tfrag_level);
+  extract_single_ag("RUI.DGO", "amphibian-ag", db, tex_db, tfrag_level);
+  extract_single_ag("RUI.DGO", "rapid-gunner-ag", db, tex_db, tfrag_level);
+  extract_single_ag("RUI.DGO", "grunt-ag", db, tex_db, tfrag_level);
+  extract_single_ag("FOR.DGO", "predator-ag", db, tex_db, tfrag_level);
+  extract_single_ag("RUI.DGO", "flitter-ag", db, tex_db, tfrag_level);
+  extract_single_ag("MTX.DGO", "rhino-ag", db, tex_db, tfrag_level);
+  extract_single_ag("DRI.DGO", "centurion-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NES.DGO", "mammoth-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NES.DGO", "flying-spider-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NES.DGO", "mantis-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NES.DGO", "mammoth-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "rift-ring-in-game-ag", db, tex_db, tfrag_level);
+  extract_single_ag("VIN.DGO", "vin-ag", db, tex_db, tfrag_level);
+  extract_single_ag("VIN.DGO", "vin-turbine-ag", db, tex_db, tfrag_level);
+  extract_single_ag("FOB.DGO", "transport-ag", db, tex_db, tfrag_level);
+  extract_single_ag("CAS.DGO", "crimson-guard-ag", db, tex_db, tfrag_level);
+  extract_single_ag("CAS.DGO", "roboguard-ag", db, tex_db, tfrag_level);
+  extract_single_ag("SAG.DGO", "torn-highres-ag", db, tex_db, tfrag_level);
 
   add_all_textures_from_level(tfrag_level, "ARTSPOOL", tex_db);
   extract_art_groups_from_level(db, tex_db, {}, "ARTSPOOL", tfrag_level, art_group_data);
