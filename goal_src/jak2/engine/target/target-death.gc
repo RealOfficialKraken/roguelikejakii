@@ -976,6 +976,9 @@
       (set! (-> v1-7 control) 0.0)
       (set! (-> v1-7 invinc-time) (the-as time-frame (-> *TARGET-bank* hit-invulnerable-timeout)))
       (set! (-> v1-7 damage) (-> *FACT-bank* health-default-inc))
+      (when (and (= p-clover #t)(rand-vu-percent? (+ luck 0.2)))
+        (set! (-> v1-7 damage) 0.0)
+      )
       )
     (case arg0
       (('shove)

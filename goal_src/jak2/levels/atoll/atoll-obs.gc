@@ -837,7 +837,7 @@ This commonly includes things such as:
       (set! (-> a1-7 sync-type) 'sync-eased)
       (set! (-> a1-7 sync-flags) (the-as sync-flags v1-12))
       )
-    (set! (-> a1-7 period) (the-as uint 2400))
+    (set! (-> a1-7 period) (the-as uint (rand-vu-int-range 200 3800)))
     (set! (-> a1-7 entity) (-> this entity))
     (set! (-> a1-7 percent) 0.0)
     (set! (-> a1-7 ease-in) 0.15)

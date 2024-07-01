@@ -119,6 +119,12 @@ Seen take in - `true-func` which takes no args TODO - seems fishy
 (defstate idle (process-taskable)
   :virtual #t
   :event (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
+    (when (logtest? (-> self draw status) (draw-control-status on-screen))
+      (set! talk-to-vin #t)
+    )
+    (when (not (logtest? (-> self draw status) (draw-control-status on-screen)))
+      (set! talk-to-vin #f)
+    )
     (case message
       (('attack)
        (if (-> self bounce-away)

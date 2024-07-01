@@ -1220,7 +1220,7 @@
             :borrow '()
             :open? #f
             :on-close #f
-            :add (game-task-node-command add-darkjak)
+            :add (game-task-node-command add-gun-yellow)
             :description (text-id progress-missions-city-save-kid)
             )
           (new 'static 'game-task-node-info
@@ -1869,7 +1869,7 @@
             :borrow '((ctywide 0 lpackage display) (hiphog 0 lguard special))
             :open? #f
             :on-close #f
-            :add (game-task-node-command add-gun-red)
+            :add (game-task-node-command none)
             :description (text-id progress-missions-city-krew-delivery)
             )
           (new 'static 'game-task-node-info
@@ -2468,7 +2468,7 @@
             :borrow '()
             :open? #f
             :on-close #f
-            :add (game-task-node-command add-gun-yellow)
+            :add (game-task-node-command none)
             :description (text-id progress-missions-city-get-yellow-gun)
             )
           (new 'static 'game-task-node-info
@@ -3601,7 +3601,7 @@
             :borrow '((ctywide 0 lsack display) (hiphog 0 lguard special))
             :open? #f
             :on-close #f
-            :add (game-task-node-command add-gun-up-1)
+            :add (game-task-node-command none)
             :description (text-id progress-missions-city-krew-collection)
             )
           (new 'static 'game-task-node-info
@@ -4306,7 +4306,7 @@
             :borrow '((hideout 0 ltrnysam special))
             :open? #f
             :on-close #f
-            :add (game-task-node-command add-gun-blue)
+            :add (game-task-node-command none)
             :description (text-id progress-missions-talk-to-torn)
             )
           (new 'static 'game-task-node-info
@@ -5197,7 +5197,7 @@
             :borrow '((hiphog 0 lguard special))
             :open? #f
             :on-close #f
-            :add (game-task-node-command add-gun-up-2)
+            :add (game-task-node-command none)
             :description (text-id progress-missions-talk-to-krew)
             )
           (new 'static 'game-task-node-info
@@ -7040,7 +7040,7 @@
             :borrow '((hiphog 0 lguard special))
             :open? #f
             :on-close #f
-            :add (game-task-node-command add-gun-dark)
+            :add (game-task-node-command none)
             :description (text-id progress-missions-city-get-dark-gun)
             )
           (new 'static 'game-task-node-info
@@ -8642,7 +8642,7 @@
             :borrow '()
             :open? #f
             :on-close #f
-            :add (game-task-node-command add-gun-up-3)
+            :add (game-task-node-command none)
             )
           (new 'static 'game-task-node-info
             :level 'castle
@@ -9873,7 +9873,7 @@
               )
             :flags (game-task-node-flag save-on-try)
             :parent-node (new 'static 'array game-task-node 4
-              (game-task-node atoll-water-resolution)
+              (game-task-node none)
               (game-task-node none)
               (game-task-node none)
               (game-task-node none)

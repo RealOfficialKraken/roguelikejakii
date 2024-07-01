@@ -123,8 +123,8 @@
                       :eco-level-max 2.0
                       :eco-single-inc 1.0
                       :eco-full-inc 5.0
-                      :eco-single-timeout (seconds 5)
-                      :eco-full-timeout (seconds 20)
+                      :eco-single-timeout (seconds 1)
+                      :eco-full-timeout (seconds 1.2)
                       :dummy (seconds 15)
                       :health-max-default 8.0
                       :health-single-inc 1.0

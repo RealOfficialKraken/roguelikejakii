@@ -37,7 +37,7 @@
 
 (defun pc-cheat-health-bars-unlock ()
   "#t = cheat unlock requirements met. #f = locked"
-  (>= (get-count-for-enemy (-> *pc-settings* stats kill-stats) 'civilian) (-> *pc-cheat-state* kill-civvie-target)))
+  #t)
 
 (defun pc-cheat-vehicle-health-bars-unlock ()
   "#t = cheat unlock requirements met. #f = locked"

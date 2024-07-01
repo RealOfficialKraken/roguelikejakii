@@ -54,6 +54,62 @@
 
 (defmethod update ((this traffic-manager))
   (update-traffic (-> this traffic-engine))
+(let (
+  (gp-0 (-> this traffic-engine)))
+
+
+
+(when (= traffic-metalheads? #f)
+         (set! (-> gp-0 object-type-info-array 0 level) 'lwidea)
+         (set! (-> gp-0 object-type-info-array 1 level) 'lwidea)
+         (set! (-> gp-0 object-type-info-array 2 level) 'lwidea)
+         (set! (-> gp-0 object-type-info-array 3 level) 'lwidea)
+         (set! (-> gp-0 object-type-info-array 4 level) 'lwidea)
+         (set! (-> gp-0 object-type-info-array 5 level) #f)
+         (set! (-> gp-0 object-type-info-array 6 level) 'lwidea)
+         (set! (-> gp-0 object-type-info-array 7 level) #f)
+         (set! (-> gp-0 object-type-info-array 8 level) #f)
+         (set! (-> gp-0 object-type-info-array 9 level) #f)
+         (set! (-> gp-0 object-type-info-array 10 level) #f)
+         (set! (-> gp-0 object-type-info-array 11 level) 'lwidea)
+         (set! (-> gp-0 object-type-info-array 12 level) 'lwidea)
+         (set! (-> gp-0 object-type-info-array 13 level) 'lwidea)
+         (set! (-> gp-0 object-type-info-array 14 level) 'lwidea)
+         (set! (-> gp-0 object-type-info-array 15 level) 'lwidea)
+         (set! (-> gp-0 object-type-info-array 16 level) 'lwidea)
+         (set! (-> gp-0 object-type-info-array 17 level) #f)
+         (set! (-> gp-0 object-type-info-array 18 level) 'lwidea)
+         (set! (-> gp-0 object-type-info-array 19 level) 'lwidea)
+         (logior! (-> gp-0 alert-state flags) (traffic-alert-flag target-jak))
+         (set! *traffic-alert-level-force* #f)
+         )
+         (when (= traffic-metalheads? #t)
+         (set! (-> gp-0 object-type-info-array 0 level) #f) ;ped
+         (set! (-> gp-0 object-type-info-array 1 level) #f)
+         (set! (-> gp-0 object-type-info-array 2 level) #f)
+         (set! (-> gp-0 object-type-info-array 3 level) #f)
+         (set! (-> gp-0 object-type-info-array 4 level) #f)
+         (set! (-> gp-0 object-type-info-array 5 level) #f)
+         (set! (-> gp-0 object-type-info-array 6 level) 'lwidea) ;guard
+         (set! (-> gp-0 object-type-info-array 7 level) #f)
+         (set! (-> gp-0 object-type-info-array 8 level) 'lwidea) ;grunt
+         (set! (-> gp-0 object-type-info-array 9 level) 'lwidea) ;flitter
+         (set! (-> gp-0 object-type-info-array 10 level) 'lwidea) ;predator
+         (set! (-> gp-0 object-type-info-array 11 level) #f) ;car
+         (set! (-> gp-0 object-type-info-array 12 level) #f)
+         (set! (-> gp-0 object-type-info-array 13 level) #f)
+         (set! (-> gp-0 object-type-info-array 14 level) #f) ;bike
+         (set! (-> gp-0 object-type-info-array 15 level) #f)
+         (set! (-> gp-0 object-type-info-array 16 level) #f)
+         (set! (-> gp-0 object-type-info-array 17 level) #f)
+         (set! (-> gp-0 object-type-info-array 18 level) #f) ;hellbike
+         (set! (-> gp-0 object-type-info-array 19 level) #f) ;hellcat
+         (set-alert-level gp-0 3)
+         (logior! (-> gp-0 alert-state flags) (traffic-alert-flag target-jak))
+         (set-alert-duration gp-0 (seconds 6048000))
+         (set! *traffic-alert-level-force* #t)
+         )
+)
   (kill-excess-once this)
   (spawn-all this)
   (if *debug-segment*
@@ -449,8 +505,38 @@
   (none)
   )
 
+
+#|
+(defenum traffic-type
+  :type uint8
+  (citizen-norm-1 0)
+  (citizen-chick 1)
+  (citizen-fat 2)
+  (citizen-norm-2 3)
+  (crimson-guard-0 4)
+  (tt5 5)
+  (crimson-guard-1 6)
+  (crimson-guard-2 7)
+  (metalhead-grunt 8)
+  (metalhead-flitter 9)
+  (metalhead-predator 10)
+  (bikea 11)
+  (bikeb 12)
+  (bikec 13)
+  (cara 14)
+  (carb 15)
+  (carc 16)
+  (tt17 17)
+  (guard-bike 18)
+  (hellcat 19)
+  (traffic-type-20 20)
+  (traffic-type-21 21)
+  )|#
+
 (defmethod init-params ((this traffic-manager))
-  (let ((traffic-want-counts (new 'stack-no-clear 'array 'int8 21)))
+  (let ((traffic-want-counts (new 'stack-no-clear 'array 'int8 21))
+        (rand (rand-vu-int-range 7 20))
+  )
     (set! (-> traffic-want-counts 11) 8)
     (set! (-> traffic-want-counts 12) 8)
     (set! (-> traffic-want-counts 13) 8)
@@ -460,16 +546,16 @@
     (set! (-> traffic-want-counts 18) 4)
     (set! (-> traffic-want-counts 19) 3)
     (set! (-> traffic-want-counts 20) 0)
-    (set! (-> traffic-want-counts 0) 15)
-    (set! (-> traffic-want-counts 1) 15)
-    (set! (-> traffic-want-counts 2) 14)
+    (set! (-> traffic-want-counts 0) (- 20 rand))
+    (set! (-> traffic-want-counts 1) (- 20 rand))
+    (set! (-> traffic-want-counts 2) (- 20 rand))
     (set! (-> traffic-want-counts 3) 1)
     (set! (-> traffic-want-counts 4) 1)
-    (set! (-> traffic-want-counts 6) 9)
+    (set! (-> traffic-want-counts 6) rand)
     (set! (-> traffic-want-counts 7) 0)
-    (set! (-> traffic-want-counts 8) 14)
-    (set! (-> traffic-want-counts 9) 14)
-    (set! (-> traffic-want-counts 10) 14)
+    (set! (-> traffic-want-counts 8) 20)
+    (set! (-> traffic-want-counts 9) 20)
+    (set! (-> traffic-want-counts 10) 20)
     (set! (-> this fast-spawn) *traffic-fast-spawn*)
     (reset-and-init this)
     (let ((v1-20 (-> this traffic-engine)))

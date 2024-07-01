@@ -259,6 +259,7 @@
   :event (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
     (case message
       (('darkjak)
+      (go target-darkjak-get-off)
        (when (zero? (-> self darkjak want-stage))
          (set! (-> self darkjak want-stage) (the-as darkjak-stage (-> block param 0)))
          #t
@@ -331,7 +332,7 @@
         (suspend)
         )
       )
-    (let ((s5-2 (sound-play "djak-transform")))
+    #|(let ((s5-2 (sound-play "djak-transform")))
       (cond
         ((task-node-open? (game-task-node city-help-kid-battle))
          (ja-channel-push! 1 (seconds 0.1))
@@ -370,7 +371,7 @@
             )
           )
         )
-      )
+      )|#
     (send-event
       *traffic-manager*
       'increase-alert-level
@@ -382,7 +383,7 @@
           2
           )
       )
-    (go target-stance)
+    (go target-darkjak-get-off)
     )
   :post (-> target-grab post)
   )

@@ -2825,6 +2825,7 @@
 
 (defmethod draw-option ((this menu-icon-info-option) (arg0 progress) (arg1 font-context) (arg2 int) (arg3 symbol))
   (set! (-> arg1 alpha) (- 1.0 (-> arg0 menu-transition)))
+  (set-master-mode 'game)
   (let ((a0-1 arg1))
     (set! (-> a0-1 color) (font-color progress))
     )

@@ -692,7 +692,7 @@ For example for an elevator pre-compute the distance between the first and last 
     :notice-nav-radius (meters 2)
     :frustration-distance (meters 8)
     :frustration-time (seconds 4)
-    :blocked-time (seconds 0.3)
+    :blocked-time (seconds 0.0)
     :circle-dist-lo 20480.0
     :circle-dist-hi 61440.0
     :nav-mesh #f
@@ -895,7 +895,7 @@ For example for an elevator pre-compute the distance between the first and last 
   :virtual #t
   :enter (behavior ()
     (sound-play "krew-gets-hit")
-    (let ((t9-2 (-> (method-of-type nav-enemy knocked) enter)))
+    (let ((t9-2 (-> (method-of-type nav-enemy hostile) enter)))
       (if t9-2
           (t9-2)
           )
@@ -971,7 +971,7 @@ For example for an elevator pre-compute the distance between the first and last 
                     )
                  )
             )
-      (set! (-> a0-2 param 1) (* 5.0 (-> arg0 anim-speed)))
+      (set! (-> a0-2 param 1) (* 100.0 (-> arg0 anim-speed)))
       (set! (-> a0-2 frame-num) 0.0)
       (joint-control-channel-group!
         a0-2
@@ -979,6 +979,7 @@ For example for an elevator pre-compute the distance between the first and last 
         num-func-seek!
         )
       )
+      (method-of-type nav-enemy hostile)
     )
   #t
   )

@@ -18,10 +18,10 @@
               )
 
 (define *transport-turret-state-info* (new 'static 'traffic-guard-type-settings
-                                        :acquire-delay (seconds 1.5)
+                                        :acquire-delay (seconds 0.9)
                                         :shot-delay (seconds 0.25)
-                                        :burst-delay (seconds 3)
-                                        :shot-count 2
+                                        :burst-delay (seconds 1)
+                                        :shot-count 4
                                         :rand-shot-count 1
                                         )
         )
@@ -414,14 +414,14 @@
       (when (-> s5-0 proc)
         (set! (-> this spawn-side) (- 1 (the-as int (-> this spawn-side))))
         (if (logtest? (-> this draw status) (draw-control-status on-screen))
-            (set! (-> this last-guard-spawn-time) (+ (current-time) (seconds 1)))
-            (set! (-> this last-guard-spawn-time) (+ (current-time) (seconds 2)))
+            (set! (-> this last-guard-spawn-time) (+ (current-time) (seconds 0.2)))
+            (set! (-> this last-guard-spawn-time) (+ (current-time) (seconds 0.1)))
             )
         (+! (-> this count-guard) 1)
         )
       (when (not (-> s5-0 proc))
         (if (logtest? (-> this draw status) (draw-control-status on-screen))
-            (set! (-> this last-guard-spawn-time) (+ (current-time) (seconds 0.1)))
+            (set! (-> this last-guard-spawn-time) (+ (current-time) (seconds 0.2)))
             (set! (-> this last-guard-spawn-time) (+ (current-time) (seconds 1)))
             )
         )

@@ -112,9 +112,11 @@
 
   (let ((enemy-name (remap-enemy-type-name (-> enemy type)))
         (source (pu&attacker->kill-source (-> attack penetrate-using) (handle->process (-> attack attacker-handle)))))
-
-    (when *debug-segment*
+        (when *debug-segment*
         (format #t "STATS : enemy ~S(~S) killed by ~S~%" enemy-name (-> enemy type symbol) (kill-source->string source)))
+        (when (= p-sage-blue #t)
+            (weight-add)
+          )
 
     (if (or (!= source (kill-stats-source unknown)) (-> *statistics* kill-stats allow-unknown?))
         (increment (-> *statistics* kill-stats) enemy-name source))

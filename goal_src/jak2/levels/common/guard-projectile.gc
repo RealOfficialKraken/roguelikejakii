@@ -695,7 +695,7 @@
     )
   (set-collide-with!
     (-> this root)
-    (collide-spec backgnd jak crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
+    (collide-spec backgnd crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
     )
   (set-collide-as! (-> this root) (collide-spec enemy))
   (set! (-> this root pat-ignore-mask)
@@ -718,7 +718,9 @@
   (set! (-> this part) (create-launch-control (-> *part-group-id-table* 138) this))
   (set! (-> this blast-radius) 16384.0)
   (set! (-> this max-speed) 90112.0)
-  (set! (-> this timeout) (seconds 4))
+  (set! (-> this timeout) (seconds 0))
+  (set! (-> this damage) 6.0)
+  (logior! (-> this options) (projectile-options deal-damage))
   0
   (none)
   )
@@ -775,7 +777,7 @@
       (set! (-> gp-0 radius) (-> self blast-radius))
       (set! (-> gp-0 group) (-> *part-group-id-table* 76))
       (set! (-> gp-0 collide-with)
-            (collide-spec backgnd jak crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
+            (collide-spec backgnd crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
             )
       (set! (-> gp-0 penetrate-using) (penetrate explode))
       (explosion-spawn self explosion gp-0)

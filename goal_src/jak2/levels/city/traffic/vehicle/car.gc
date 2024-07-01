@@ -59,7 +59,7 @@
     :anim 2
     )
   )
-
+(when (= p-upgrade-vehicles #f)
 (define *cara-constants*
   (new 'static 'rigid-body-vehicle-constants
     :info (new 'static 'rigid-body-info
@@ -844,6 +844,795 @@
       (new 'static 'vector :x 1.0 :y 0.6 :z 1.5 :w 1.0)
       )
     )
+  )
+  )
+
+  (when (= p-upgrade-vehicles #t)
+    (define *cara-constants*
+  (new 'static 'rigid-body-vehicle-constants
+    :info (new 'static 'rigid-body-info
+      :mass 8.0
+      :inv-mass 0.125
+      :linear-damping 0.995
+      :angular-damping 0.995
+      :bounce-factor 0.4
+      :friction-factor 0.05
+      :bounce-mult-factor 1.22
+      :cm-offset-joint (new 'static 'vector :w 1.0)
+      :inertial-tensor-box (new 'static 'array meters 3 (meters 4) (meters 3) (meters 6))
+      )
+    :extra (new 'static 'rigid-body-object-extra-info
+      :max-time-step 0.033333335
+      :gravity (meters 40)
+      :idle-distance (meters 50)
+      :attack-force-scale 1.0
+      )
+    :name '*cara-constants*
+    :flags #x68
+    :object-type #xe
+    :guard-type #x7
+    :max-engine-thrust (meters 75)
+    :inv-max-engine-thrust 0.000006260016
+    :engine-response-rate 20.0
+    :engine-intake-factor 1.0
+    :brake-factor 2.25
+    :turbo-boost-factor 1.0
+    :max-xz-speed (meters 40)
+    :ground-probe-distance (meters 4.5)
+    :cos-ground-effect-angle 0.42261824
+    :spring-lift-factor 0.4
+    :air-drag-factor 1.0
+    :steering-thruster-factor 4.0
+    :steering-thruster-max-gain 5.0
+    :steering-thruster-half-gain-speed (meters 15)
+    :tire-friction-factor 1.0
+    :tire-static-friction 1.0
+    :tire-dynamic-friction 0.4
+    :tire-dynamic-friction-speed (meters 2)
+    :tire-inv-max-friction-speed 0.000024414063
+    :airfoil-factor 1.0
+    :drag-force-factor 1.0
+    :speed-scrubbing-drag 10.0
+    :speed-limiting-drag 0.7
+    :pitch-control-factor 0.5
+    :roll-control-factor 1.0
+    :jump-thrust-factor 0.5
+    :buoyancy-factor 1.0
+    :player-weight 163840.0
+    :player-shift-x (meters 0.6)
+    :player-shift-z (meters 1)
+    :target-speed-offset (meters 3)
+    :turning-accel (meters 20)
+    :toughness-factor 1.0
+    :damage-factor 1.0
+    :camera-string-min-height (meters 4.5)
+    :camera-string-max-height (meters 4.5)
+    :camera-string-min-length (meters 5)
+    :camera-string-max-length (meters 12.5)
+    :camera-min-fov 15109.688
+    :camera-max-fov 17476.268
+    :camera-head-offset 8192.0
+    :camera-foot-offset 4096.0
+    :camera-normal-max-angle-offset 5461.3335
+    :camera-air-max-angle-offset 5461.3335
+    :camera-max-lookaround-speed 40960.0
+    :seat-count 3
+    :section-count 4
+    :rider-stance #x1
+    :grab-rail-count 6
+    :grab-rail-array (new 'static 'inline-array vehicle-grab-rail-info 6
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x 4505.6 :y -2662.4 :z 15360.0 :w 1.0)
+          (new 'static 'vector :x -4505.6 :y -2662.4 :z 15360.0 :w 1.0)
+          )
+        :normal (new 'static 'vector :z 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x 7372.8 :y -819.2 :z -4096.0 :w 1.0)
+          (new 'static 'vector :x 7372.8 :y -819.2 :z 4096.0 :w 1.0)
+          )
+        :normal (new 'static 'vector :x 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x -7372.8 :y -819.2 :z 4096.0 :w 1.0)
+          (new 'static 'vector :x -7372.8 :y -819.2 :z -4096.0 :w 1.0)
+          )
+        :normal (new 'static 'vector :x -1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x -3686.4 :y -409.6 :z -14950.4 :w 1.0)
+          (new 'static 'vector :x 3686.4 :y -409.6 :z -14950.4 :w 1.0)
+          )
+        :normal (new 'static 'vector :z -1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x 3837.952 :y -409.6 :z -14950.4 :w 1.0)
+          (new 'static 'vector :x 6041.6 :y -614.4 :z -9011.2 :w 1.0)
+          )
+        :normal (new 'static 'vector :x 0.707 :z -0.707 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x -6041.6 :y -614.4 :z -9011.2 :w 1.0)
+          (new 'static 'vector :x -3837.952 :y -409.6 :z -14950.4 :w 1.0)
+          )
+        :normal (new 'static 'vector :x -0.707 :z -0.707 :w 1.0)
+        )
+      )
+    :seat-array (new 'static 'inline-array vehicle-seat-info 4
+      (new 'static 'vehicle-seat-info
+        :position (new 'static 'vector :x 4079.616 :y 819.2 :z -311.296 :w (the-as float #x30000))
+        )
+      (new 'static 'vehicle-seat-info
+        :position (new 'static 'vector :x -4079.616 :y 819.2 :z -311.296 :w (the-as float #x30000))
+        )
+      (new 'static 'vehicle-seat-info
+        :position (new 'static 'vector :y 3751.936 :z -10563.584 :w (the-as float #x40000))
+        )
+      (new 'static 'vehicle-seat-info)
+      )
+    :rider-hand-offset (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 614.4 :y 614.4 :z 1433.6 :w 1.0)
+      (new 'static 'vector :x 614.4 :y 614.4 :z -1433.6 :w 1.0)
+      )
+    :section-bike-front (new 'static 'vehicle-section-info
+      :damage-seg-array (new 'static 'array uint64 3 #x200 #x20 #x2)
+      :damage-seg-count 3
+      )
+    :section-bike-rear (new 'static 'vehicle-section-info
+      :damage-seg-array (new 'static 'array uint64 3 #x400 #x40 #x4)
+      :damage-seg-count 3
+      )
+    :section-car-front-right (new 'static 'vehicle-section-info
+      :damage-seg-array (new 'static 'array uint64 3 #x800 #x80 #x8)
+      :damage-seg-count 3
+      )
+    :section-car-rear-right (new 'static 'vehicle-section-info
+      :damage-seg-array (new 'static 'array uint64 3 #x1000 #x100 #x10)
+      :damage-seg-count 3
+      )
+    :explosion #f
+    :engine-pitch-scale 0.09
+    :engine-pitch-mod-amp 0.01
+    :engine-sound-select 5
+    :engine-sound (static-sound-name "vehicle-engine")
+    :thrust-sound (static-sound-name "bike-thrust")
+    :scrape-sound (static-sound-name "car-scrape-stn")
+    :glance-sound (static-sound-name "car-glance-stn")
+    :impact-sound (static-sound-name "car-impact-stn")
+    :extra-sound (static-sound-name "car-by-5")
+    :explosion-part #xa1
+    :headlight-count 2
+    :taillight-count 2
+    :thruster-flame-width (meters 0.6)
+    :thruster-flame-length (meters 2)
+    :thruster-local-pos (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 3072.0 :z -14336.0 :w 1.0)
+      (new 'static 'vector :x -3072.0 :z -14336.0 :w 1.0)
+      )
+    :exhaust-local-pos (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 6963.2 :y -1024.0 :z -7372.8 :w 1.0)
+      (new 'static 'vector :x -6963.2 :y -1024.0 :z -7372.8 :w 1.0)
+      )
+    :exhaust-local-dir (new 'static 'inline-array vector 2 (new 'static 'vector :z -1.0 :w 1.0) (new 'static 'vector :z -1.0 :w 1.0))
+    :smoke-local-pos (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 3072.0 :z -13926.4 :w 1.0)
+      (new 'static 'vector :x -3072.0 :z -13926.4 :w 1.0)
+      )
+    :smoke-local-vel (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 12288.0 :w 1.0)
+      (new 'static 'vector :x -12288.0 :w 1.0)
+      )
+    :headlight-local-pos (new 'static 'inline-array vector 3
+      (new 'static 'vector :x 4915.2 :z 15564.8 :w 1.0)
+      (new 'static 'vector :x -4915.2 :z 15564.8 :w 1.0)
+      (new 'static 'vector)
+      )
+    :taillight-local-pos (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 3276.8 :y 3276.8 :z -14131.2 :w 1.0)
+      (new 'static 'vector :x -3276.8 :y 3276.8 :z -14131.2 :w 1.0)
+      )
+    :lift-thruster-count 2
+    :roll-thruster-count 2
+    :steering-thruster-count 2
+    :stabilizer-count 4
+    :inv-lift-thruster-count 0.5
+    :lift-thruster-array (new 'static 'inline-array vehicle-control-point 2
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :y 819.2 :z 8192.0 :w 1.0)
+        :normal (new 'static 'vector :y -1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :y 819.2 :z -8192.0 :w 1.0)
+        :normal (new 'static 'vector :y -1.0 :w 1.0)
+        )
+      )
+    :roll-thruster-array (new 'static 'inline-array vehicle-control-point 2
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :x 6963.2 :y 819.2 :w 1.0)
+        :normal (new 'static 'vector :x 0.3 :y -0.6 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :x -6963.2 :y 819.2 :w 1.0)
+        :normal (new 'static 'vector :x -0.3 :y -0.6 :w 1.0)
+        )
+      )
+    :steering-thruster-array (new 'static 'inline-array vehicle-control-point 2
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z 7782.4 :w 1.0)
+        :normal (new 'static 'vector :x 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z -7782.4 :w 1.0)
+        :normal (new 'static 'vector :x -1.0 :w 1.0)
+        )
+      )
+    :stabilizer-array (new 'static 'inline-array vehicle-control-point 6
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z -8192.0 :w 1.0)
+        :normal (new 'static 'vector :x 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z 8192.0 :w 1.0)
+        :normal (new 'static 'vector :x 1.0 :w 0.5)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :w 1.0)
+        :normal (new 'static 'vector :x 1.0 :w 2.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z -8192.0 :w 1.0)
+        :normal (new 'static 'vector :y 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point)
+      (new 'static 'vehicle-control-point)
+      )
+    :engine-thrust-local-pos (new 'static 'vector :z -5734.4 :w 1.0)
+    :brake-local-pos (new 'static 'vector :z -8192.0 :w 1.0)
+    :color-option-count 3
+    :color-option-array (new 'static 'inline-array vector 3
+      (new 'static 'vector :x 1.0 :y 1.0 :z 1.0 :w 1.0)
+      (new 'static 'vector :x 1.0 :y 0.7 :z 1.0 :w 1.0)
+      (new 'static 'vector :x 1.0 :y 0.7 :z 0.7 :w 1.0)
+      )
+    )
+  )
+
+(define *carb-constants*
+  (new 'static 'rigid-body-vehicle-constants
+    :info (new 'static 'rigid-body-info
+      :mass 6.0
+      :inv-mass 0.16666667
+      :linear-damping 0.995
+      :angular-damping 0.995
+      :bounce-factor 0.4
+      :friction-factor 0.05
+      :bounce-mult-factor 1.22
+      :cm-offset-joint (new 'static 'vector :w 1.0)
+      :inertial-tensor-box (new 'static 'array meters 3 (meters 3) (meters 4) (meters 6))
+      )
+    :extra (new 'static 'rigid-body-object-extra-info
+      :max-time-step 0.033333335
+      :gravity (meters 40)
+      :idle-distance (meters 50)
+      :attack-force-scale 1.0
+      )
+    :name '*carb-constants*
+    :flags #x68
+    :object-type #xf
+    :guard-type #x7
+    :max-engine-thrust (meters 75)
+    :inv-max-engine-thrust 0.0000061035157
+    :engine-response-rate 10.0
+    :engine-intake-factor 1.0
+    :brake-factor 2.25
+    :turbo-boost-factor 1.0
+    :max-xz-speed (meters 40)
+    :ground-probe-distance (meters 4.5)
+    :cos-ground-effect-angle 0.42261824
+    :spring-lift-factor 0.4
+    :air-drag-factor 1.0
+    :steering-thruster-factor 4.0
+    :steering-thruster-max-gain 5.0
+    :steering-thruster-half-gain-speed (meters 15)
+    :tire-friction-factor 1.0
+    :tire-static-friction 1.0
+    :tire-dynamic-friction 0.4
+    :tire-dynamic-friction-speed (meters 2)
+    :tire-inv-max-friction-speed 0.000034877234
+    :airfoil-factor 1.0
+    :drag-force-factor 1.0
+    :speed-scrubbing-drag 10.0
+    :speed-limiting-drag 0.69
+    :pitch-control-factor 0.5
+    :roll-control-factor 1.0
+    :jump-thrust-factor 0.5
+    :buoyancy-factor 1.0
+    :player-weight 163840.0
+    :player-shift-x (meters 0.6)
+    :player-shift-z (meters 1)
+    :target-speed-offset (meters 3)
+    :turning-accel (meters 20)
+    :toughness-factor 1.0
+    :damage-factor 1.0
+    :camera-string-min-height (meters 4.5)
+    :camera-string-max-height (meters 4.5)
+    :camera-string-min-length (meters 5)
+    :camera-string-max-length (meters 12.5)
+    :camera-min-fov 15109.688
+    :camera-max-fov 17476.268
+    :camera-head-offset 8192.0
+    :camera-foot-offset 4096.0
+    :camera-normal-max-angle-offset 5461.3335
+    :camera-air-max-angle-offset 5461.3335
+    :camera-max-lookaround-speed 40960.0
+    :seat-count 3
+    :section-count 4
+    :rider-stance #x1
+    :grab-rail-count 5
+    :grab-rail-array (new 'static 'inline-array vehicle-grab-rail-info 5
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x 6963.2 :y -2048.0 :z -3276.8 :w 1.0)
+          (new 'static 'vector :x 6963.2 :y -2048.0 :z 1638.4 :w 1.0)
+          )
+        :normal (new 'static 'vector :x 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x -6963.2 :y -2048.0 :z 1638.4 :w 1.0)
+          (new 'static 'vector :x -6963.2 :y -2048.0 :z -3276.8 :w 1.0)
+          )
+        :normal (new 'static 'vector :x -1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x 4096.0 :y -1638.4 :z 16384.0 :w 1.0)
+          (new 'static 'vector :x 3891.2 :y -1638.4 :z 16384.0 :w 1.0)
+          )
+        :normal (new 'static 'vector :z 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x -3891.2 :y -1638.4 :z 16384.0 :w 1.0)
+          (new 'static 'vector :x -4096.0 :y -1638.4 :z 16384.0 :w 1.0)
+          )
+        :normal (new 'static 'vector :z 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x -819.2 :y 1024.0 :z -12697.6 :w 1.0)
+          (new 'static 'vector :x 819.2 :y 1024.0 :z -12697.6 :w 1.0)
+          )
+        :normal (new 'static 'vector :z -1.0 :w 1.0)
+        )
+      )
+    :seat-array (new 'static 'inline-array vehicle-seat-info 4
+      (new 'static 'vehicle-seat-info
+        :position (new 'static 'vector :x 4218.88 :y 999.424 :z -172.032 :w (the-as float #x30000))
+        )
+      (new 'static 'vehicle-seat-info
+        :position (new 'static 'vector :x -3891.2 :y 999.424 :z -172.032 :w (the-as float #x30000))
+        )
+      (new 'static 'vehicle-seat-info
+        :position (new 'static 'vector :y 3751.936 :z -8192.0 :w (the-as float #x40000))
+        )
+      (new 'static 'vehicle-seat-info)
+      )
+    :rider-hand-offset (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 122.88 :y -1433.6 :z 614.4 :w 1.0)
+      (new 'static 'vector :x 122.88 :y 1433.6 :z 614.4 :w 1.0)
+      )
+    :section-bike-front (new 'static 'vehicle-section-info
+      :damage-seg-array (new 'static 'array uint64 3 #x200 #x20 #x2)
+      :damage-seg-count 3
+      )
+    :section-bike-rear (new 'static 'vehicle-section-info
+      :damage-seg-array (new 'static 'array uint64 3 #x400 #x40 #x4)
+      :damage-seg-count 3
+      )
+    :section-car-front-right (new 'static 'vehicle-section-info
+      :damage-seg-array (new 'static 'array uint64 3 #x800 #x80 #x8)
+      :damage-seg-count 3
+      )
+    :section-car-rear-right (new 'static 'vehicle-section-info
+      :damage-seg-array (new 'static 'array uint64 3 #x1000 #x100 #x10)
+      :damage-seg-count 3
+      )
+    :explosion #f
+    :engine-pitch-scale 0.25
+    :engine-pitch-mod-amp 0.025
+    :engine-sound-select 6
+    :engine-sound (static-sound-name "vehicle-engine")
+    :thrust-sound (static-sound-name "bike-thrust")
+    :scrape-sound (static-sound-name "car-scrape-stn")
+    :glance-sound (static-sound-name "car-glance-stn")
+    :impact-sound (static-sound-name "car-impact-stn")
+    :extra-sound (static-sound-name "car-by-6")
+    :explosion-part #xa1
+    :headlight-count 2
+    :taillight-count 2
+    :thruster-flame-width (meters 0.6)
+    :thruster-flame-length (meters 2)
+    :thruster-local-pos (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 4096.0 :y 1638.4 :z -13107.2 :w 1.0)
+      (new 'static 'vector :x -4096.0 :y 1638.4 :z -13107.2 :w 1.0)
+      )
+    :exhaust-local-pos (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 6553.6 :y 3072.0 :z -10240.0 :w 1.0)
+      (new 'static 'vector :x -6553.6 :y 3072.0 :z -10240.0 :w 1.0)
+      )
+    :exhaust-local-dir (new 'static 'inline-array vector 2 (new 'static 'vector :z -1.0 :w 1.0) (new 'static 'vector :z -1.0 :w 1.0))
+    :smoke-local-pos (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 4096.0 :y 1638.4 :z -10240.0 :w 1.0)
+      (new 'static 'vector :x -4096.0 :y 1638.4 :z -10240.0 :w 1.0)
+      )
+    :smoke-local-vel (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 12288.0 :w 1.0)
+      (new 'static 'vector :x -12288.0 :w 1.0)
+      )
+    :headlight-local-pos (new 'static 'inline-array vector 3
+      (new 'static 'vector :x 4096.0 :y 2457.6 :z 15155.2 :w 1.0)
+      (new 'static 'vector :x -4096.0 :y 2457.6 :z 15155.2 :w 1.0)
+      (new 'static 'vector)
+      )
+    :taillight-local-pos (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 3891.2 :y 4096.0 :z -12697.6 :w 1.0)
+      (new 'static 'vector :x -3891.2 :y 4096.0 :z -12697.6 :w 1.0)
+      )
+    :lift-thruster-count 2
+    :roll-thruster-count 2
+    :steering-thruster-count 2
+    :stabilizer-count 4
+    :inv-lift-thruster-count 0.5
+    :lift-thruster-array (new 'static 'inline-array vehicle-control-point 2
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :y 819.2 :z 9011.2 :w 1.0)
+        :normal (new 'static 'vector :y -1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :y 819.2 :z -9011.2 :w 1.0)
+        :normal (new 'static 'vector :y -1.0 :w 1.0)
+        )
+      )
+    :roll-thruster-array (new 'static 'inline-array vehicle-control-point 2
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :x 6963.2 :y 819.2 :w 1.0)
+        :normal (new 'static 'vector :x 0.3 :y -0.6 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :x -6963.2 :y 819.2 :w 1.0)
+        :normal (new 'static 'vector :x -0.3 :y -0.6 :w 1.0)
+        )
+      )
+    :steering-thruster-array (new 'static 'inline-array vehicle-control-point 2
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z 7782.4 :w 1.0)
+        :normal (new 'static 'vector :x 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z -7782.4 :w 1.0)
+        :normal (new 'static 'vector :x -1.0 :w 1.0)
+        )
+      )
+    :stabilizer-array (new 'static 'inline-array vehicle-control-point 6
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z -8192.0 :w 1.0)
+        :normal (new 'static 'vector :x 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z 8192.0 :w 1.0)
+        :normal (new 'static 'vector :x 1.0 :w 0.5)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :w 1.0)
+        :normal (new 'static 'vector :x 1.0 :w 2.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z -8192.0 :w 1.0)
+        :normal (new 'static 'vector :y 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point)
+      (new 'static 'vehicle-control-point)
+      )
+    :engine-thrust-local-pos (new 'static 'vector :z -5734.4 :w 1.0)
+    :brake-local-pos (new 'static 'vector :z -8192.0 :w 1.0)
+    :color-option-count 4
+    :color-option-array (new 'static 'inline-array vector 4
+      (new 'static 'vector :x 1.0 :y 1.0 :z 1.0 :w 1.0)
+      (new 'static 'vector :x 1.0 :y 0.7 :z 1.0 :w 1.0)
+      (new 'static 'vector :x 1.0 :y 0.7 :z 0.7 :w 1.0)
+      (new 'static 'vector :x 0.6 :y 1.0 :z 0.8 :w 1.0)
+      )
+    )
+  )
+
+(define *carc-constants*
+  (new 'static 'rigid-body-vehicle-constants
+    :info (new 'static 'rigid-body-info
+      :mass 9.0
+      :inv-mass 0.11111111
+      :linear-damping 0.995
+      :angular-damping 0.995
+      :bounce-factor 0.4
+      :friction-factor 0.05
+      :bounce-mult-factor 1.22
+      :cm-offset-joint (new 'static 'vector :z -4096.0 :w 1.0)
+      :inertial-tensor-box (new 'static 'array meters 3 (meters 3) (meters 4) (meters 6))
+      )
+    :extra (new 'static 'rigid-body-object-extra-info
+      :max-time-step 0.033333335
+      :gravity (meters 40)
+      :idle-distance (meters 50)
+      :attack-force-scale 1.0
+      )
+    :name '*carc-constants*
+    :flags #x68
+    :object-type #x10
+    :guard-type #x7
+    :max-engine-thrust (meters 75)
+    :inv-max-engine-thrust 0.0000069754465
+    :engine-response-rate 10.0
+    :engine-intake-factor 1.0
+    :brake-factor 2.25
+    :turbo-boost-factor 1.0
+    :max-xz-speed (meters 40)
+    :ground-probe-distance (meters 4.5)
+    :cos-ground-effect-angle 0.42261824
+    :spring-lift-factor 0.4
+    :air-drag-factor 1.0
+    :steering-thruster-factor 4.0
+    :steering-thruster-max-gain 5.0
+    :steering-thruster-half-gain-speed (meters 15)
+    :tire-friction-factor 1.0
+    :tire-static-friction 1.0
+    :tire-dynamic-friction 0.4
+    :tire-dynamic-friction-speed (meters 2)
+    :tire-inv-max-friction-speed 0.000024414063
+    :airfoil-factor 1.0
+    :drag-force-factor 1.0
+    :speed-scrubbing-drag 10.0
+    :speed-limiting-drag 0.7
+    :pitch-control-factor 0.5
+    :roll-control-factor 1.0
+    :jump-thrust-factor 0.5
+    :buoyancy-factor 1.0
+    :player-weight 163840.0
+    :player-shift-x (meters 0.6)
+    :player-shift-z (meters 1)
+    :target-speed-offset (meters -2)
+    :turning-accel (meters 15)
+    :toughness-factor 1.0
+    :damage-factor 1.0
+    :camera-string-min-height (meters 4.5)
+    :camera-string-max-height (meters 4.5)
+    :camera-string-min-length (meters 5)
+    :camera-string-max-length (meters 12.5)
+    :camera-min-fov 15109.688
+    :camera-max-fov 17476.268
+    :camera-head-offset 8192.0
+    :camera-foot-offset 4096.0
+    :camera-normal-max-angle-offset 5461.3335
+    :camera-air-max-angle-offset 5461.3335
+    :camera-max-lookaround-speed 40960.0
+    :seat-count 4
+    :section-count 4
+    :rider-stance #x1
+    :grab-rail-count 9
+    :grab-rail-array (new 'static 'inline-array vehicle-grab-rail-info 9
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x 5324.8 :y -819.2 :z -4096.0 :w 1.0)
+          (new 'static 'vector :x 5324.8 :y -819.2 :z 2048.0 :w 1.0)
+          )
+        :normal (new 'static 'vector :x 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x -5324.8 :y -819.2 :z 2048.0 :w 1.0)
+          (new 'static 'vector :x -5324.8 :y -819.2 :z -4096.0 :w 1.0)
+          )
+        :normal (new 'static 'vector :x -1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x 3276.8 :y -204.8 :z 9830.4 :w 1.0)
+          (new 'static 'vector :y -204.8 :z 10547.2 :w 1.0)
+          )
+        :normal (new 'static 'vector :z 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :y -204.8 :z 10547.2 :w 1.0)
+          (new 'static 'vector :x -3276.8 :y -204.8 :z 9830.4 :w 1.0)
+          )
+        :normal (new 'static 'vector :z 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x -204.8 :y 3276.8 :z -20889.6 :w 1.0)
+          (new 'static 'vector :x 204.8 :y 3276.8 :z -20889.6 :w 1.0)
+          )
+        :normal (new 'static 'vector :z -1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x 3072.0 :y 3481.6 :z -19660.8 :w 1.0)
+          (new 'static 'vector :x 3891.2 :y 3481.6 :z -16793.6 :w 1.0)
+          )
+        :normal (new 'static 'vector :x 0.707 :z -0.707 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x -3891.2 :y 3481.6 :z -16793.6 :w 1.0)
+          (new 'static 'vector :x -3072.0 :y 3481.6 :z -19660.8 :w 1.0)
+          )
+        :normal (new 'static 'vector :x -0.707 :z -0.707 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x 4915.2 :z -14745.6 :w 1.0)
+          (new 'static 'vector :x 4915.2 :z -12697.6 :w 1.0)
+          )
+        :normal (new 'static 'vector :x 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-grab-rail-info
+        :local-pos (new 'static 'inline-array vector 2
+          (new 'static 'vector :x -4915.2 :z -12697.6 :w 1.0)
+          (new 'static 'vector :x -4915.2 :z -14745.6 :w 1.0)
+          )
+        :normal (new 'static 'vector :x -1.0 :w 1.0)
+        )
+      )
+    :seat-array (new 'static 'inline-array vehicle-seat-info 4
+      (new 'static 'vehicle-seat-info
+        :position (new 'static 'vector :y 761.856 :z 1368.064 :w (the-as float #x10000))
+        )
+      (new 'static 'vehicle-seat-info
+        :position (new 'static 'vector :x -2867.2 :y 1638.4 :z -2867.2 :w (the-as float #x20000))
+        )
+      (new 'static 'vehicle-seat-info
+        :position (new 'static 'vector :x 2867.2 :y 1638.4 :z -2867.2 :w (the-as float #x20000))
+        )
+      (new 'static 'vehicle-seat-info
+        :position (new 'static 'vector :y 4239.36 :z -14192.64 :w (the-as float #x40000))
+        )
+      )
+    :rider-hand-offset (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 696.32 :y -1433.6 :z 614.4 :w 1.0)
+      (new 'static 'vector :x 696.32 :y 1433.6 :z 614.4 :w 1.0)
+      )
+    :section-bike-front (new 'static 'vehicle-section-info
+      :damage-seg-array (new 'static 'array uint64 3 #x200 #x20 #x2)
+      :damage-seg-count 3
+      )
+    :section-bike-rear (new 'static 'vehicle-section-info
+      :damage-seg-array (new 'static 'array uint64 3 #x400 #x40 #x4)
+      :damage-seg-count 3
+      )
+    :section-car-front-right (new 'static 'vehicle-section-info
+      :damage-seg-array (new 'static 'array uint64 3 #x800 #x80 #x8)
+      :damage-seg-count 3
+      )
+    :section-car-rear-right (new 'static 'vehicle-section-info
+      :damage-seg-array (new 'static 'array uint64 3 #x1000 #x100 #x10)
+      :damage-seg-count 3
+      )
+    :explosion #f
+    :engine-pitch-scale 0.25
+    :engine-pitch-mod-amp 0.025
+    :engine-sound-select 7
+    :engine-sound (static-sound-name "vehicle-engine")
+    :thrust-sound (static-sound-name "bike-thrust")
+    :scrape-sound (static-sound-name "car-scrape-stn")
+    :glance-sound (static-sound-name "car-glance-stn")
+    :impact-sound (static-sound-name "car-impact-stn")
+    :extra-sound (static-sound-name "car-by-7")
+    :explosion-part #xa1
+    :headlight-count 1
+    :taillight-count 2
+    :thruster-flame-width (meters 0.6)
+    :thruster-flame-length (meters 2)
+    :thruster-local-pos (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 3891.2 :z -15155.2 :w 1.0)
+      (new 'static 'vector :x -3891.2 :z -15155.2 :w 1.0)
+      )
+    :exhaust-local-pos (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 2457.6 :y 3481.6 :z -20480.0 :w 1.0)
+      (new 'static 'vector :x -2457.6 :y 3481.6 :z -20480.0 :w 1.0)
+      )
+    :exhaust-local-dir (new 'static 'inline-array vector 2
+      (new 'static 'vector :x -0.4 :z -0.92 :w 1.0)
+      (new 'static 'vector :x 0.4 :z -0.92 :w 1.0)
+      )
+    :smoke-local-pos (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 4096.0 :y 2048.0 :z -14336.0 :w 1.0)
+      (new 'static 'vector :x -4096.0 :y 2048.0 :z -14336.0 :w 1.0)
+      )
+    :smoke-local-vel (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 12288.0 :w 1.0)
+      (new 'static 'vector :x -12288.0 :w 1.0)
+      )
+    :headlight-local-pos (new 'static 'inline-array vector 3
+      (new 'static 'vector :y 409.6 :z 8601.6 :w 1.0)
+      (new 'static 'vector)
+      (new 'static 'vector)
+      )
+    :taillight-local-pos (new 'static 'inline-array vector 2
+      (new 'static 'vector :x 2867.2 :y 2048.0 :z -18022.4 :w 1.0)
+      (new 'static 'vector :x -2867.2 :y 2048.0 :z -18022.4 :w 1.0)
+      )
+    :lift-thruster-count 2
+    :roll-thruster-count 2
+    :steering-thruster-count 2
+    :stabilizer-count 4
+    :inv-lift-thruster-count 0.5
+    :lift-thruster-array (new 'static 'inline-array vehicle-control-point 2
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z 4915.2 :w 1.0)
+        :normal (new 'static 'vector :y -1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z -13107.2 :w 1.0)
+        :normal (new 'static 'vector :y -1.0 :w 1.0)
+        )
+      )
+    :roll-thruster-array (new 'static 'inline-array vehicle-control-point 2
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :x 6963.2 :y 819.2 :z -4096.0 :w 1.0)
+        :normal (new 'static 'vector :x 0.3 :y -0.6 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :x -6963.2 :y 819.2 :z -4096.0 :w 1.0)
+        :normal (new 'static 'vector :x -0.3 :y -0.6 :w 1.0)
+        )
+      )
+    :steering-thruster-array (new 'static 'inline-array vehicle-control-point 2
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z 3686.4 :w 1.0)
+        :normal (new 'static 'vector :x 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z -11878.4 :w 1.0)
+        :normal (new 'static 'vector :x -1.0 :w 1.0)
+        )
+      )
+    :stabilizer-array (new 'static 'inline-array vehicle-control-point 6
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z -12288.0 :w 1.0)
+        :normal (new 'static 'vector :x 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z 4096.0 :w 1.0)
+        :normal (new 'static 'vector :x 1.0 :w 0.5)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z -4096.0 :w 1.0)
+        :normal (new 'static 'vector :x 1.0 :w 2.0)
+        )
+      (new 'static 'vehicle-control-point
+        :local-pos (new 'static 'vector :z -12288.0 :w 1.0)
+        :normal (new 'static 'vector :y 1.0 :w 1.0)
+        )
+      (new 'static 'vehicle-control-point)
+      (new 'static 'vehicle-control-point)
+      )
+    :engine-thrust-local-pos (new 'static 'vector :z -9830.4 :w 1.0)
+    :brake-local-pos (new 'static 'vector :z -12288.0 :w 1.0)
+    :color-option-count 4
+    :color-option-array (new 'static 'inline-array vector 4
+      (new 'static 'vector :x 1.0 :y 1.0 :z 1.0 :w 1.0)
+      (new 'static 'vector :x 0.6 :y 1.2 :z 1.2 :w 1.0)
+      (new 'static 'vector :x 0.7 :y 1.25 :z 0.8 :w 1.0)
+      (new 'static 'vector :x 1.0 :y 0.6 :z 1.5 :w 1.0)
+      )
+    )
+  )
   )
 
 (define *hellcat-constants*

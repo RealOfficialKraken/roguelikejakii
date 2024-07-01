@@ -90,7 +90,7 @@
    (fast-elevator? symbol)
    (fast-progress? symbol)
    (minimap-force-north   symbol)
-
+   
    (stats   statistics)
 
    ;; gfx
@@ -147,7 +147,7 @@
   (false! (-> obj minimap-force-north))
   (false! (-> obj hires-clouds?))
   (set! (-> obj speedrunner-mode-custom-bind) 0)
-
+  
   (cond
     ((and (= *default-territory* GAME_TERRITORY_SCEE) (= (-> obj text-language) (pc-language english)))
       (set! (-> obj text-language) (pc-language uk-english))
@@ -175,7 +175,7 @@
   (clear-all! (-> obj music-unlocked))
   (dotimes (i 6)
     (set! (-> obj flava-unlocked i) #f))
-
+  
   (set! (-> obj stats) *statistics*)
   (initialize (-> obj stats kill-stats))
   0)
@@ -269,7 +269,7 @@
                               :hijack-speech-chance 0.45
 
                               :sewer-valve-target-seconds 75
-
+                              
                               :kill-civvie-target 40
                               :kill-car-target 20
                               ))

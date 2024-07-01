@@ -22,12 +22,12 @@ jobs:
     uses: open-goal/mod-bundling-tools/.github/workflows/mod-bundler.yml@v1
     with:
       semverBump: ${{ inputs.bump }}
-      metadataName: "Test Mod Bundle"
-      metadataDescription: "This is a test mod bundle. 2"
-      metadataSupportedGames: "jak1"
-      metadataAuthors: "barg,vaser"
-      metadataTags: "rng,gameplay-mod"
-      metadataWebsiteUrl: "https://www.example.com/this/is/optional"
+      metadataName: "Roguelike Jak 2"
+      metadataDescription: "The Jak Time Loop is broken! To restore it, Jak must fight through random missions that grow more unstable the further you venture. As the enemies get stronger, so can you! With Vin's help, Jak must blast his way back into the metalhead nest, and restore his destiny."
+      metadataSupportedGames: "jak2"
+      metadataAuthors: "Kraken"
+      metadataTags: "rng,gameplay-mod,challenge"
+      metadataWebsiteUrl: "https://github.com/RealOfficialKraken/roguelikejakii"
       skipMacOS: true
       skipLinux: true
       toolingBinaryDir: "out/build/Release/bin"
