@@ -196,6 +196,7 @@ This commonly includes things such as:
 (and
 (not (string= arg0 "red"))
 (not (string= arg0 "blue"))
+(not (string= arg0 "dark"))
 (not (string= arg0 "redrof"))
 (not (string= arg0 "damage"))
 (not (string= arg0 "ammo"))

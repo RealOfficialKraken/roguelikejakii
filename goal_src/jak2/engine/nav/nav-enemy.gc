@@ -1436,6 +1436,52 @@
                          (-> *FACT-bank* default-eco-pill-green-inc)
                          )
         )
+        (when (rand-vu-percent? 0.33)
+    (set! (-> this fact pickup-type) (pickup-type ammo-random))
+    (set! (-> this fact pickup-amount) 1.0)
+  )
+  (when 
+  (and
+  (>= (-> *game-info* karma) 5.0)
+  (rand-vu-percent? 0.065)
+  )
+    (set! (-> this fact pickup-type) (pickup-type eco-yellow))
+    (set! (-> this fact pickup-amount) 1.0)
+    (color-light-eco)
+  )
+        (when (and (rand-vu-percent? (- luck 0.04))) ;drop orbs off luck stat
+    (set! (-> this fact pickup-type) (pickup-type skill))
+    (set! (-> this fact pickup-amount) 1.0)
+    (when (rand-vu-percent? (/ luck 4))
+      (set! (-> this fact pickup-amount) 3.0)
+    )
+    (when (rand-vu-percent? (/ luck 12))
+      (set! (-> this fact pickup-amount) 6.0)
+    )
+    (when (rand-vu-percent? (/ luck 64))
+      (set! (-> this fact pickup-amount) 12.0)
+    )
+    (when (rand-vu-percent? (/ luck 150))
+      (set! (-> this fact pickup-amount) 24.0)
+    )
+    (when (rand-vu-percent? (/ luck 400))
+      (set! (-> this fact pickup-amount) 48.0)
+    )
+    (print "
+spawned-orb-entity
+")
+  )
+  (when ;drop health when HP isn't 0 off luck stat
+  (and 
+  (rand-vu-percent? (- luck 0.086))
+  (!= (-> *target* fact health) 8.0)
+  )
+    (set! (-> this fact pickup-type) (pickup-type health))
+    (set! (-> this fact pickup-amount) 2.0)
+    (print "
+spawned-health-entity
+")
+  )
   (let ((a1-9 (if (logtest? (enemy-option multi-focus) (-> this fact enemy-options))
                   1030
                   1026
