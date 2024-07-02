@@ -732,6 +732,8 @@ This commonly includes things such as:
   (set! autosave-delayed #t)
   (set! enemy-drop-weapon-once #f)
   (set! challenge-mission 0)
+  (set! d-challenge-failed #f)
+  (set! d-challenge-won #f)
   (set! machine-locked? #f)
   (when (= (-> *game-info* total-trys) 4)
     (set! menu-value 5.0)

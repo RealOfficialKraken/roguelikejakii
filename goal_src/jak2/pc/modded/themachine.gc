@@ -150,7 +150,7 @@
 (set! machine-prompt? #f)
 )
 
-(when (and (= machine-prompt? #t)(= avoidc-waitb #f)(= machine-locked? #f)(= in-machine? #f)) ;draw interact button
+(when (and (= machine-prompt? #t)(= avoidc-waitb #f)(= machine-locked? #f)(= in-machine? #f)(= (paused?) #f)(= pause-allowed? #t) *target* (= in-hub? #f)) ;draw interact button
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "<COLOR_RED>R3<COLOR_WHITE>:<COLOR_ORANGE> Access Machine <COLOR_PINK>(15 Tokens)~%<COLOR_ORANGE>Current Tokens: <COLOR_PINK>~d"
@@ -166,7 +166,7 @@
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
 
-(when (and (= machine-prompt? #t)(= machine-locked? #t)(= in-machine? #f)) ;draw interact button
+(when (and (= machine-prompt? #t)(= machine-locked? #t)(= in-machine? #f)(= (paused?) #f)(= pause-allowed? #t) *target* (= in-hub? #f)) ;draw interact button
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "<COLOR_RED>The Machine stopped working...~%<COLOR_ORANGE>Current Tokens: <COLOR_PINK>~d"
@@ -182,7 +182,7 @@
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
 
-(when (= d-challenge-failed #t)
+(when (and (= d-challenge-failed #t)(= (paused?) #f)(= pause-allowed? #t) *target* (= in-hub? #f))
     (+! d-cfi 1)
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
@@ -202,7 +202,7 @@
         )
 )
 
-(when (= d-challenge-won #t)
+(when (and (= d-challenge-won #t)(= (paused?) #f)(= pause-allowed? #t) *target* (= in-hub? #f))
     (+! d-cwi 1)
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
