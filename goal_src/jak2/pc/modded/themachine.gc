@@ -3,9 +3,38 @@
 
 ;; name: themachine.gc
 
+(define machine-current-pos (new 'static 'vector :x (meters 0.0) :y (meters 0.0) :z (meters 0.0) :w 1.0))
+(define hideout-machine-spawn-pos (new 'static 'vector :x (meters 1136.4810) :y (meters 8.0) :z (meters 3.2301) :w 1.0))
+(define port-machine-spawn-pos (new 'static 'vector :x (meters -62.8353) :y (meters 8.9) :z (meters 1323.0412) :w 1.0))
+(define sewer-machine-spawn-pos (new 'static 'vector :x (meters 1352.5213) :y (meters -42.85) :z (meters 483.4087) :w 1.0))
+(define strip-machine-spawn-pos (new 'static 'vector :x (meters 2373.8669) :y (meters 69.8985) :z (meters -35.3681) :w 1.0))
+(define mountain-machine-spawn-pos (new 'static 'vector :x (meters -741.1651) :y (meters 80.9000) :z (meters 13.4026) :w 1.0))
+(define ruins-machine-spawn-pos (new 'static 'vector :x (meters 907.4705) :y (meters 0.1) :z (meters -400.1474) :w 1.0))
+(define markb-machine-spawn-pos (new 'static 'vector :x (meters 520.5573) :y (meters 9.7) :z (meters 414.9625) :w 1.0))
+(define atoll-machine-spawn-pos (new 'static 'vector :x (meters 579.5821) :y (meters 0.6) :z (meters -851.6854) :w 1.0))
+(define forest-machine-spawn-pos (new 'static 'vector :x (meters -598.8101) :y (meters 30.8) :z (meters 579.3311) :w 1.0))
 
-(define hideout-machine-spawn-pos (new 'static 'vector :x (meters 1136.4810) :y (meters 8.0) :z (meters 3.2301) :w 1.0))
-(define hideout-machine-spawn-pos (new 'static 'vector :x (meters 1136.4810) :y (meters 8.0) :z (meters 3.2301) :w 1.0))
+(define reward-string "")
+
+(define wait-machine #f)
+(define wait-machinei 0)
+
+(define waite-machine #f)
+(define waite-machinei 0)
+
+(define machine-locked? #f)
+
+(define machine-distance 0)
+(define machine-spawning? #t)
+(define in-machine? #f)
+(define machine-talk? #f)
+(define machine-prompt? #f)
+
+(defun-extern machine-run (none))
+(defun-extern machine-exit (none))
+(defun-extern recieve-reward (none))
+
+(define machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
 
 
 (declare-type whack-a-metal process-drawable)
@@ -104,45 +133,757 @@
   (none)
 )
 
+(define machine-interact-rad 30000.0)
+(define machine-spawn-rad 800000.0)
 
 
 (defun machine-update ()
-(when 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;MACHINE PARAMS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when ;display interact prompt
 (and
 (= machine-spawning? #t)
-(not (ppointer->process *machine-tracker*))
-(< (vector-vector-distance (target-pos 0) hideout-machine-spawn-pos) 400000.0)
+(ppointer->process *machine-tracker*)
+(< (vector-vector-distance (target-pos 0) machine-current-pos) machine-interact-rad)
+(= popup-shop #f)
+(= avoidc-waitb #f)
+(= machine-prompt? #f)
 )
-(process-spawn chip-whack-a-metal hideout-machine-spawn-pos)
-(set! *machine-tracker* (process-spawn chip-whack-a-metal hideout-machine-spawn-pos))
-(format #t "
-spawned process chip-whack-a-metal
-")
+(set! machine-prompt? #t)
+)
+
+(when ;dont display interact prompt
+(and
+(= machine-spawning? #t)
+(ppointer->process *machine-tracker*)
+(> (vector-vector-distance (target-pos 0) machine-current-pos) machine-interact-rad)
+(= popup-shop #f)
+(= machine-prompt? #t)
+)
+(set! machine-prompt? #f)
+)
+
+(when (and (= machine-prompt? #t)(= avoidc-waitb #f)(= machine-locked? #f)(= in-machine? #f)) ;draw interact button
+    (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_RED>R3<COLOR_WHITE>:<COLOR_ORANGE> Access Machine"
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 0 245 0.0 (font-color default) (font-flags shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+
+(when (and (= machine-prompt? #t)(= machine-locked? #t)(= in-machine? #f)) ;draw interact button
+    (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_RED>The Machine stopped working..."
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 0 245 0.0 (font-color default) (font-flags shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+
+(when (= d-challenge-failed #t)
+    (+! d-cfi 1)
+    (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_RED>CHALLENGE FAILED~%<COLOR_ORANGE>Try again in the next one"
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 20 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+        (when (>= d-cfi 600)
+            (set! d-cfi 0)
+            (set! d-challenge-failed #f)
+        )
+)
+
+(when (= d-challenge-won #t)
+    (+! d-cwi 1)
+    (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_GREEN>CHALLENGE SUCCESS!~%<COLOR_ORANGE>You won ~s"
+    reward-string
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 20 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+        (when (>= d-cwi 600)
+            (set! d-cwi 0)
+            (set! d-challenge-won #f)
+        )
 )
 
 (when 
 (and
-(= machine-spawning? #t)
-(ppointer->process *machine-tracker*)
-(> (vector-vector-distance (target-pos 0) hideout-machine-spawn-pos) 400000.0)
+(= challenge-mission 2)
+(<= c-stored-orbs (-> *game-info* skill))
 )
-(kill-by-name "chip-whack-a-metal" *default-pool*)
-(set! *machine-tracker* #f)
-(format #t "
-killed chip-whack-a-metal
-")
+    (set! challenge-win? #t)
+    (set! challenge-completed? #t)
+    (set! d-challenge-won #t)
 )
+
+(when (and (= machine-locked? #f)(= machine-prompt? #t) (cpad-pressed? 0 r3) (= avoidc-waitb #f)(= in-machine? #f)(= in-hub? #f)) ;run camera and jak position-settings
+    (machine-run)
+)
+
+(when (and (= waite-machine #t)) ;wait for camera then run machine
+    (+! waite-machinei 1)
+    (when (= waite-machinei 7)
+        (machine-exit)
+        (set! waite-machine #f)
+        (set! waite-machinei 0)
+    )
+)
+
+(when (and (= wait-machine #t)) ;wait for camera then run machine
+(+! wait-machinei 1)
+(when (= wait-machinei 50)
+    (set-setting-by-param *setting-control* 'mode-name 'cam-really-fixed 0 0)
+    (set! wait-machinei 0)
+    (set! wait-machine #f)
+    (set! in-machine? #t)
+    (set! in-dialogue? #t)
+    (set! log-id (rand-vu-int-range 10 11))
+    (set! log-sec 0)
+    (set! machine-locked? #t)
+    (let ((rnd (rand-vu-int-range 1 6)))
+        (when (= rnd 1)
+            (set! di-s "Welcome to the Machine.")
+            (set! di-s2 "Here's whats on the agenda for today's challenge.") 
+            (set! di-s3 "")
+            (set! di-s4 "")
+        )
+        (when (= rnd 2)
+            (set! di-s "Greetings from the Machine!")
+            (set! di-s2 "Are you ready for a challenge, with a reward?") 
+            (set! di-s3 "")
+            (set! di-s4 "")
+        )
+        (when (= rnd 3)
+            (set! di-s "Welcome to the Machine.")
+            (set! di-s2 "Here's the gist of this stage's challenge") 
+            (set! di-s3 "")
+            (set! di-s4 "")
+        )
+        (when (= rnd 4)
+            (set! di-s "WELCOME TO THE MACHINE")
+            (set! di-s2 "PRESENTING TODAY'S CHALLENGE:") 
+            (set! di-s3 "")
+            (set! di-s4 "")
+        )
+        (when (= rnd 5)
+            (set! di-s "Machine Updated.")
+            (set! di-s2 "Your next challenge is...") 
+            (set! di-s3 "")
+            (set! di-s4 "")
+        )
+        (when (= rnd 6)
+            (set! di-s "The Challenge Machine")
+            (set! di-s2 "Complete a random challenge to gain a random reward.") 
+            (set! di-s3 "")
+            (set! di-s4 "")
+        )
+    )
+)
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;LOG SECTION;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when 
+(and
+    (= in-dialogue? #t)
+    (= log-id 10)
+    (cpad-pressed? 0 x)
+)
+    (+! log-sec 1)
+    (when (= log-sec 1)
+        (set! di-s "You must proceed past the next stage")
+        (set! di-s2 "") 
+        (set! di-s3 "")
+        (set! di-s4 "")
+    )
+    (when (= log-sec 2)
+        (set! di-s "Without taking damage!")
+        (set! di-s2 "Complete the next level flawlessly") 
+        (set! di-s3 "")
+        (set! di-s4 "")
+    )
+    (when (= log-sec 3)
+        (set! di-s "After the level completion you will get")
+        (set! di-s2 "an extra reward alongside your orbs!") 
+        (set! di-s3 "")
+        (set! di-s4 "")
+    )
+    (when (= log-sec 4)
+        (set! di-s "...")
+        (set! di-s2 "") 
+        (set! di-s3 "")
+        (set! di-s4 "")
+    )
+    (when (= log-sec 5)
+        (set! di-s "")
+        (set! di-s2 "") 
+        (set! di-s3 "")
+        (set! di-s4 "")
+        (set! waite-machine #t)
+        (set! challenge-win? #t)
+        (set! challenge-mission 1)
+        (set! in-dialogue? #f)
+    )
+)
+
 
 (when 
 (and
-(ppointer->process *machine-tracker*)
-(= machine-spawning? #f)
+    (= in-dialogue? #t)
+    (= log-id 11)
+    (cpad-pressed? 0 x)
 )
-(kill-by-name "chip-whack-a-metal" *default-pool*)
-(set! *machine-tracker* #f)
-(format #t "
-killed chip-whack-a-metal
-")
+    (+! log-sec 1)
+    (when (= log-sec 1)
+        (set! di-s "You must proceed past the next stage")
+        (set! di-s2 "") 
+        (set! di-s3 "")
+        (set! di-s4 "")
+    )
+    (when (= log-sec 2)
+        (set! di-s "...And collect at least 10 orbs!")
+        (set! di-s2 "") 
+        (set! di-s3 "")
+        (set! di-s4 "")
+    )
+    (when (= log-sec 3)
+        (set! di-s "After the level completion you will get")
+        (set! di-s2 "an extra reward alongside your orbs!") 
+        (set! di-s3 "")
+        (set! di-s4 "")
+    )
+    (when (= log-sec 4)
+        (set! di-s "...")
+        (set! di-s2 "") 
+        (set! di-s3 "")
+        (set! di-s4 "")
+    )
+    (when (= log-sec 5)
+        (set! di-s "")
+        (set! di-s2 "") 
+        (set! di-s3 "")
+        (set! di-s4 "")
+        (set! waite-machine #t)
+        (set! c-stored-orbs (-> *game-info* skill))
+        (set! in-dialogue? #f)
+        (+! c-stored-orbs 10.0)
+        (set! challenge-mission 2)
+    )
+
 )
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;SPAWN LOCATIONS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;HIDEOUT;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (= (-> (level-get-target-inside *level*) name) 'ctysluma)
+    (let (
+        (vec-spawn hideout-machine-spawn-pos)
+        (which-area "ctysluma")
+    )
+        (when 
+    (and
+        (= machine-spawning? #t)
+        (not (ppointer->process *machine-tracker*))
+        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (process-spawn chip-whack-a-metal vec-spawn)
+        (set! machine-current-pos vec-spawn)
+        (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
+        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
+        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (= machine-spawning? #t)
+        (ppointer->process *machine-tracker*)
+        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (ppointer->process *machine-tracker*)
+        (= machine-spawning? #f)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+    )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CTYPORT;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (= (-> (level-get-target-inside *level*) name) 'ctyport)
+    (let (
+        (vec-spawn port-machine-spawn-pos)
+        (which-area "ctyport")
+    )
+        (when 
+    (and
+        (= machine-spawning? #t)
+        (not (ppointer->process *machine-tracker*))
+        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (process-spawn chip-whack-a-metal vec-spawn)
+        (set! machine-current-pos vec-spawn)
+        (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
+        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
+        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (= machine-spawning? #t)
+        (ppointer->process *machine-tracker*)
+        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (ppointer->process *machine-tracker*)
+        (= machine-spawning? #f)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+    )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;SEWERS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (= (-> (level-get-target-inside *level*) name) 'sewer)
+    (let (
+        (vec-spawn sewer-machine-spawn-pos)
+        (which-area "sewers")
+    )
+        (when 
+    (and
+        (= machine-spawning? #t)
+        (not (ppointer->process *machine-tracker*))
+        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (process-spawn chip-whack-a-metal vec-spawn)
+        (set! machine-current-pos vec-spawn)
+        (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
+        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
+        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (= machine-spawning? #t)
+        (ppointer->process *machine-tracker*)
+        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (ppointer->process *machine-tracker*)
+        (= machine-spawning? #f)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+    )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;STRIP;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (= (-> (level-get-target-inside *level*) name) 'strip)
+    (let (
+        (vec-spawn strip-machine-spawn-pos)
+        (which-area "strip")
+    )
+        (when 
+    (and
+        (= machine-spawning? #t)
+        (not (ppointer->process *machine-tracker*))
+        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (process-spawn chip-whack-a-metal vec-spawn)
+        (set! machine-current-pos vec-spawn)
+        (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
+        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
+        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (= machine-spawning? #t)
+        (ppointer->process *machine-tracker*)
+        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (ppointer->process *machine-tracker*)
+        (= machine-spawning? #f)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+    )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;MOUNTAIN;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (= (-> (level-get-target-inside *level*) name) 'mountain)
+    (let (
+        (vec-spawn mountain-machine-spawn-pos)
+        (which-area "mountain")
+    )
+        (when 
+    (and
+        (= machine-spawning? #t)
+        (not (ppointer->process *machine-tracker*))
+        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (process-spawn chip-whack-a-metal vec-spawn)
+        (set! machine-current-pos vec-spawn)
+        (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
+        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
+        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (= machine-spawning? #t)
+        (ppointer->process *machine-tracker*)
+        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (ppointer->process *machine-tracker*)
+        (= machine-spawning? #f)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+    )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;RUINS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (= (-> (level-get-target-inside *level*) name) 'ruins)
+    (let (
+        (vec-spawn ruins-machine-spawn-pos)
+        (which-area "ruins")
+    )
+        (when 
+    (and
+        (= machine-spawning? #t)
+        (not (ppointer->process *machine-tracker*))
+        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (process-spawn chip-whack-a-metal vec-spawn)
+        (set! machine-current-pos vec-spawn)
+        (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
+        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
+        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (= machine-spawning? #t)
+        (ppointer->process *machine-tracker*)
+        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (ppointer->process *machine-tracker*)
+        (= machine-spawning? #f)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+    )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;MARKB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (= (-> (level-get-target-inside *level*) name) 'ctymarkb)
+    (let (
+        (vec-spawn markb-machine-spawn-pos)
+        (which-area "markb")
+    )
+        (when 
+    (and
+        (= machine-spawning? #t)
+        (not (ppointer->process *machine-tracker*))
+        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (process-spawn chip-whack-a-metal vec-spawn)
+        (set! machine-current-pos vec-spawn)
+        (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
+        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
+        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (= machine-spawning? #t)
+        (ppointer->process *machine-tracker*)
+        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (ppointer->process *machine-tracker*)
+        (= machine-spawning? #f)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+    )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;ATOLL;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (= (-> (level-get-target-inside *level*) name) 'atoll)
+    (let (
+        (vec-spawn atoll-machine-spawn-pos)
+        (which-area "atoll")
+    )
+        (when 
+    (and
+        (= machine-spawning? #t)
+        (not (ppointer->process *machine-tracker*))
+        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (process-spawn chip-whack-a-metal vec-spawn)
+        (set! machine-current-pos vec-spawn)
+        (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
+        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
+        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (= machine-spawning? #t)
+        (ppointer->process *machine-tracker*)
+        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (ppointer->process *machine-tracker*)
+        (= machine-spawning? #f)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+    )
+)
+
+(when (and 
+(= challenge-completed? #t)
+(= challenge-win? #t)
+)
+    (recieve-reward)
+    (set! challenge-win? #f)
+    (set! challenge-completed? #f)
+    (set! challenge-mission 0)
+    (set! d-challenge-won #t)
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;FOREST;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (= (-> (level-get-target-inside *level*) name) 'forest)
+    (let (
+        (vec-spawn forest-machine-spawn-pos)
+        (which-area "forest")
+    )
+        (when 
+    (and
+        (= machine-spawning? #t)
+        (not (ppointer->process *machine-tracker*))
+        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (process-spawn chip-whack-a-metal vec-spawn)
+        (set! machine-current-pos vec-spawn)
+        (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
+        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
+        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (= machine-spawning? #t)
+        (ppointer->process *machine-tracker*)
+        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (ppointer->process *machine-tracker*)
+        (= machine-spawning? #f)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+    )
+)
+
+(when (and 
+(= challenge-completed? #t)
+(= challenge-win? #t)
+)
+    (recieve-reward)
+    (set! challenge-win? #f)
+    (set! challenge-completed? #f)
+    (set! challenge-mission 0)
+    (set! d-challenge-won #t)
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    
 (none)
+)
+
+(defun recieve-reward ()
+    (let ((rnd (rand-vu-int-range 1 3))
+        (randominteger (rand-vu-int-range 15 40))
+        )
+
+        (when (= rnd 1)
+            (set! roll-randomitem #t)
+            (set! reward-string "a random item!")
+        )
+        (when (= rnd 2)
+            (+! (-> *game-info* gem) (the float randominteger))
+            (set! reward-string "some gems for your effort!")
+        )
+        (when (= rnd 3)
+            (+! (-> *game-info* skill) (the float randominteger))
+            (set! reward-string "some orbs for your effort!")
+        )
+        (set! machine-spawning? #f)
+    )
+    (none)
+)
+
+(defun challenge-mission-fail ()
+    (set! challenge-win? #f)
+    (set! challenge-mission 0)
+    (set! challenge-completed? #f)
+    (set! machine-spawning? #f)
+    (set! d-challenge-failed #t)
+    (set! machine-prompt? #f)
+    (none)
+)
+
+(defun machine-run ()
+    (process-grab? *target* #f)
+    (set-setting-by-param *setting-control* 'mode-name 'cam-really-fixed 0 0)
+    (send-event *camera* 'teleport-to-vector-start-string machinev-camera)
+    (set! wait-machine #t)
+    (set! machine-prompt? #f)
+    (none)
+)
+
+(defun machine-exit ()
+    (remove-setting-by-arg0 *setting-control* 'mode-name)
+    (process-release? *target*)
+    (set! log-id 0)
+    (set! log-sec 0)
+    (set! in-dialogue? #f)
+    (set! in-machine? #f)
+    (none)
 )

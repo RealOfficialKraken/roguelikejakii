@@ -337,9 +337,18 @@
 (define item-ts30 "")
 (define item-tss1 "")
 
-(define machine-distance 0)
-(define machine-spawning? #f)
-(define machine-talk? #f)
+(defun-extern challenge-mission-fail (none))
+(define c-stored-gems 0.0)
+(define c-stored-orbs 0.0)
+
+(define challenge-mission 0)
+(define challenge-completed? #f)
+(define challenge-win? #f)
+
+(define d-challenge-failed #f)
+(define d-challenge-won #f)
+(define d-cfi 0)
+(define d-cwi 0)
 
 (define in-hub? #f)
 (define talk-to-vin #f)

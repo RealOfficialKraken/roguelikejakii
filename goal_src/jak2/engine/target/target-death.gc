@@ -979,6 +979,9 @@
       (when (and (= p-clover #t)(rand-vu-percent? (+ luck 0.2)))
         (set! (-> v1-7 damage) 0.0)
       )
+      (when (and (!= (-> v1-7 damage) 0.0)(= challenge-mission 1) (= challenge-win? #t))
+        (challenge-mission-fail)
+      )
       )
     (case arg0
       (('shove)
