@@ -188,7 +188,7 @@ This commonly includes things such as:
   (set! (-> self root scale y) 10.0)
   (set! (-> self root scale z) 10.0)
   (none)
-  )
+    )
 
 
 (defun give-item ((arg0 string) (arg1 int))
@@ -651,7 +651,9 @@ This commonly includes things such as:
   (set! (-> *game-info* total-trys) 4)
 )
 
-;Checks to see if you're in consite with tutorial completed to set variables to play.
+
+
+;Checks to see if you're in consite with tutorial completed (>= (-> *game-info* karma) 1.0) to set variables to play.
 (when 
 (and 
 *target*

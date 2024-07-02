@@ -310,6 +310,9 @@ void extract_common(const ObjectFileDB& db,
   extract_single_ag("CAS.DGO", "crimson-guard-ag", db, tex_db, tfrag_level);
   extract_single_ag("CAS.DGO", "roboguard-ag", db, tex_db, tfrag_level);
   extract_single_ag("SAG.DGO", "torn-highres-ag", db, tex_db, tfrag_level);
+  extract_single_ag("HIPHOG.DGO", "hip-whack-a-metal-ag", db, tex_db, tfrag_level);
+  extract_single_ag("HIPHOG.DGO", "hip-mole-ag", db, tex_db, tfrag_level);
+
 
   add_all_textures_from_level(tfrag_level, "ARTSPOOL", tex_db);
   extract_art_groups_from_level(db, tex_db, {}, "ARTSPOOL", tfrag_level, art_group_data);

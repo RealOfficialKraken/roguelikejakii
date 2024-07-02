@@ -2038,11 +2038,11 @@
 (defstate wait-for-start (whack-a-metal)
   :virtual #t
   :code (behavior ()
-    (while (or (not *target*) (not (process-grab? *target* #f)))
+    #|(while (or (not *target*) (not (process-grab? *target* #f)))
       (suspend)
       )
-    (send-event *target* 'draw #f)
-    (go-virtual active #t)
+    (send-event *target* 'draw #f)|#
+    (go-virtual wait-for-start)
     )
   )
 
