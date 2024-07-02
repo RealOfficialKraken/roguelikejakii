@@ -337,6 +337,10 @@
 (define item-ts30 "")
 (define item-tss1 "")
 
+(define machine-distance 0)
+(define machine-spawning? #f)
+(define machine-talk? #f)
+(define machine-position (new 'static 'vector :x (meters 1136.4810) :y (meters 3.0) :z (meters 3.2301) :w 1.0))
 
 (define in-hub? #f)
 (define talk-to-vin #f)

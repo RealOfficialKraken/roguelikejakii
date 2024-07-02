@@ -525,5 +525,10 @@
   "metalkor-extras.o"
   "nestb-scenes.o"
   "nestb-part.o";; 
+  "hiphog-scenes.o"
+  "whack.o"
+  "hip-mole-ag.go"
+  "hip-whack-a-metal-ag.go"
   "rift-ring-in-game-ag.go"
+  "themachine.o"
  ))
