@@ -337,6 +337,18 @@
 (define item-ts30 "")
 (define item-tss1 "")
 
+(define machine-locked? #f)
+(define reward-string "")
+(define wait-machine #f)
+(define wait-machinei 0)
+(define waite-machine #f)
+(define waite-machinei 0)
+(define machine-distance 0)
+(define machine-spawning? #t)
+(define in-machine? #f)
+(define machine-talk? #f)
+(define machine-prompt? #f)
+
 (defun-extern challenge-mission-fail (none))
 (define c-stored-gems 0.0)
 (define c-stored-orbs 0.0)

@@ -13,28 +13,14 @@
 (define markb-machine-spawn-pos (new 'static 'vector :x (meters 520.5573) :y (meters 9.7) :z (meters 414.9625) :w 1.0))
 (define atoll-machine-spawn-pos (new 'static 'vector :x (meters 579.5821) :y (meters 0.6) :z (meters -851.6854) :w 1.0))
 (define forest-machine-spawn-pos (new 'static 'vector :x (meters -598.8101) :y (meters 30.8) :z (meters 579.3311) :w 1.0))
-
-(define reward-string "")
-
-(define wait-machine #f)
-(define wait-machinei 0)
-
-(define waite-machine #f)
-(define waite-machinei 0)
-
-(define machine-locked? #f)
-
-(define machine-distance 0)
-(define machine-spawning? #t)
-(define in-machine? #f)
-(define machine-talk? #f)
-(define machine-prompt? #f)
+(define dig1-machine-spawn-pos (new 'static 'vector :x (meters 451.9943) :y (meters -58.5069) :z (meters -1810.1236) :w 1.0))
 
 (defun-extern machine-run (none))
 (defun-extern machine-exit (none))
 (defun-extern recieve-reward (none))
 
 (define machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
+(define machinev-cam-final machine-current-pos)
 
 
 (declare-type whack-a-metal process-drawable)
@@ -205,7 +191,7 @@
       ;; reset bucket settings prior to drawing - font won't do self for us, and
       ;; draw-raw-image can sometimes mess them up. (intro sequence)
       (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 20 0.0 (font-color default) (font-flags middle shadow kerning large))))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 60 0.0 (font-color default) (font-flags middle shadow kerning large))))
         (set! (-> font-ctx scale) 0.325)
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
         (when (>= d-cfi 600)
@@ -226,7 +212,7 @@
       ;; reset bucket settings prior to drawing - font won't do self for us, and
       ;; draw-raw-image can sometimes mess them up. (intro sequence)
       (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 20 0.0 (font-color default) (font-flags middle shadow kerning large))))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 60 0.0 (font-color default) (font-flags middle shadow kerning large))))
         (set! (-> font-ctx scale) 0.325)
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
         (when (>= d-cwi 600)
@@ -321,19 +307,19 @@
 )
     (+! log-sec 1)
     (when (= log-sec 1)
-        (set! di-s "You must proceed past the next stage")
+        (set! di-s "You must proceed into the next stage")
         (set! di-s2 "") 
         (set! di-s3 "")
         (set! di-s4 "")
     )
     (when (= log-sec 2)
-        (set! di-s "Without taking damage!")
+        (set! di-s "Without taking damage OR BONKS!")
         (set! di-s2 "Complete the next level flawlessly") 
         (set! di-s3 "")
         (set! di-s4 "")
     )
     (when (= log-sec 3)
-        (set! di-s "After the level completion you will get")
+        (set! di-s "After this level completion you will get")
         (set! di-s2 "an extra reward alongside your orbs!") 
         (set! di-s3 "")
         (set! di-s4 "")
@@ -365,7 +351,7 @@
 )
     (+! log-sec 1)
     (when (= log-sec 1)
-        (set! di-s "You must proceed past the next stage")
+        (set! di-s "You must proceed into the next stage")
         (set! di-s2 "") 
         (set! di-s3 "")
         (set! di-s4 "")
@@ -377,7 +363,7 @@
         (set! di-s4 "")
     )
     (when (= log-sec 3)
-        (set! di-s "After the level completion you will get")
+        (set! di-s "After this level completion you will get")
         (set! di-s2 "an extra reward alongside your orbs!") 
         (set! di-s3 "")
         (set! di-s4 "")
@@ -411,6 +397,7 @@
 (when (= (-> (level-get-target-inside *level*) name) 'ctysluma)
     (let (
         (vec-spawn hideout-machine-spawn-pos)
+        (vec-offset (new-stack-vector0))
         (which-area "ctysluma")
     )
         (when 
@@ -422,7 +409,7 @@
         (process-spawn chip-whack-a-metal vec-spawn)
         (set! machine-current-pos vec-spawn)
         (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (vector-copy! machinev-cam-final (vector+! vec-offset machine-current-pos machinev-camera))
         (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
         (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
     )
@@ -456,6 +443,7 @@
 (when (= (-> (level-get-target-inside *level*) name) 'ctyport)
     (let (
         (vec-spawn port-machine-spawn-pos)
+        (vec-offset (new-stack-vector0))
         (which-area "ctyport")
     )
         (when 
@@ -467,7 +455,7 @@
         (process-spawn chip-whack-a-metal vec-spawn)
         (set! machine-current-pos vec-spawn)
         (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (vector-copy! machinev-cam-final (vector+! vec-offset machine-current-pos machinev-camera))
         (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
         (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
     )
@@ -501,6 +489,7 @@
 (when (= (-> (level-get-target-inside *level*) name) 'sewer)
     (let (
         (vec-spawn sewer-machine-spawn-pos)
+        (vec-offset (new-stack-vector0))
         (which-area "sewers")
     )
         (when 
@@ -512,7 +501,7 @@
         (process-spawn chip-whack-a-metal vec-spawn)
         (set! machine-current-pos vec-spawn)
         (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (vector-copy! machinev-cam-final (vector+! vec-offset machine-current-pos machinev-camera))
         (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
         (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
     )
@@ -546,6 +535,7 @@
 (when (= (-> (level-get-target-inside *level*) name) 'strip)
     (let (
         (vec-spawn strip-machine-spawn-pos)
+        (vec-offset (new-stack-vector0))
         (which-area "strip")
     )
         (when 
@@ -557,7 +547,7 @@
         (process-spawn chip-whack-a-metal vec-spawn)
         (set! machine-current-pos vec-spawn)
         (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (vector-copy! machinev-cam-final (vector+! vec-offset machine-current-pos machinev-camera))
         (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
         (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
     )
@@ -591,6 +581,7 @@
 (when (= (-> (level-get-target-inside *level*) name) 'mountain)
     (let (
         (vec-spawn mountain-machine-spawn-pos)
+        (vec-offset (new-stack-vector0))
         (which-area "mountain")
     )
         (when 
@@ -602,7 +593,7 @@
         (process-spawn chip-whack-a-metal vec-spawn)
         (set! machine-current-pos vec-spawn)
         (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (vector-copy! machinev-cam-final (vector+! vec-offset machine-current-pos machinev-camera))
         (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
         (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
     )
@@ -636,6 +627,7 @@
 (when (= (-> (level-get-target-inside *level*) name) 'ruins)
     (let (
         (vec-spawn ruins-machine-spawn-pos)
+        (vec-offset (new-stack-vector0))
         (which-area "ruins")
     )
         (when 
@@ -647,7 +639,7 @@
         (process-spawn chip-whack-a-metal vec-spawn)
         (set! machine-current-pos vec-spawn)
         (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (vector-copy! machinev-cam-final (vector+! vec-offset machine-current-pos machinev-camera))
         (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
         (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
     )
@@ -681,6 +673,7 @@
 (when (= (-> (level-get-target-inside *level*) name) 'ctymarkb)
     (let (
         (vec-spawn markb-machine-spawn-pos)
+        (vec-offset (new-stack-vector0))
         (which-area "markb")
     )
         (when 
@@ -692,7 +685,7 @@
         (process-spawn chip-whack-a-metal vec-spawn)
         (set! machine-current-pos vec-spawn)
         (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (vector-copy! machinev-cam-final (vector+! vec-offset machine-current-pos machinev-camera))
         (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
         (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
     )
@@ -726,6 +719,7 @@
 (when (= (-> (level-get-target-inside *level*) name) 'atoll)
     (let (
         (vec-spawn atoll-machine-spawn-pos)
+        (vec-offset (new-stack-vector0))
         (which-area "atoll")
     )
         (when 
@@ -737,7 +731,7 @@
         (process-spawn chip-whack-a-metal vec-spawn)
         (set! machine-current-pos vec-spawn)
         (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (vector-copy! machinev-cam-final (vector+! vec-offset machine-current-pos machinev-camera))
         (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
         (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
     )
@@ -765,23 +759,13 @@
     )
 )
 
-(when (and 
-(= challenge-completed? #t)
-(= challenge-win? #t)
-)
-    (recieve-reward)
-    (set! challenge-win? #f)
-    (set! challenge-completed? #f)
-    (set! challenge-mission 0)
-    (set! d-challenge-won #t)
-)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;FOREST;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (= (-> (level-get-target-inside *level*) name) 'forest)
     (let (
         (vec-spawn forest-machine-spawn-pos)
+        (vec-offset (new-stack-vector0))
         (which-area "forest")
     )
         (when 
@@ -793,7 +777,7 @@
         (process-spawn chip-whack-a-metal vec-spawn)
         (set! machine-current-pos vec-spawn)
         (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! machinev-camera (vector+! machinev-camera machinev-camera machine-current-pos))
+        (vector-copy! machinev-cam-final (vector+! vec-offset machine-current-pos machinev-camera))
         (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
         (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
     )
@@ -821,7 +805,57 @@
     )
 )
 
-(when (and 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DIG1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (= (-> (level-get-target-inside *level*) name) 'dig1)
+    (let (
+        (vec-spawn dig1-machine-spawn-pos)
+        (vec-offset (new-stack-vector0))
+        (which-area "dig1")
+    )
+        (when 
+    (and
+        (= machine-spawning? #t)
+        (not (ppointer->process *machine-tracker*))
+        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (process-spawn chip-whack-a-metal vec-spawn)
+        (set! machine-current-pos vec-spawn)
+        (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
+        (vector-copy! machinev-cam-final (vector+! vec-offset machine-current-pos machinev-camera))
+        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
+        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (= machine-spawning? #t)
+        (ppointer->process *machine-tracker*)
+        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (ppointer->process *machine-tracker*)
+        (= machine-spawning? #f)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+    )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    
+
+
+    (when (and 
 (= challenge-completed? #t)
 (= challenge-win? #t)
 )
@@ -831,9 +865,6 @@
     (set! challenge-mission 0)
     (set! d-challenge-won #t)
 )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    
 (none)
 )
 
@@ -872,7 +903,7 @@
 (defun machine-run ()
     (process-grab? *target* #f)
     (set-setting-by-param *setting-control* 'mode-name 'cam-really-fixed 0 0)
-    (send-event *camera* 'teleport-to-vector-start-string machinev-camera)
+    (send-event *camera* 'teleport-to-vector-start-string machinev-cam-final)
     (set! wait-machine #t)
     (set! machine-prompt? #f)
     (none)
