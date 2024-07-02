@@ -3,12 +3,23 @@
 
 ;; name: themachine.gc
 
-(define *rift-tracker* (the (pointer rift-ring-ingame) #f))
-(define *machine-tracker* (the (pointer hip-whack-a-metal) #f))
+
+(define hideout-machine-spawn-pos (new 'static 'vector :x (meters 1136.4810) :y (meters 8.0) :z (meters 3.2301) :w 1.0))
+(define hideout-machine-spawn-pos (new 'static 'vector :x (meters 1136.4810) :y (meters 8.0) :z (meters 3.2301) :w 1.0))
 
 
 (declare-type whack-a-metal process-drawable)
 (define-extern whack-a-metal-init (function entity-actor none :behavior whack-a-metal))
+
+
+
+  (deftype chip-whack-a-metal (process-taskable)
+  ()
+  )
+
+  (define *rift-tracker* (the (pointer rift-ring-ingame) #f))
+  (define *machine-tracker* (the (pointer chip-whack-a-metal) #f))
+
 
 (defskelgroup skel-hip-whack-a-metal hip-whack-a-metal hip-whack-a-metal-lod0-jg hip-whack-a-metal-idle-ja
               ((hip-whack-a-metal-lod0-mg (meters 999999)))
@@ -16,12 +27,9 @@
               :origin-joint-index 3
               )
 
-(deftype hip-whack-a-metal (process-taskable)
-  ()
-  )
 
 
-(defstate hide (hip-whack-a-metal)
+(defstate hide (chip-whack-a-metal)
   :virtual #t
   :enter #f
   :exit #f
@@ -32,7 +40,7 @@
   )
 
 ;; WARN: Return type mismatch draw-control vs none.
-(defmethod init-art! ((this hip-whack-a-metal))
+(defmethod init-art! ((this chip-whack-a-metal))
   "@see [[initialize-skeleton]]"
   (initialize-skeleton
     this
@@ -42,7 +50,7 @@
   (none)
   )
 
-(defmethod get-art-elem ((this hip-whack-a-metal))
+(defmethod get-art-elem ((this chip-whack-a-metal))
   "Checks various things such the current actor, task status, etc to determine the right art-group data to use
 @returns the appropriate [[art-element]] for the given NPC"
   (case (-> (get-current-task-event (-> this task)) action)
@@ -56,7 +64,7 @@
   (-> this draw art-group data 2)
   )
 
-(defstate play-game (hip-whack-a-metal)
+(defstate play-game (chip-whack-a-metal)
   :virtual #t
   :code (behavior ((arg0 game-task-event))
     (set-setting! 'borrow '((hiphog 0 lwhack special)) 0.0 0)
@@ -81,7 +89,7 @@
     )
   )
 
-  (defbehavior hip-whack-a-metal-init-by-other hip-whack-a-metal ((vec vector))
+  (defbehavior chip-whack-a-metal-init-by-other chip-whack-a-metal ((vec vector))
   (stack-size-set! (-> self main-thread) 512)
   (process-taskable-method-31 self)
   (logior! (-> self mask) (process-mask actor-pause))
@@ -102,24 +110,26 @@
 (when 
 (and
 (= machine-spawning? #t)
-(< (vector-vector-distance (target-pos 0) machine-position) 35.0)
+(not (ppointer->process *machine-tracker*))
+(< (vector-vector-distance (target-pos 0) hideout-machine-spawn-pos) 400000.0)
 )
-(process-spawn hip-whack-a-metal machine-position)
-(set! *machine-tracker* (process-spawn hip-whack-a-metal machine-position))
+(process-spawn chip-whack-a-metal hideout-machine-spawn-pos)
+(set! *machine-tracker* (process-spawn chip-whack-a-metal hideout-machine-spawn-pos))
 (format #t "
-spawned process hip-whack-a-metal
+spawned process chip-whack-a-metal
 ")
 )
 
 (when 
 (and
 (= machine-spawning? #t)
-(> (vector-vector-distance (target-pos 0) machine-position) 35.0)
+(ppointer->process *machine-tracker*)
+(> (vector-vector-distance (target-pos 0) hideout-machine-spawn-pos) 400000.0)
 )
-(kill-by-name "hip-whack-a-metal" *default-pool*)
+(kill-by-name "chip-whack-a-metal" *default-pool*)
 (set! *machine-tracker* #f)
 (format #t "
-killed hip-whack-a-metal
+killed chip-whack-a-metal
 ")
 )
 
@@ -128,10 +138,10 @@ killed hip-whack-a-metal
 (ppointer->process *machine-tracker*)
 (= machine-spawning? #f)
 )
-(kill-by-name "hip-whack-a-metal" *default-pool*)
+(kill-by-name "chip-whack-a-metal" *default-pool*)
 (set! *machine-tracker* #f)
 (format #t "
-killed hip-whack-a-metal
+killed chip-whack-a-metal
 ")
 )
 (none)
