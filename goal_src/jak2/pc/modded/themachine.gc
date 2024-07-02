@@ -153,7 +153,8 @@
 (when (and (= machine-prompt? #t)(= avoidc-waitb #f)(= machine-locked? #f)(= in-machine? #f)) ;draw interact button
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_RED>R3<COLOR_WHITE>:<COLOR_ORANGE> Access Machine"
+    (format matt-str "<COLOR_RED>R3<COLOR_WHITE>:<COLOR_ORANGE> Access Machine <COLOR_PINK>(15 Tokens)~%<COLOR_ORANGE>Current Tokens: <COLOR_PINK>~d"
+    (the int (-> *game-info* fuel))
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
     (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
@@ -168,7 +169,8 @@
 (when (and (= machine-prompt? #t)(= machine-locked? #t)(= in-machine? #f)) ;draw interact button
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_RED>The Machine stopped working..."
+    (format matt-str "<COLOR_RED>The Machine stopped working...~%<COLOR_ORANGE>Current Tokens: <COLOR_PINK>~d"
+    (the int (-> *game-info* fuel))
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
     (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
@@ -231,7 +233,7 @@
     (set! d-challenge-won #t)
 )
 
-(when (and (= machine-locked? #f)(= machine-prompt? #t) (cpad-pressed? 0 r3) (= avoidc-waitb #f)(= in-machine? #f)(= in-hub? #f)) ;run camera and jak position-settings
+(when (and (= machine-locked? #f)(>= (-> *game-info* fuel) 15.0)(= machine-prompt? #t) (cpad-pressed? 0 r3) (= avoidc-waitb #f)(= in-machine? #f)(= in-hub? #f)) ;run camera and jak position-settings
     (machine-run)
 )
 
@@ -247,6 +249,7 @@
 (when (and (= wait-machine #t)) ;wait for camera then run machine
 (+! wait-machinei 1)
 (when (= wait-machinei 50)
+    (-! (-> *game-info* fuel) 15.0)
     (set-setting-by-param *setting-control* 'mode-name 'cam-really-fixed 0 0)
     (set! wait-machinei 0)
     (set! wait-machine #f)
@@ -357,7 +360,7 @@
         (set! di-s4 "")
     )
     (when (= log-sec 2)
-        (set! di-s "...And collect at least 10 orbs!")
+        (set! di-s "...And collect at least 20 orbs!")
         (set! di-s2 "") 
         (set! di-s3 "")
         (set! di-s4 "")
@@ -382,7 +385,7 @@
         (set! waite-machine #t)
         (set! c-stored-orbs (-> *game-info* skill))
         (set! in-dialogue? #f)
-        (+! c-stored-orbs 10.0)
+        (+! c-stored-orbs 20.0)
         (set! challenge-mission 2)
     )
 
