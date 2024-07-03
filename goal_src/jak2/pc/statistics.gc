@@ -117,6 +117,9 @@
         (when (= p-sage-blue #t)
             (weight-add)
           )
+          (when (= challenge-mission 4)
+            (+! enemies-killed? 1)
+          )
 
     (if (or (!= source (kill-stats-source unknown)) (-> *statistics* kill-stats allow-unknown?))
         (increment (-> *statistics* kill-stats) enemy-name source))

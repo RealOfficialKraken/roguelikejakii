@@ -337,6 +337,8 @@
 (define item-ts30 "")
 (define item-tss1 "")
 
+(define enemies-killed? 0)
+
 (define machine-locked? #f)
 (define reward-string "")
 (define wait-machine #f)
