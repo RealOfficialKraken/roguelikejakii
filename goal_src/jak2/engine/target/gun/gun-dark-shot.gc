@@ -139,6 +139,9 @@
           (set! power-shot-d #t)
           (set! power-shoti-d 0)
         )
+        (when (= challenge-mission 3)
+          (challenge-mission-fail)
+        )
         )
       v0-1
       )
