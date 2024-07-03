@@ -1783,7 +1783,7 @@ auto-save-post
            )
          (set! (-> self event-hook) #f)
          )
-       (+! (-> *game-info* auto-save-count) 1)
+       (+! (-> *game-info* auto-save-count) 0)
        )
       )
     (while (or (< (-> *display* base-clock frame-counter) (-> *game-info* blackout-time))
