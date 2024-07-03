@@ -14,6 +14,10 @@
 (define atoll-machine-spawn-pos (new 'static 'vector :x (meters 579.5821) :y (meters 0.6) :z (meters -851.6854) :w 1.0))
 (define forest-machine-spawn-pos (new 'static 'vector :x (meters -598.8101) :y (meters 30.8) :z (meters 579.3311) :w 1.0))
 (define dig1-machine-spawn-pos (new 'static 'vector :x (meters 451.9943) :y (meters -58.5069) :z (meters -1810.1236) :w 1.0))
+(define dig3a-machine-spawn-pos (new 'static 'vector :x (meters 337.2496) :y (meters -74.0) :z (meters -2037.3114) :w 1.0))
+
+(define challenge-string "")
+(define in-challenge? #f)
 
 (defun-extern machine-run (none))
 (defun-extern machine-exit (none))
@@ -123,10 +127,21 @@
 (define machine-interact-rad 30000.0)
 (define machine-spawn-rad 800000.0)
 
+(define x-aspect-ratio-challenge 0)
+(define y-aspect-ratio-challenge 0)
+
 
 (defun machine-update ()
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;MACHINE PARAMS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when (and (= in-challenge? #f) (!= challenge-mission 0))
+    (set! in-challenge? #t)
+)
+
+(when (and (= in-challenge? #t) (= challenge-mission 0))
+    (set! in-challenge? #f)
+)
 
 (when ;display interact prompt
 (and
@@ -224,6 +239,56 @@
         )
 )
 
+(when (and (= in-challenge? #t)(!= challenge-mission 2)(!= challenge-mission 4))
+    (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_WHITE>Current Challenge:~%<COLOR_ORANGE>~s"
+    challenge-string
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 1 10 0.0 (font-color default) (font-flags shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+
+(when (and (= in-challenge? #t)(!= challenge-mission 2)(= challenge-mission 4))
+    (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_WHITE>Current Challenge:~%<COLOR_ORANGE>~s <COLOR_YELLOW>~d/50"
+    challenge-string
+    enemies-killed?
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 1 10 0.0 (font-color default) (font-flags shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+
+(when (and (= in-challenge? #t)(= challenge-mission 2)(!= challenge-mission 4))
+    (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_WHITE>Current Challenge:~%<COLOR_ORANGE>~s <COLOR_YELLOW>~d/10"
+    challenge-string
+    (the int pc-stored-orbs)
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 1 10 0.0 (font-color default) (font-flags shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+
 (when 
 (and
 (= challenge-mission 2)
@@ -232,6 +297,7 @@
     (set! challenge-win? #t)
     (set! challenge-completed? #t)
     (set! d-challenge-won #t)
+    (set! pc-stored-orbs 0.0)
 )
 
 (when 
@@ -352,6 +418,7 @@
         (set! challenge-win? #t)
         (set! challenge-mission 1)
         (set! in-dialogue? #f)
+        (set! challenge-string "No Damage or Bonks")
     )
 )
 
@@ -394,9 +461,11 @@
         (set! di-s4 "")
         (set! waite-machine #t)
         (set! c-stored-orbs (-> *game-info* skill))
+        (set! pc-stored-orbs 0.0)
         (set! in-dialogue? #f)
         (+! c-stored-orbs 10.0)
         (set! challenge-mission 2)
+        (set! challenge-string "Collect 10 orbs:")
     )
 
 )
@@ -441,6 +510,7 @@
         (set! challenge-win? #t)
         (set! challenge-mission 3)
         (set! in-dialogue? #f)
+        (set! challenge-string "No Weapons")
     )
 )
 
@@ -484,6 +554,7 @@
         (set! challenge-mission 4)
         (set! enemies-killed? 0)
         (set! in-dialogue? #f)
+        (set! challenge-string "Kill Enemies:")
     )
 )
 
@@ -951,6 +1022,52 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;DIG3A;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (= (-> (level-get-target-inside *level*) name) 'dig3a)
+    (let (
+        (vec-spawn dig3a-machine-spawn-pos)
+        (vec-offset (new-stack-vector0))
+        (which-area "dig3a")
+    )
+        (when 
+    (and
+        (= machine-spawning? #t)
+        (not (ppointer->process *machine-tracker*))
+        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (process-spawn chip-whack-a-metal vec-spawn)
+        (set! machine-current-pos vec-spawn)
+        (set! machinev-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
+        (vector-copy! machinev-cam-final (vector+! vec-offset machine-current-pos machinev-camera))
+        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
+        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (= machine-spawning? #t)
+        (ppointer->process *machine-tracker*)
+        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+
+    (when 
+    (and
+        (ppointer->process *machine-tracker*)
+        (= machine-spawning? #f)
+    )
+        (kill-by-name "chip-whack-a-metal" *default-pool*)
+        (set! *machine-tracker* #f)
+        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
+    )
+    )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     
 
 
@@ -1026,6 +1143,7 @@
     (set! machine-spawning? #f)
     (set! d-challenge-failed #t)
     (set! machine-prompt? #f)
+     (play-sound-file "data/goal_src/jak2/pc/snd/challenge-failed.wav" (the int (* (-> *setting-control* user-current sfx-volume) 100)))
     (none)
 )
 

@@ -338,6 +338,7 @@
 (define item-tss1 "")
 
 (define enemies-killed? 0)
+(define pc-stored-orbs 0.0)
 
 (define machine-locked? #f)
 (define reward-string "")
