@@ -533,6 +533,17 @@
                                2.0
                                )
           )
+          (when (= p-crit-hits #t)
+          (let ((crit-dmg-1 (+ (/ (-> *game-info* skill) 45) 2.0))
+                  (crit-dmg-2 (+ (/ (-> *game-info* skill) 45) 4.0)))
+            (when (= p-upgrade-damage #t)
+              (set! (-> this damage) crit-dmg-2)
+            )
+            (when (= p-upgrade-damage #f)
+              (set! (-> this damage) crit-dmg-1)
+            )
+            )
+        )
     0
     (none)
     )

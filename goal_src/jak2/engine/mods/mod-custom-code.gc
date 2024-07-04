@@ -2443,6 +2443,7 @@ This commonly includes things such as:
           )
           (when (= challenge-mission 6)
             (set! challenge-completed? #t)
+            (set! dark-mode #f)
           )
         )
   (set! please-reward #t)
@@ -3235,6 +3236,14 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
         (set! (-> font-ctx scale) 0.325)
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 
+)
+
+(when (and (= p-crit-hits #t)(= crit-part #f))
+  (crit-gun-part)
+)
+
+(when (and (= p-crit-hits #f)(= crit-part #t))
+  (reset-gun-part)
 )
 
 (when (= p-sage-dark #f)

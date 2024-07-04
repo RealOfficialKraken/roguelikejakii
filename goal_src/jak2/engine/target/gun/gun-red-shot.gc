@@ -152,9 +152,22 @@
                            3.0
                            2.0
                            )
-                       (if (logtest? (game-feature gun-upgrade-damage) (-> *game-info* features))
+                       (when (= p-crit-hits #f)
+                        (if (logtest? (game-feature gun-upgrade-damage) (-> *game-info* features))
                            2.0
                            1.0
+                           )
+                       )
+                           (when (= p-crit-hits #t)
+                           (let ((crit-dmg-1 (+ (/ (-> *game-info* skill) 65) 2.0))
+                                 (crit-dmg-2 (+ (/ (-> *game-info* skill) 65) 4.0)))
+                            (when (= p-upgrade-damage #t)
+                              crit-dmg-2
+                            )
+                            (when (= p-upgrade-damage #f)
+                              crit-dmg-1
+                            )
+                           )
                            )
                        )
                     )

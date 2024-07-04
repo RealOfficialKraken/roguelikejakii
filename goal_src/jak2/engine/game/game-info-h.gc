@@ -279,6 +279,10 @@
 (define p-sage-blue #f)
 (define p-sage-red #f)
 (define p-sage-dark #f)
+(define p-crit-hits #f)
+
+(define crit-part #f)
+(define gun-damage-percent 0.0)
 
 (define p-already-punched? #f)
 
@@ -353,6 +357,8 @@
 (define machine-prompt? #f)
 
 (defun-extern challenge-mission-fail (none))
+(defun-extern reset-gun-part (none))
+(defun-extern crit-gun-part (none))
 (define c-stored-gems 0.0)
 (define c-stored-orbs 0.0)
 
