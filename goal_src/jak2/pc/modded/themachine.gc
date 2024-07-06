@@ -331,7 +331,7 @@
     (set! wait-machine #f)
     (set! in-machine? #t)
     (set! in-dialogue? #t)
-    (set! log-id (rand-vu-int-range 14 14))
+    (set! log-id (rand-vu-int-range 10 15))
     (set! log-sec 0)
     (set! machine-locked? #t)
     (let ((rnd (rand-vu-int-range 1 6)))

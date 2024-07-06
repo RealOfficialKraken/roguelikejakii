@@ -415,6 +415,12 @@
       )
     )
 
+
+    (defun checkpoint-green ()
+    
+    (none)
+    )
+
     (defun activate-weight-start ()
       (set! (-> *run-attack-mods* align-speed) (/ (-> *run-attack-mods* align-speed) 2))
       (set! (-> *attack-mods* align-speed) (/ (-> *attack-mods* align-speed) 2))
@@ -533,6 +539,8 @@
     (set! (-> *part-id-table* 220 init-specs 8 initial-valuef) 16.0);dark
     (set! (-> *part-id-table* 220 init-specs 5 initial-valuef) 0.0)
     (set! (-> *part-id-table* 216 init-specs 6 initial-valuef) 0.0)
+    (set! (-> *part-id-table* 224 init-specs 6 initial-valuef) 255.0);yellow R
+    (set! (-> *part-id-table* 224 init-specs 7 initial-valuef) 255.0);yellow R
     (set! (-> *part-id-table* 224 init-specs 8 initial-valuef) 0.0);yellow
     (set! (-> *part-id-table* 224 init-specs 9 initial-valuef) 8.0)
     (set! (-> *part-id-table* 230 init-specs 8 initial-valuef) 0.0)

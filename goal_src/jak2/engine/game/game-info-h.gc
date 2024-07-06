@@ -261,6 +261,7 @@
 (define under-sig-mission? #f)
 
 (defun-extern color-light-eco (none))
+(defun-extern checkpoint-green (none))
 
 ;give jak his items if he has bought them but doesn't actually have them
 (define p-red-gun #f)
