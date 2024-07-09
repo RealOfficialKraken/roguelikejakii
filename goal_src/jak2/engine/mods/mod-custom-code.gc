@@ -10,15 +10,11 @@
 - Traffic-kill whenever you buy or collect buffed-vehicles
 - Remake randomized missions to use knuth random
 - Getting to end after you've beaten ending before, softlocks jak
-- Debug the f out of the cheat menu
-- Make the item spawning work with (-> *game-info* total-trys) in cheat menu
-- Add curse and luck stat to cheat menu
-- Add free health refill and invulnerability in cheat menu
+- Make more reasons to not start a mission right away, and to go into other areas for things.
 vv--optional ideas--vv
+- Make BOONS accessible challenges from before you start the run
 - Add a chance of random challenges that reward skull gems per stage, to make acquiring gems to buy items easier.
 - Add a way to get items at the start of runs, at the cost of gems
-- After 100%ing items, for 1000 gems unlock the cheats menu.
-- Make a way to access shop from not just HipHog
 - Create intro msg for accessing dark act for the first time, selecting 1 of 3 equal boons to carry to the end.
 - Create items off of pc-settings.gc (pending), the most OP items ever. It's a separate shop and is only accessible after karma 3.0/4.0.
 - Create crit, a way for Jak's mechanical abilities to improve damage on chance (based off luck). It's damage can be boosted with items or by doing damage with punches or twirls
@@ -77,6 +73,7 @@ IF ADDING A NEW ITEM:
 
 --------------------------------------------------------------------------------------------------
 
+Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hits
 |#
     ;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;; Begin function defintions.
@@ -85,6 +82,7 @@ IF ADDING A NEW ITEM:
 (define matt-str (new 'global 'string 2048 (the-as string #f)))
 (define *pc-encoded-matt-str* (new 'global 'string 2048 (the-as string #f)))
 
+(define in-debug? #t)
 
 (defskelgroup skel-rift-ring-ingame rift-ring-in-game rift-ring-in-game-lod0-jg rift-ring-in-game-idle-ja
               ((rift-ring-in-game-lod0-mg (meters 999999)))
@@ -1078,14 +1076,6 @@ This commonly includes things such as:
 )
 
 
-(when (= wait-loading #t)
-  (+! load-w 1)
-  (when (= load-w 300)
-    (script-eval '(want-load 'vinroom 'consiteb))
-    (set! load-w 0)
-    (set! wait-loading #f)
-  )
-)
 
 (when ;tutorial for tp jak out of fortress
 (and 
@@ -8247,7 +8237,7 @@ Here are the shop IDs
   )
 
 ;---------------------vvvTHIS IS TO DEBUG THE VARSvvv--------------------
-(when *debug-segment*
+(when (= in-debug? #t)
   (when (= in-game? #t)
     (clear matt-str)
       (clear *pc-encoded-matt-str*)

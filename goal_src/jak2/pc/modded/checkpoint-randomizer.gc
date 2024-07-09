@@ -520,35 +520,35 @@
     )
 
     (defun crit-gun-part ()
-    (set! (-> *part-id-table* 220 init-specs 5 initial-valuef) 255.0);dark
-    (set! (-> *part-id-table* 220 init-specs 8 initial-valuef) 128.0);dark
-    (set! (-> *part-id-table* 216 init-specs 6 initial-valuef) 255.0);dark
-    (set! (-> *part-id-table* 188 init-specs 8 initial-valuef) 255.0);red
-    (set! (-> *part-id-table* 189 init-specs 8 initial-valuef) 255.0);red
-    (set! (-> *part-id-table* 189 init-specs 9 initial-valuef) 255.0);red
-    (set! (-> *part-id-table* 224 init-specs 6 initial-valuef) 255.0);yellow R
-    (set! (-> *part-id-table* 224 init-specs 7 initial-valuef) 0.0);yellow G
-    (set! (-> *part-id-table* 230 init-specs 8 initial-valuef) 0.0);yellow B
-    (set! (-> *part-id-table* 224 init-specs 9 initial-valuef) 15.0);yellow W
-    (set! (-> *part-id-table* 211 init-specs 6 initial-valuef) 255.0);blue
-    (set! crit-part #t)
-    (none)
+      (set! (-> *part-id-table* 220 init-specs 5 initial-valuef) 255.0);dark
+      (set! (-> *part-id-table* 220 init-specs 8 initial-valuef) 128.0);dark
+      (set! (-> *part-id-table* 216 init-specs 6 initial-valuef) 255.0);dark
+      (set! (-> *part-id-table* 188 init-specs 8 initial-valuef) 255.0);red
+      (set! (-> *part-id-table* 189 init-specs 8 initial-valuef) 255.0);red
+      (set! (-> *part-id-table* 189 init-specs 9 initial-valuef) 255.0);red
+      (set! (-> *part-id-table* 224 init-specs 6 initial-valuef) 255.0);yellow R
+      (set! (-> *part-id-table* 224 init-specs 7 initial-valuef) 0.0);yellow G
+      (set! (-> *part-id-table* 230 init-specs 8 initial-valuef) 0.0);yellow B
+      (set! (-> *part-id-table* 224 init-specs 9 initial-valuef) 15.0);yellow W
+      (set! (-> *part-id-table* 211 init-specs 6 initial-valuef) 255.0);blue
+      (set! crit-part #t)
+      (none)
     )
 
     (defun reset-gun-part ()
-    (set! (-> *part-id-table* 220 init-specs 8 initial-valuef) 16.0);dark
-    (set! (-> *part-id-table* 220 init-specs 5 initial-valuef) 0.0)
-    (set! (-> *part-id-table* 216 init-specs 6 initial-valuef) 0.0)
-    (set! (-> *part-id-table* 224 init-specs 6 initial-valuef) 255.0);yellow R
-    (set! (-> *part-id-table* 224 init-specs 7 initial-valuef) 255.0);yellow R
-    (set! (-> *part-id-table* 224 init-specs 8 initial-valuef) 0.0);yellow
-    (set! (-> *part-id-table* 224 init-specs 9 initial-valuef) 8.0)
-    (set! (-> *part-id-table* 230 init-specs 8 initial-valuef) 0.0)
-    (set! (-> *part-id-table* 188 init-specs 8 initial-valuef) 0.0);red
-    (set! (-> *part-id-table* 189 init-specs 8 initial-valuef) 0.0)
-    (set! (-> *part-id-table* 189 init-specs 9 initial-valuef) 96.0)
-    (set! (-> *part-id-table* 211 init-specs 6 initial-valuef) 0.0);blue
-    (set! crit-part #f)
+      (set! (-> *part-id-table* 220 init-specs 8 initial-valuef) 16.0);dark
+      (set! (-> *part-id-table* 220 init-specs 5 initial-valuef) 0.0)
+      (set! (-> *part-id-table* 216 init-specs 6 initial-valuef) 0.0)
+      (set! (-> *part-id-table* 224 init-specs 6 initial-valuef) 255.0);yellow R
+      (set! (-> *part-id-table* 224 init-specs 7 initial-valuef) 255.0);yellow R
+      (set! (-> *part-id-table* 224 init-specs 8 initial-valuef) 0.0);yellow
+      (set! (-> *part-id-table* 224 init-specs 9 initial-valuef) 8.0)
+      (set! (-> *part-id-table* 230 init-specs 8 initial-valuef) 0.0)
+      (set! (-> *part-id-table* 188 init-specs 8 initial-valuef) 0.0);red
+      (set! (-> *part-id-table* 189 init-specs 8 initial-valuef) 0.0)
+      (set! (-> *part-id-table* 189 init-specs 9 initial-valuef) 96.0)
+      (set! (-> *part-id-table* 211 init-specs 6 initial-valuef) 0.0);blue
+      (set! crit-part #f)
     (none)
     )
 
