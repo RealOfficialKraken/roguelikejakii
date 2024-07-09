@@ -82,7 +82,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 (define matt-str (new 'global 'string 2048 (the-as string #f)))
 (define *pc-encoded-matt-str* (new 'global 'string 2048 (the-as string #f)))
 
-(define in-debug? #t)
+(define in-debug? #f)
 
 (defskelgroup skel-rift-ring-ingame rift-ring-in-game rift-ring-in-game-lod0-jg rift-ring-in-game-idle-ja
               ((rift-ring-in-game-lod0-mg (meters 999999)))
