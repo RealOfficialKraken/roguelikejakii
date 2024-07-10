@@ -8237,7 +8237,7 @@ Here are the shop IDs
   )
 
 ;---------------------vvvTHIS IS TO DEBUG THE VARSvvv--------------------
-(when (= in-debug? #t)
+(when (and (= in-debug? #t)*debug-segment*)
   (when (= in-game? #t)
     (clear matt-str)
       (clear *pc-encoded-matt-str*)
@@ -8916,6 +8916,14 @@ Here are the shop IDs
 (task-node-closed? (game-task-node castle-boss-resolution))
 (= krew-boss-mission? #t))
 (set! krew-boss-mission? #f)
+)
+
+(when (and
+(= krew-completed-mission? #t)
+(>= (-> *game-info* total-deaths) 4)
+)
+(task-node-close! (game-task-node castle-boss-resolution))
+(set! krew-completed-mission? #f)
 )
 
 (when (= ending-loop #t)

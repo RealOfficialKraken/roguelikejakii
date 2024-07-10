@@ -282,6 +282,8 @@
 (define p-sage-dark #f)
 (define p-crit-hits #f)
 
+(define krew-completed-mission? #f)
+
 (define crit-part #f)
 (define gun-damage-percent 0.0)
 

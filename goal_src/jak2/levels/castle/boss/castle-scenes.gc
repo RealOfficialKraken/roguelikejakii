@@ -564,7 +564,7 @@
                  )
 
 (scene-method-16 (new 'static 'scene
-                   :name "castle-krew-boss-fight-res"
+                   :name "castle-krew-boss-fight-res-DEPRECATED"
                    :extra #f
                    :info #f
                    :mask-to-clear (process-mask movie enemy platform projectile)

@@ -3062,7 +3062,7 @@ For example for an elevator pre-compute the distance between the first and last 
     (while (nonzero? (get-status *gui-control* (-> self id)))
       (suspend)
       )
-    (set! (-> self movie-handle) (ppointer->handle (process-spawn
+    #|(set! (-> self movie-handle) (ppointer->handle (process-spawn
                                                      scene-player
                                                      :init scene-player-init
                                                      '("castle-krew-boss-fight-res" "city-ashelin-drop-off")
@@ -3070,7 +3070,8 @@ For example for an elevator pre-compute the distance between the first and last 
                                                      #f
                                                      )
                                                    )
-          )
+          )|#
+          (set! krew-completed-mission? #t)
     (send-event self 'death-end)
     (while (-> self child)
       (suspend)
