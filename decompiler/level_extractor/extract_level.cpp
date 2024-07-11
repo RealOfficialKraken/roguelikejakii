@@ -312,6 +312,23 @@ void extract_common(const ObjectFileDB& db,
   extract_single_ag("SAG.DGO", "torn-highres-ag", db, tex_db, tfrag_level);
   extract_single_ag("HIPHOG.DGO", "hip-whack-a-metal-ag", db, tex_db, tfrag_level);
   extract_single_ag("HIPHOG.DGO", "hip-mole-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "metalkor-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "metalkor-lowtorso-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "metalkor-legs-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "metalkor-explode-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "wasp-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "metalkor-bomb-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "metalkor-wings-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "metalkor-egg-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "metalkor-distort-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "metalkor-rays-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "precursor-stone-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "particleman-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "kid-nestb+0-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "metalkor-fma-spinner-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "nestb-tail-bound-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "palmpilot-ag", db, tex_db, tfrag_level);
+  extract_single_ag("NEB.DGO", "kid-highres-ag", db, tex_db, tfrag_level);
 
 
   add_all_textures_from_level(tfrag_level, "ARTSPOOL", tex_db);

@@ -83,6 +83,9 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 (define *pc-encoded-matt-str* (new 'global 'string 2048 (the-as string #f)))
 
 (define in-debug? #f)
+(define metalkor-waitkill #f)
+(define m-killi 0)
+
 
 (defskelgroup skel-rift-ring-ingame rift-ring-in-game rift-ring-in-game-lod0-jg rift-ring-in-game-idle-ja
               ((rift-ring-in-game-lod0-mg (meters 999999)))
@@ -138,6 +141,17 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
       (sound-stop (-> this spin-sound))
       )
   ((method-of-type process-drawable deactivate) this)
+  (none)
+  )
+
+
+
+  (defun metalkor-appear ()
+  (let ((vec1 (new 'stack-no-clear 'vector :x (meters 10) :y (meters -15) :z (meters 10) :w 1.0)) ;offset metalkor spawn away from (target-pos 0)
+        (metalkor-pos (new 'stack-no-clear 'vector :x (meters 51.4366) :y (meters -32.6720) :z (meters -1010.0715)))
+        )
+    (process-spawn metalkor metalkor-pos)
+  )
   (none)
   )
 
@@ -4419,6 +4433,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 
 
 
+
 (when (and (= waitdie #t)(>= (-> *game-info* karma) 1.0)(= (pause-allowed?) #t))
   (+! waitdi 1)
   (when (= waitdi 1)
@@ -4471,6 +4486,18 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 )
 (when (and (= p-upgrade-damage #t)(not (logtest? (-> *game-info* features) (game-feature gun-upgrade-damage))))
   (logior! (-> *game-info* features) (game-feature gun gun-upgrade-damage))
+)
+
+(when (= metalkor-waitkill #t)
+  (+! m-killi 1)
+  (when (= m-killi 200)
+    (metalkor-appear)
+  )
+  (when (= m-killi 6000)
+    (task-node-close! (game-task-node castle-boss-resolution))
+    (set! metalkor-waitkill #f)
+    (set! m-killi 0)
+  )
 )
 
 ;MODS

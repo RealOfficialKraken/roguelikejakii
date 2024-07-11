@@ -480,8 +480,6 @@
   "mod-settings.o" ;; added ;;mod-base-change
   "mod-common-functions.o" ;; added
   "orb-placer.o"  ;; added
-  "checkpoint-randomizer.o" ;added by Kraken
-  "mod-custom-code.o" ;; added
   "crimson-guard-level.o";;;;;;;;;;;;;;;;; added for guard-grenade and all the way down.
   "guard-conversation.o"
   "hover-nav-control-h.o" ;added
@@ -498,37 +496,26 @@
   "crimson-guard-hover.o"
   "flamer.o"
   "gstate.o"
-  "dig-digger.o"
+  ;;"dig-digger.o"
   "dig-obs.o"
-  "dig1-obs.o"
-  "dig2-obs.o"
-  "dig3-obs.o"
+  ;;"dig1-obs.o"
+  ;;"dig2-obs.o"
+  ;;"dig3-obs.o"
   "grenadier.o"
   "dig-texture.o"
   "dig-scenes.o"
   "dig-part.o"
-  "tpage-2282.go"
-  "tpage-2284.go"
-  "tpage-2283.go"
-  "tpage-2419.go"
-  "tpage-2844.go"
-  "dig-digger-ag.go"
-  "crimson-guard-ag.go"
-  "dig-bomb-crate-ag.go"
-  "dig-bomb-crate-cylinder-ag.go"
-  "dig1-vis.go"
   "mod-debug.o" ;; added
   "nest-texture.o"
+  "nestb-scenes.o"
+  "nestb-part.o";; 
   "metalkor-part.o"
   "metalkor-setup.o"
   "metalkor-states.o"
   "metalkor-extras.o"
-  "nestb-scenes.o"
-  "nestb-part.o";; 
   "hiphog-scenes.o"
   "whack.o"
-  "hip-mole-ag.go"
-  "hip-whack-a-metal-ag.go"
-  "rift-ring-in-game-ag.go"
-  "themachine.o"
+  "checkpoint-randomizer.o" ;;added by Kraken
+  "mod-custom-code.o" ;; added
+  "themachine.o" ;;added by Kraken
  ))
