@@ -7,6 +7,7 @@
 
 (declare-type gun-red-shot process-drawable)
 (define-extern gun-red-shot-init-by-other (function vector vector gun-red-shot :behavior gun-red-shot))
+(define crit-red 3.0)
 
 ;; DECOMP BEGINS
 
@@ -147,7 +148,8 @@
                )
          )
     (when v1-0
-      (let* ((s5-2 (vector-! (new 'stack-no-clear 'vector) (-> v1-0 root trans) (-> this start-pos)))
+      (when (= p-crit-hits #f)
+        (let* ((s5-2 (vector-! (new 'stack-no-clear 'vector) (-> v1-0 root trans) (-> this start-pos)))
              (f30-0 (* (if (< (vector-length s5-2) 24576.0)
                            3.0
                            2.0
@@ -156,23 +158,6 @@
                            2.0
                            1.0
                            )
-                       #|(when (= p-crit-hits #f)
-                        (if (logtest? (game-feature gun-upgrade-damage) (-> *game-info* features))
-                           2.0
-                           1.0
-                           )
-                       )
-                           (when (= p-crit-hits #t)
-                           (let ((crit-dmg-1 (+ (/ (-> *game-info* skill) 65) 2.0))
-                                 (crit-dmg-2 (+ (/ (-> *game-info* skill) 65) 4.0)))
-                            (when (= p-upgrade-damage #t)
-                              crit-dmg-2
-                            )
-                            (when (= p-upgrade-damage #f)
-                              crit-dmg-1
-                            )
-                           )
-                           )|#
                        )
                     )
              )
@@ -201,6 +186,46 @@
           (static-attack-info ((id (-> this attack-id)) (mode 'eco-red) (attacker-velocity s5-2) (damage f30-0)))
           )
         )
+      )
+      (when (= p-crit-hits #t)
+        (let* ((s5-2 (vector-! (new 'stack-no-clear 'vector) (-> v1-0 root trans) (-> this start-pos)))
+             (f30-0 (* (if (< (vector-length s5-2) 24576.0)
+                           (+ (/ (-> *game-info* skill) 65) 3.0)
+                           (+ (/ (-> *game-info* skill) 65) 2.0)
+                           )
+                           (if (logtest? (game-feature gun-upgrade-damage) (-> *game-info* features))
+                           (+ (/ (-> *game-info* skill) 65) 2.0)
+                           1.0
+                           )
+                       )
+                    )
+             )
+        (let ((s2-0 (new 'stack-no-clear 'vector)))
+          (rot-zxy-from-vector! s2-0 s5-2)
+          (let ((f28-0 (deg- (-> s2-0 x) (-> this start-rot x)))
+                (f0-6 (deg- (-> s2-0 y) (-> this start-rot y)))
+                )
+            (when (or (< 2730.6667 (fabs f28-0)) (< 8192.0 (fabs f0-6)))
+              (let ((f1-5 (fmax -2730.6667 (fmin 2730.6667 f28-0)))
+                    (f0-8 (fmax -8192.0 (fmin 8192.0 f0-6)))
+                    )
+                (set! (-> s2-0 x) (+ (-> this start-rot x) f1-5))
+                (set! (-> s2-0 y) (+ (-> this start-rot y) f0-8))
+                )
+              (set-vector! s5-2 0.0 0.0 1.0 1.0)
+              (vector-rotate-around-x! s5-2 s5-2 (-> s2-0 x))
+              (vector-rotate-around-y! s5-2 s5-2 (-> s2-0 y))
+              )
+            )
+          )
+        (send-event
+          arg0
+          'attack
+          arg1
+          (static-attack-info ((id (-> this attack-id)) (mode 'eco-red) (attacker-velocity s5-2) (damage f30-0)))
+          )
+        )
+      )
       )
     )
   )
