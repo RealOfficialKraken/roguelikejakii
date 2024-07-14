@@ -432,7 +432,7 @@
     (set! (-> self force-onto-mesh) #f)
     )
   :exit (behavior ()
-    (set! (-> self hit-points) 10)
+    (set! (-> self hit-points) 50)
     (set! (-> self stage) (min 2 (+ (-> self stage) 1)))
     (change-to (nav-mesh-from-res-tag (-> self entity) 'nav-mesh-actor (-> self stage)) self)
     (set! (-> self current-nav-poly) #f)

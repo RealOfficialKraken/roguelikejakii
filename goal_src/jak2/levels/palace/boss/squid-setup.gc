@@ -1450,12 +1450,12 @@
             (squid-take-hit (the-as touching-shapes-entry (-> arg3 param 0)) (the-as attack-info (-> arg3 param 1)) #f)
             )
           )
-         ((time-elapsed? (-> self invincible-timer) (seconds 3))
+         ((time-elapsed? (-> self invincible-timer) (seconds 0.01))
           (cond
             ((and (= (-> self shield-hit-points) 0.0)
                   (not (and (-> self next-state) (= (-> self next-state name) 'recharge)))
                   )
-             (set! (-> self hit-points) (max 0 (+ (-> self hit-points) -2)))
+             (set! (-> self hit-points) (max 0 (+ (-> self hit-points) -1)))
              (squid-talker 'damaged)
              )
             (else
@@ -1807,7 +1807,7 @@ This commonly includes things such as:
   (set! (-> this shield-timer) 0)
   (set! (-> this shield-hit-points) 1.0)
   (set! (-> this shield-shattered) #f)
-  (set! (-> this hit-points) 10)
+  (set! (-> this hit-points) 50)
   (set! (-> this invincible-timer) 0)
   (set! (-> this stage) 0)
   (set! (-> this stage-2-go-status) 0)
@@ -2669,7 +2669,7 @@ This commonly includes things such as:
            )
           (else
             (set! (-> (the-as hud-squid v1-316) values 0 target) (-> this stage))
-            (set! (-> (the-as hud-squid v1-316) values 1 target) (/ (* 100 (-> this hit-points)) 10))
+            (set! (-> (the-as hud-squid v1-316) values 1 target) (/ (* 100 (-> this hit-points)) 50))
             )
           )
         )
