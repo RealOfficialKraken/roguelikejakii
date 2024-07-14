@@ -234,12 +234,25 @@
 (define skip-intro #f)
 (define enemy-drop-weapon-once #f)
 
+(when *debug-segment*
+(define sound-eco-grab-white "goal_src/jak2/pc/snd/light-eco-grab.wav")
+(define sound-endofworld "goal_src/jak2/pc/snd/endofworld.mp3")
+(define sound-ohshit "goal_src/jak2/pc/snd/ohshit.mp3")
+(define sound-eco-blue "goal_src/jak2/pc/snd/blue-eco-grab.mp3")
+(define sound-eco-yellow "goal_src/jak2/pc/snd/yellow-eco-grab.mp3")
+(define sound-eco-red "goal_src/jak2/pc/snd/red-eco-grab.mp3")
+(define sound-quick-death "goal_src/jak2/pc/snd/quick-death.wav")
+)
+
+(when (not *debug-segment*)
 (define sound-eco-grab-white "data/goal_src/jak2/pc/snd/light-eco-grab.wav")
 (define sound-endofworld "data/goal_src/jak2/pc/snd/endofworld.mp3")
 (define sound-ohshit "data/goal_src/jak2/pc/snd/ohshit.mp3")
 (define sound-eco-blue "data/goal_src/jak2/pc/snd/blue-eco-grab.mp3")
 (define sound-eco-yellow "data/goal_src/jak2/pc/snd/yellow-eco-grab.mp3")
 (define sound-eco-red "data/goal_src/jak2/pc/snd/red-eco-grab.mp3")
+(define sound-quick-death "data/goal_src/jak2/pc/snd/quick-death.wav")
+)
 
 (define powered? #f)
 (define power-dur 0)

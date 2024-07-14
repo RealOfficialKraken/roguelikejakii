@@ -1620,14 +1620,20 @@ This commonly includes things such as:
   (none)
   )
 
-  (defbehavior metalkor-init-by-other metalkor ((vec vector))
-  (set! (-> self root scale x) 10.0)
-  (set! (-> self root scale y) 10.0)
-  (set! (-> self root scale z) 10.0)
+  #|
   (let ((offset-quat (new-stack-quaternion0)) ;new quat
+        (metalkor-pos (new 'stack-no-clear 'vector :x (meters 51.4366) :y (meters -32.6720) :z (meters -1010.0715)))
+        (metalkor-pos-off (new 'stack-no-clear 'vector :x (meters 51.4366) :y (meters -32.6720) :z (meters -1010.0715)))
+        (metalkor-pos-quat (new 'static 'quaternion :x (meters -50.4366) :y (meters -32.6720) :z (meters -310.0715)))
+        )
+        |#
+
+  (defbehavior metalkor-init-by-other metalkor ((vec vector))
+  (local-vars (sv-16 res-tag))
+  (let ((metalkor-pos-quat (new 'static 'quaternion :x 0.0 :y -1.0 :z 0.0))
         )
     ;;manipy code
-    (quaternion-copy! offset-quat (quaternion-from-two-vectors! offset-quat moffset-vec (target-pos 0))) ;make a quat from target-pos 0 and the original vector
+    ;(quaternion-copy! offset-quat (quaternion-from-two-vectors! metalkor-pos-quat metalkor-pos metalkor-pos-off)) ;make a quat from target-pos 0 and the original vector
     (let ((kor (process-spawn manipy
                             :init
                             manipy-init
@@ -1636,7 +1642,6 @@ This commonly includes things such as:
                             (art-group-get-by-name *level* "skel-metalkor" (the (pointer uint32) #f))
                             #f
                             0)
-                            (send-event (-> kor 0) 'rot-quat offset-quat)
                             ))
     (if kor
       (let ((torso (process-spawn manipy
@@ -1649,7 +1654,6 @@ This commonly includes things such as:
                                   0
                                   :to
                                   (-> kor 0))
-                                  (send-event (-> kor 0) 'rot-quat offset-quat)
                                   )
             (legs (process-spawn manipy
                                 :init
@@ -1661,8 +1665,11 @@ This commonly includes things such as:
                                 0
                                 :to
                                 (-> kor 0))
-                                (send-event (-> kor 0) 'rot-quat offset-quat)
-                                )))))
+                                ))
+                                (send-event (-> kor 0) 'rot-quat metalkor-pos-quat)
+                                (send-event (-> torso 0) 'rot-quat metalkor-pos-quat)
+                                (send-event (-> legs 0) 'rot-quat metalkor-pos-quat)
+                                )))
   )
   (none)
     )

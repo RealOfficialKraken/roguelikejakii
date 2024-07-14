@@ -294,6 +294,11 @@
         (s4-0 (-> *target* gun fire-dir-out))
         (s5-0 (new 'stack-no-clear 'vector))
         )
+        (let ((s3-0 (new 'stack-no-clear 'quaternion)))
+      (quaternion-vector-angle! s3-0 s4-0 (* 182.04445 (rand-vu-float-range 0.0 360.0)))
+      (vector-rotate-y! s5-0 s4-0 (* 182.04445 (rand-vu-float-range 0.0 1.1)))
+      (vector-orient-by-quat! s5-0 s5-0 s3-0)
+      )
     (let ((s4-1 (new 'stack-no-clear 'projectile-init-by-other-params)))
       (set! (-> s4-1 ent) (-> arg0 entity))
       (set! (-> s4-1 charge) 1.0)
@@ -533,7 +538,7 @@
                                2.0
                                )
           )
-          (when (= p-crit-hits #t)
+          #|(when (= p-crit-hits #t)
           (let ((crit-dmg-1 (+ (/ (-> *game-info* skill) 45) 2.0))
                   (crit-dmg-2 (+ (/ (-> *game-info* skill) 45) 4.0)))
             (when (= p-upgrade-damage #t)
@@ -543,7 +548,7 @@
               (set! (-> this damage) crit-dmg-1)
             )
             )
-        )
+        )|#
     0
     (none)
     )

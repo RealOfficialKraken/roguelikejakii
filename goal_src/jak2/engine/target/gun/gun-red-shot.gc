@@ -89,8 +89,8 @@
                       )
                 )
             (when s5-3
-              (send-event (ppointer->process s5-3) 'anim-mode 'play1)
-              (send-event (ppointer->process s5-3) 'anim "idle")
+                (send-event (ppointer->process s5-3) 'anim-mode 'play1)
+                (send-event (ppointer->process s5-3) 'anim "idle")
               (forward-up->quaternion
                 (-> (the-as process-drawable (-> s5-3 0)) root quat)
                 (-> gp-0 fire-dir-out)
@@ -655,8 +655,8 @@
                       )
                 )
             (when s5-3
-              (send-event (ppointer->process s5-3) 'anim-mode 'play1)
-              (send-event (ppointer->process s5-3) 'anim "idle")
+                (send-event (ppointer->process s5-3) 'anim-mode 'play1)
+                (send-event (ppointer->process s5-3) 'anim "idle")
               (forward-up->quaternion
                 (-> (the-as process-drawable (-> s5-3 0)) root quat)
                 (-> gp-0 fire-dir-out)

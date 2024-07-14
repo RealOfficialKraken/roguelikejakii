@@ -47,7 +47,7 @@
   (let ((gp-0 (new 'stack-no-clear 'projectile-init-by-other-params)))
     (set! (-> gp-0 ent) (-> arg0 entity))
     (set! (-> gp-0 charge) 1.0)
-    (set! (-> gp-0 options) (projectile-options account-for-target-velocity proj-options-8000))
+    (set! (-> gp-0 options) (projectile-options account-for-target-velocity deal-damage proj-options-8000))
     (set! (-> gp-0 pos quad) (-> arg1 quad))
     (set! (-> gp-0 notify-handle) (the-as handle #f))
     (set! (-> gp-0 owner-handle) (the-as handle #f))
@@ -60,7 +60,7 @@
       )
     (set! (-> gp-0 timeout) (seconds 4))
     (vector-normalize-copy! (-> gp-0 vel) arg2 819200.0)
-    (spawn-projectile gun-yellow-shot gp-0 arg0 *default-dead-pool*)
+    (spawn-projectile gun-yellow-shot gp-0 (ppointer->process (-> (-> *target* gun) gun)) *default-dead-pool*)
     )
   )
 

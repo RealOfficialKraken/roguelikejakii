@@ -85,6 +85,9 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 (define in-debug? #f)
 (define metalkor-waitkill #f)
 (define m-killi 0)
+(define fog-comein #f)
+(define fog-ci 0)
+(define found-you #f)
 
 
 (defskelgroup skel-rift-ring-ingame rift-ring-in-game rift-ring-in-game-lod0-jg rift-ring-in-game-idle-ja
@@ -147,10 +150,8 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 
 
   (defun metalkor-appear ()
-  (let ((vec1 (new 'stack-no-clear 'vector :x (meters 10) :y (meters -15) :z (meters 10) :w 1.0)) ;offset metalkor spawn away from (target-pos 0)
-        (metalkor-pos (new 'stack-no-clear 'vector :x (meters 51.4366) :y (meters -32.6720) :z (meters -1010.0715)))
-        )
-    (process-spawn metalkor metalkor-pos)
+  (let ((metalkor-pos1 (new 'static 'vector :x (meters -292.9985) :y (meters 353.4276) :z (meters -1640.9791))))
+        (process-spawn metalkor metalkor-pos1)
   )
   (none)
   )
@@ -959,6 +960,8 @@ This commonly includes things such as:
   (set! machine-locked? #f)
   (set! powered? #f)
   (set! power-dur 0)
+  (set! found-you #f)
+  (kill-by-name "manipy" *default-pool*)
   (when (= (-> *game-info* total-trys) 4)
     (set! menu-value 5.0)
     (set! mod-s "Peacemaker")
@@ -1131,6 +1134,42 @@ This commonly includes things such as:
   (set! vin-spawned? #t)
   (set! waitspawn 0)
   (set! wait-vinspawn #f)
+  )
+)
+
+(when (= fog-comein #t) ;end of Act 3 Stage 5 without ecos
+(+! fog-ci 1)
+(when (= fog-ci 1)
+  (set! (-> *mood-control* overide-weather-flag) #t)
+)
+  (when (< gt-i 0.99)
+      (+! gt-i 0.001)
+      (set! (-> *mood-control* overide cloud) gt-i)
+    )
+    (when (< gf-i 0.99)
+      (set! gf-i 0.001)
+      (set! (-> *mood-control* overide fog) gf-i)
+    )
+    (when (= fog-ci 500)
+      (play-sound-file sound-ohshit (the int (* (-> *setting-control* user-current sfx-volume) 100)))
+    )
+  (when (= fog-ci 660)
+    (set! found-you #t)
+  )
+  (when (>= fog-ci 1000)
+  (metalkor-appear)
+  (play-sound-file sound-quick-death (the int (* (-> *setting-control* user-current sfx-volume) 100)))
+  (send-event (ppointer->process *time-of-day*) 'change 'ratio 240.0) 
+  (set! (-> *time-of-day-context* overide-enable) #f)
+  (set! (-> *mood-control* overide-weather-flag) #t)
+  (set! (-> *mood-control* overide fog) 1.0)
+  (set! (-> *mood-control* overide cloud) 1.0)
+  (set! (-> (level-get-target-inside *level*) mood-func)update-mood-nest)
+  (task-node-close! (game-task-node castle-boss-resolution))
+  )
+  (when (= fog-ci 1001)
+    (set! fog-ci 0)
+    (set! fog-comein #f)
   )
 )
 
@@ -2900,6 +2939,7 @@ This commonly includes things such as:
       (set! reward-orbs #t)
       (set! please-reward #f)
     )
+    (set! already-teleported? #f)
     (when (= re-i 501)
       (set! re-i 0)
       (set! re-wait #f)
@@ -4428,6 +4468,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
   (set! avoidc-waitb #f)
   (set! display-run #f)
   (set! avoidc-wait 0)
+  (stop-sound-file)
 )
 
 
@@ -6117,7 +6158,8 @@ Here are the shop IDs
 (when (and (= in-menu #t)(= (paused?) #f)(= win-lose #t)(>= (-> *game-info* karma) 2.0)(!= (-> *game-info* karma) 6.0)(not (cpad-pressed? 0 x)))
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "~%<COLOR_GREEN>~%You Won!
+    (format matt-str "~%<COLOR_RED>~%The Entity found you.
+~%<COLOR_ORANGE>Explosive Yellow Shot unlocked in shops across all dimensions!
 ~%
 ~%<COLOR_WHITE>Skulls Gems turned into Tokens:
 ~%<COLOR_YELLOW>~d
@@ -6130,10 +6172,9 @@ Here are the shop IDs
 ~%<COLOR_WHITE>Current Tokens:
 ~%<COLOR_PINK>~d
 ~%
-~%
-~%<COLOR_ORANGE>Explosive Yellow Shot unlocked in shops across all dimensions!
 ~%<COLOR_RED>The Time Loop remains broken.
-~%<COLOR_ORANGE>Hint: Try to collect important items for Vin!
+~%<COLOR_YELLOW>Hint:<COLOR_ORANGE> Try to collect important items for Vin!
+~%That way The Entity doesn't track you down
 ~%
 ~%<COLOR_GREEN>Press <COLOR_BLUE>X<COLOR_GREEN> to Continue"
     (the int temp-skullgemamount)
@@ -9169,6 +9210,7 @@ Here are the shop IDs
 (= (-> *game-info* karma) 6.0)
 (cpad-hold? 0 l2)
 (cpad-pressed? 0 r3)
+(= in-hub? #f)
 (= popup-shop #f)
 (= in-menu2 #f)
 )
@@ -10192,6 +10234,28 @@ Here are the shop IDs
 
 
 |#
+
+(when 
+(and 
+(= found-you #t)
+(= (paused?) #f)
+(= (pause-allowed?) #t)
+*target*
+(not *scene-player*)
+)
+  (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_RED>FOUND YOU"
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 100 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
 
     ;(set! (-> (level-get-target-inside *level*) mood-func)update-mood-nest)
 
