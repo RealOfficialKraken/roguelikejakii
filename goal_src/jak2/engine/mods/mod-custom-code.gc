@@ -414,307 +414,6 @@ This commonly includes things such as:
     )
 
 
-(defun give-item ((arg0 string) (arg1 int))
-(when 
-(and
-(not (string= arg0 "red"))
-(not (string= arg0 "blue"))
-(not (string= arg0 "dark"))
-(not (string= arg0 "redrof"))
-(not (string= arg0 "damage"))
-(not (string= arg0 "ammo"))
-(not (string= arg0 "vehicles"))
-(not (string= arg0 "double"))
-(not (string= arg0 "explosive"))
-(not (string= arg0 "clover"))
-(not (string= arg0 "2hp"))
-(not (string= arg0 "mpunch"))
-(not (string= arg0 "clone"))
-(not (string= arg0 "weight"))
-(not (string= arg0 "rapid"))
-(not (string= arg0 "darkupgrade"))
-)
-(format #t "ERROR: Unknown Item. Please use: ~%red~%blue~%dark~%redrof~%ammo~%damage~%vehicles~%double~%explosive~%clover~%2hp~%mpunch~%clone~%weight~%rapid~%darkupgrade")
-)
-(when (and (!= arg1 1) (!= arg1 0))
-(format #t "ERROR: Please choose either 0 or 1:~%1 = You have it~%0 = You don't have it")
-)
-
-(when 
-(and 
-(string= arg0 "red")
-(= arg1 1)
-(= (/ (mod (-> *game-info* task-deaths) 10) 1) 0)
-)
- (+! (-> *game-info* task-deaths) 1)
-)
-(when 
-(and 
-(string= arg0 "red")
-(= arg1 0)
-(= (/ (mod (-> *game-info* task-deaths) 10) 1) 1)
-)
- (-! (-> *game-info* task-deaths) 1)
-)
-
-(when 
-(and 
-(string= arg0 "blue")
-(= arg1 1)
-(= (/ (mod (-> *game-info* task-deaths) 100) 10) 0)
-)
- (+! (-> *game-info* task-deaths) 10)
-)
-(when 
-(and 
-(string= arg0 "blue")
-(= arg1 0)
-(= (/ (mod (-> *game-info* task-deaths) 100) 10) 1)
-)
- (-! (-> *game-info* task-deaths) 10)
-)
-
-(when 
-(and 
-(string= arg0 "dark")
-(= arg1 1)
-(= (/ (mod (-> *game-info* task-deaths) 1000) 100) 0)
-)
- (+! (-> *game-info* task-deaths) 100)
-)
-(when 
-(and 
-(string= arg0 "dark")
-(= arg1 0)
-(= (/ (mod (-> *game-info* task-deaths) 1000) 100) 1)
-)
- (-! (-> *game-info* task-deaths) 100)
-)
-
-(when 
-(and 
-(string= arg0 "redrof")
-(= arg1 1)
-(= (/ (mod (-> *game-info* task-deaths) 10000) 1000) 0)
-)
- (+! (-> *game-info* task-deaths) 1000)
-)
-(when 
-(and 
-(string= arg0 "redrof")
-(= arg1 0)
-(= (/ (mod (-> *game-info* task-deaths) 10000) 1000) 1)
-)
- (-! (-> *game-info* task-deaths) 1000)
-)
-
-(when 
-(and 
-(string= arg0 "ammo")
-(= arg1 1)
-(= (/ (mod (-> *game-info* task-deaths) 100000) 10000) 0)
-)
- (+! (-> *game-info* task-deaths) 10000)
-)
-(when 
-(and 
-(string= arg0 "ammo")
-(= arg1 0)
-(= (/ (mod (-> *game-info* task-deaths) 100000) 10000) 1)
-)
- (-! (-> *game-info* task-deaths) 10000)
-)
-
-(when 
-(and 
-(string= arg0 "damage")
-(= arg1 1)
-(= (/ (mod (-> *game-info* task-deaths) 1000000) 100000) 0)
-)
- (+! (-> *game-info* task-deaths) 100000)
-)
-(when 
-(and 
-(string= arg0 "damage")
-(= arg1 0)
-(= (/ (mod (-> *game-info* task-deaths) 1000000) 100000) 1)
-)
- (-! (-> *game-info* task-deaths) 100000)
-)
-
-(when 
-(and 
-(string= arg0 "vehicles")
-(= arg1 1)
-(= (/ (mod (-> *game-info* task-deaths) 10000000) 1000000) 0)
-)
- (+! (-> *game-info* task-deaths) 1000000)
-)
-(when 
-(and 
-(string= arg0 "vehicles")
-(= arg1 0)
-(= (/ (mod (-> *game-info* task-deaths) 10000000) 1000000) 1)
-)
- (-! (-> *game-info* task-deaths) 1000000)
-)
-
-(when 
-(and 
-(string= arg0 "double")
-(= arg1 1)
-(= (/ (mod (-> *game-info* task-deaths) 100000000) 10000000) 0)
-)
- (+! (-> *game-info* task-deaths) 10000000)
-)
-(when 
-(and 
-(string= arg0 "double")
-(= arg1 0)
-(= (/ (mod (-> *game-info* task-deaths) 100000000) 10000000) 1)
-)
- (-! (-> *game-info* task-deaths) 10000000)
-)
-
-(when 
-(and 
-(string= arg0 "explosive")
-(= arg1 1)
-(= (/ (mod (-> *game-info* task-deaths) 1000000000) 100000000) 0)
-)
- (+! (-> *game-info* task-deaths) 100000000)
-)
-(when 
-(and 
-(string= arg0 "explosive")
-(= arg1 0)
-(= (/ (mod (-> *game-info* task-deaths) 1000000000) 100000000) 1)
-)
- (-! (-> *game-info* task-deaths) 100000000)
-)
-
-
-(when 
-(and 
-(string= arg0 "clover")
-(= arg1 1)
-(= (/ (mod (-> *game-info* continue-deaths) 10) 1) 0)
-)
- (+! (-> *game-info* continue-deaths) 1)
-)
-(when 
-(and 
-(string= arg0 "clover")
-(= arg1 0)
-(= (/ (mod (-> *game-info* continue-deaths) 10) 1) 1)
-)
- (-! (-> *game-info* continue-deaths) 1)
-)
-
-(when 
-(and 
-(string= arg0 "2hp")
-(= arg1 1)
-(= (/ (mod (-> *game-info* continue-deaths) 100) 10) 0)
-)
- (+! (-> *game-info* continue-deaths) 10)
-)
-(when 
-(and 
-(string= arg0 "2hp")
-(= arg1 0)
-(= (/ (mod (-> *game-info* continue-deaths) 100) 10) 1)
-)
- (-! (-> *game-info* continue-deaths) 10)
-)
-
-(when 
-(and 
-(string= arg0 "mpunch")
-(= arg1 1)
-(= (/ (mod (-> *game-info* continue-deaths) 1000) 100) 0)
-)
- (+! (-> *game-info* continue-deaths) 100)
-)
-(when 
-(and 
-(string= arg0 "mpunch")
-(= arg1 0)
-(= (/ (mod (-> *game-info* continue-deaths) 1000) 100) 1)
-)
- (-! (-> *game-info* continue-deaths) 100)
-)
-
-(when 
-(and 
-(string= arg0 "clone")
-(= arg1 1)
-(= (/ (mod (-> *game-info* continue-deaths) 10000) 1000) 0)
-)
- (+! (-> *game-info* continue-deaths) 1000)
-)
-(when 
-(and 
-(string= arg0 "clone")
-(= arg1 0)
-(= (/ (mod (-> *game-info* continue-deaths) 10000) 1000) 1)
-)
- (-! (-> *game-info* continue-deaths) 1000)
-)
-
-(when 
-(and 
-(string= arg0 "weight")
-(= arg1 1)
-(= (/ (mod (-> *game-info* continue-deaths) 100000) 10000) 0)
-)
- (+! (-> *game-info* continue-deaths) 10000)
-)
-(when 
-(and 
-(string= arg0 "weight")
-(= arg1 0)
-(= (/ (mod (-> *game-info* continue-deaths) 100000) 10000) 1)
-)
- (-! (-> *game-info* continue-deaths) 10000)
-)
-
-(when 
-(and 
-(string= arg0 "rapid")
-(= arg1 1)
-(= (/ (mod (-> *game-info* continue-deaths) 1000000) 100000) 0)
-)
- (+! (-> *game-info* continue-deaths) 100000)
-)
-(when 
-(and 
-(string= arg0 "rapid")
-(= arg1 0)
-(= (/ (mod (-> *game-info* continue-deaths) 1000000) 100000) 1)
-)
- (-! (-> *game-info* continue-deaths) 100000)
-)
-
-(when 
-(and 
-(string= arg0 "darkupgrade")
-(= arg1 1)
-(= (/ (mod (-> *game-info* continue-deaths) 10000000) 1000000) 0)
-)
- (+! (-> *game-info* continue-deaths) 1000000)
-)
-(when 
-(and 
-(string= arg0 "darkupgrade")
-(= arg1 0)
-(= (/ (mod (-> *game-info* continue-deaths) 10000000) 1000000) 1)
-)
- (-! (-> *game-info* continue-deaths) 1000000)
-)
-(set! item-refresh #t)
-(none)
-)
 
 
 
@@ -1011,6 +710,10 @@ This commonly includes things such as:
     (set! mod-s "Gol's Unbeknowngst")
   )
   (when (= (-> *game-info* total-trys) 16)
+    (set! menu-value 200.0)
+    (set! mod-s "Red Sage's Blessing")
+  )
+  (when (= (-> *game-info* total-trys) 17)
     (set! menu-value 999999.0)
     (set! mod-s "(More coming soon!)")
   )
@@ -1018,10 +721,16 @@ This commonly includes things such as:
 
 (when (and (>= (-> *game-info* fuel) menu-value)(= vin-shop #t)(cpad-pressed? 0 r1))
   (-! (-> *game-info* fuel) menu-value)
-  (when (= (-> *game-info* total-trys) 15)
-    (set! (-> *game-info* total-trys) 16)
+  (when (= (-> *game-info* total-trys) 16)
+    (set! (-> *game-info* total-trys) 17)
     (set! menu-value 999999.0)
     (set! mod-s "(More coming soon)")
+    (set! autosave-delayed #t)
+  )
+  (when (= (-> *game-info* total-trys) 15)
+    (set! (-> *game-info* total-trys) 16)
+    (set! menu-value 200.0)
+    (set! mod-s "Red Sage's Blessing")
     (set! autosave-delayed #t)
   )
   (when (= (-> *game-info* total-trys) 14)
@@ -3663,437 +3372,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
   )
 )
 
-(when 
-  (and 
-  (= p-red-gun #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* task-deaths) 10) 1) 1)
-  )
-    (set! p-red-gun #t)
-    (set! item-tss1 "Scatter Gun")
-    (set! item-update #t)
-  )
-  (when 
-  (and 
-  (= p-blue-gun #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* task-deaths) 100) 10) 1)
-  )
-    (set! p-blue-gun #t)
-    (set! item-tss1 "Blue Gun")
-    (set! item-update #t)
-  )
-  (when 
-  (and 
-  (= p-dark-gun #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* task-deaths) 1000) 100) 1)
-  )
-    (set! p-dark-gun #t)
-    (set! item-tss1 "Peacemaker")
-    (set! item-update #t)
-  )
-  (when 
-  (and 
-  (= p-upgrade-red #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* task-deaths) 10000) 1000) 1)
-  )
-    (set! p-upgrade-red #t)
-    (set! item-tss1 "Scattergun ROF")
-    (set! item-update #t)
-  )
-      (when 
-  (and 
-  (= p-upgrade-ammo #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* task-deaths) 100000) 10000) 1)
-  )
-    (set! p-upgrade-ammo #t)
-    (set! item-tss1 "Upgraded Ammo")
-    (set! item-update #t)
-  )
 
-      (when 
-  (and 
-  (= p-upgrade-damage #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* task-deaths) 1000000) 100000) 1)
-  )
-    (set! p-upgrade-damage #t)
-    (set! item-tss1 "Upgraded Damage")
-    (set! item-update #t)
-  )
-  (when 
-  (and 
-  (= p-upgrade-vehicles #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* task-deaths) 10000000) 1000000) 1)
-  )
-    (set! p-upgrade-vehicles #t)
-    (= item-update #f)
-    (set! item-tss1 "Upgraded Vehicles")
-    (set! item-update #t)
-  )
-  (when 
-  (and 
-  (= p-double-shot #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* task-deaths) 100000000) 10000000) 1)
-  )
-    (set! p-double-shot #t)
-    (= item-update #f)
-    (set! item-tss1 "Double Shot")
-    (set! item-update #t)
-  )
-  (when 
-  (and 
-  (= p-explode-shot #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* task-deaths) 1000000000) 100000000) 1)
-  )
-    (set! p-explode-shot #t)
-    (set! item-tss1 "Explosive Yellow Shot")
-    (set! item-update #t)
-  )
-  (when 
-  (and 
-  (= p-clover #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* continue-deaths) 10) 1) 1)
-  )
-    (set! p-clover #t)
-    (set! item-tss1 "Four-Leaf Clover")
-    (set! item-update #t)
-  )
-  (when 
-  (and 
-  (= p-drinkable #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* continue-deaths) 100) 10) 1)
-  )
-    (set! p-drinkable #t)
-    (set! item-tss1 "+2HP Every Level")
-    (set! item-update #t)
-  )
-  (when 
-  (and 
-  (= p-big-punch #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* continue-deaths) 1000) 100) 1)
-  )
-    (set! p-big-punch #t)
-    (set! item-tss1 "Mar's Punch")
-    (set! item-update #t)
-  )
-  (when 
-  (and 
-  (= p-sage-yellow #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* continue-deaths) 10000) 1000) 1)
-  )
-    (set! p-sage-yellow #t)
-    (set! item-tss1 "Pocket Rift Gate")
-    (set! item-update #t)
-  )
-  (when 
-  (and 
-  (= p-sage-blue #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* continue-deaths) 100000) 10000) 1)
-  )
-    (set! p-sage-blue #t)
-    (set! item-tss1 "Training Weight")
-    (set! item-update #t)
-  )
-  (when 
-  (and 
-  (= p-sage-red #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* continue-deaths) 1000000) 100000) 1)
-  )
-    (set! p-sage-red #t)
-    (set! item-tss1 "Rapid Fire")
-    (set! item-update #t)
-  )
-  (when 
-  (and 
-  (= p-sage-dark #f)
-  (= item-update #f)
-  (= (/ (mod (-> *game-info* continue-deaths) 10000000) 1000000) 1)
-  )
-    (set! p-sage-dark #t)
-    (set! item-tss1 "Gol's Unbeknowngst")
-    (set! item-update #t)
-  )
-  
-(when 
-  (and 
-  (= p-red-gun #t)
-  (!= (/ (mod (-> *game-info* task-deaths) 10) 1) 1)
-  )
-    (set! p-red-gun #f)
-  )
-  (when 
-  (and 
-  (= p-blue-gun #t)
-  (!= (/ (mod (-> *game-info* task-deaths) 100) 10) 1)
-  )
-    (set! p-blue-gun #f)
-  )
-  (when 
-  (and 
-  (= p-dark-gun #t)
-  (!= (/ (mod (-> *game-info* task-deaths) 1000) 100) 1)
-  )
-    (set! p-dark-gun #f)
-  )
-  (when 
-  (and 
-  (= p-upgrade-red #t)
-  (!= (/ (mod (-> *game-info* task-deaths) 10000) 1000) 1)
-  )
-    (set! p-upgrade-red #f)
-  )
-      (when 
-  (and 
-  (= p-upgrade-ammo #t)
-  (!= (/ (mod (-> *game-info* task-deaths) 100000) 10000) 1)
-  )
-    (set! p-upgrade-ammo #f)
-  )
-
-      (when 
-  (and 
-  (= p-upgrade-damage #t)
-  (!= (/ (mod (-> *game-info* task-deaths) 1000000) 100000) 1)
-  )
-    (set! p-upgrade-damage #f)
-  )
-  (when 
-  (and 
-  (= p-upgrade-vehicles #t)
-  (!= (/ (mod (-> *game-info* task-deaths) 10000000) 1000000) 1)
-  )
-    (set! p-upgrade-vehicles #f)
-  )
-  (when 
-  (and 
-  (= p-double-shot #t)
-  (!= (/ (mod (-> *game-info* task-deaths) 100000000) 10000000) 1)
-  )
-    (set! p-double-shot #f)
-  )
-  (when 
-  (and 
-  (= p-explode-shot #t)
-  (!= (/ (mod (-> *game-info* task-deaths) 1000000000) 100000000) 1)
-  )
-    (set! p-explode-shot #f)
-  )
-
-(when 
-  (and 
-  (= p-clover #t)
-  (!= (/ (mod (-> *game-info* continue-deaths) 10) 1) 1)
-  )
-    (set! p-clover #f)
-  )
-
-  (when 
-  (and 
-  (= p-drinkable #t)
-  (!= (/ (mod (-> *game-info* continue-deaths) 100) 10) 1)
-  )
-    (set! p-drinkable #f)
-  )
-  (when 
-  (and 
-  (= p-big-punch #t)
-  (!= (/ (mod (-> *game-info* continue-deaths) 1000) 100) 1)
-  )
-    (set! p-big-punch #f)
-  )
-    (when 
-  (and 
-  (= p-sage-yellow #t)
-  (!= (/ (mod (-> *game-info* continue-deaths) 10000) 1000) 1)
-  )
-    (set! p-sage-yellow #f)
-  )
-  (when 
-  (and 
-  (= p-sage-blue #t)
-  (!= (/ (mod (-> *game-info* continue-deaths) 100000) 10000) 1)
-  )
-    (set! p-sage-blue #f)
-  )
-  (when 
-  (and 
-  (= p-sage-red #t)
-  (!= (/ (mod (-> *game-info* continue-deaths) 1000000) 100000) 1)
-  )
-    (set! p-sage-red #f)
-  )
-  (when 
-  (and 
-  (= p-sage-dark #t)
-  (!= (/ (mod (-> *game-info* continue-deaths) 10000000) 1000000) 1)
-  )
-    (set! p-sage-dark #f)
-  )
-
-
-  (when 
-  (and 
-  (!= curse 0.0)
-  (= (/ (mod (-> *game-info* continue-deaths) 1000000000) 100000000) 0)
-  )
-    (set! curse 0.0)
-    (set! curse-level 0)
-  )
-  (when 
-  (and 
-  (!= curse 0.03)
-  (= (/ (mod (-> *game-info* continue-deaths) 1000000000) 100000000) 1)
-  )
-    (set! curse 0.03)
-    (set! curse-level 1)
-  )
- (when 
-  (and 
-  (!= curse 0.06)
-  (= (/ (mod (-> *game-info* continue-deaths) 1000000000) 100000000) 2)
-  )
-    (set! curse 0.06)
-    (set! curse-level 2)
-  )
-  (when 
-  (and 
-  (!= curse 0.1)
-  (= (/ (mod (-> *game-info* continue-deaths) 1000000000) 100000000) 3)
-  )
-    (set! curse 0.1)
-    (set! curse-level 3)
-  )
-  (when 
-  (and 
-  (!= curse 0.12)
-  (= (/ (mod (-> *game-info* continue-deaths) 1000000000) 100000000) 4)
-  )
-    (set! curse 0.12)
-    (set! curse-level 4)
-  )
-  (when 
-  (and 
-  (!= curse 0.18)
-  (= (/ (mod (-> *game-info* continue-deaths) 1000000000) 100000000) 5)
-  )
-    (set! curse 0.18)
-    (set! curse-level 5)
-  )
-  (when 
-  (and 
-  (!= curse 0.25)
-  (= (/ (mod (-> *game-info* continue-deaths) 1000000000) 100000000) 6)
-  )
-    (set! curse 0.25)
-    (set! curse-level 6)
-  )
-  (when 
-  (and 
-  (!= curse 0.35)
-  (= (/ (mod (-> *game-info* continue-deaths) 1000000000) 100000000) 7)
-  )
-    (set! curse 0.35)
-    (set! curse-level 7)
-  )
-  (when 
-  (and 
-  (!= curse 0.45)
-  (= (/ (mod (-> *game-info* continue-deaths) 1000000000) 100000000) 8)
-  )
-    (set! curse 0.45)
-    (set! curse-level 8)
-  )
-  (when 
-  (and 
-  (!= curse 1.0)
-  (= (/ (mod (-> *game-info* continue-deaths) 1000000000) 100000000) 9)
-  )
-    (set! curse 1.0)
-    (set! curse-level 9)
-  )
-  (when 
-  (and 
-  (!= luck 0.05)
-  (= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 0)
-  )
-    (set! luck 0.05)
-  )
-  (when 
-  (and 
-  (!= luck 0.1)
-  (= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 1)
-  )
-    (set! luck 0.1)
-  )
-  (when 
-  (and 
-  (!= luck 0.103)
-  (= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 2)
-  )
-    (set! luck 0.103)
-  )
-  (when 
-  (and 
-  (!= luck 0.107)
-  (= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 3)
-  )
-    (set! luck 0.107)
-  )
-  (when 
-  (and 
-  (!= luck 0.11)
-  (= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 4)
-  )
-    (set! luck 0.11)
-  )
-  (when 
-  (and 
-  (!= luck 0.13)
-  (= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 5)
-  )
-    (set! luck 0.13)
-  )
-  (when 
-  (and 
-  (!= luck 0.17)
-  (= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 6)
-  )
-    (set! luck 0.17)
-  )
-  (when 
-  (and 
-  (!= luck 0.2)
-  (= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 7)
-  )
-    (set! luck 0.2)
-  )
-  (when 
-  (and 
-  (!= luck 0.4)
-  (= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 8)
-  )
-    (set! luck 0.4)
-  )
-  (when 
-  (and 
-  (!= luck 0.6)
-  (= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 9)
-  )
-    (set! luck 0.6)
-  )
 
 
 
@@ -4814,6 +4093,18 @@ Here are the shop IDs
   (when (= shoproll3 16)
     (set! shopitem3 "Gol's Unbeknowngst (40 orbs)")
     (set! shopid3 16)
+  )
+  (when (= shoproll1 17)
+    (set! shopitem1 "Red Sage's Blessing (65 orbs)")
+    (set! shopid1 17)
+  )
+  (when (= shoproll2 17)
+    (set! shopitem2 "Red Sage's Blessing (65 orbs)")
+    (set! shopid2 17)
+  )
+  (when (= shoproll3 17)
+    (set! shopitem3 "Red Sage's Blessing (65 orbs)")
+    (set! shopid3 17)
   )
   (when (and (not (= shopid1 999))(not (= shopid2 999))(not (= shopid3 999))(rand-vu-percent? 0.1) (>= (-> *game-info* karma) 3.0))
     (set! shopitem1 "Explosive Yellow Shot (35 orbs)")
@@ -5640,6 +4931,48 @@ Here are the shop IDs
       (set! p-sage-dark #t)
       (set! item-update #t)
       (set! (-> *game-info* continue-deaths) (+ (-> *game-info* continue-deaths) 1000000))
+      (when (= already-teleported? #f)
+        (set! autosave-delayed #t)
+      )
+      (when (!= (/ (mod (-> *game-info* continue-deaths) 1000000000) 100000000) 9)
+      (+! (-> *game-info* continue-deaths) 100000000)
+    )
+    )
+    (when (and (= menu-slot 2)(= p-crit-hits #f)(>= (-> *game-info* skill) 65.0)(= shopid2 17))
+      (-! (-> *game-info* skill) 65.0)
+      (set! shopitem2 "(Out of Stock)")
+      (set! item-tss1 "Red Sage's Blessing")
+      (set! p-crit-hits #t)
+      (set! item-update #t)
+      (set! (-> *game-info* auto-save-count) (+ (-> *game-info* auto-save-count) 1))
+      (when (= already-teleported? #f)
+        (set! autosave-delayed #t)
+      )
+      (when (!= (/ (mod (-> *game-info* continue-deaths) 1000000000) 100000000) 9)
+      (+! (-> *game-info* continue-deaths) 100000000)
+    )
+    )
+    (when (and (= menu-slot 0)(= p-crit-hits #f)(>= (-> *game-info* skill) 65.0)(= shopid1 17))
+      (-! (-> *game-info* skill) 65.0)
+      (set! shopitem1 "(Out of Stock)")
+      (set! item-tss1 "Red Sage's Blessing")
+      (set! p-crit-hits #t)
+      (set! item-update #t)
+      (set! (-> *game-info* auto-save-count) (+ (-> *game-info* auto-save-count) 1))
+      (when (= already-teleported? #f)
+        (set! autosave-delayed #t)
+      )
+      (when (!= (/ (mod (-> *game-info* continue-deaths) 1000000000) 100000000) 9)
+      (+! (-> *game-info* continue-deaths) 100000000)
+    )
+    )
+    (when (and (= menu-slot 1)(= p-crit-hits #f)(>= (-> *game-info* skill) 65.0)(= shopid3 17))
+      (-! (-> *game-info* skill) 65.0)
+      (set! shopitem3 "(Out of Stock)")
+      (set! item-tss1 "Red Sage's Blessing")
+      (set! p-crit-hits #t)
+      (set! item-update #t)
+      (set! (-> *game-info* auto-save-count) (+ (-> *game-info* auto-save-count) 1))
       (when (= already-teleported? #f)
         (set! autosave-delayed #t)
       )
@@ -6739,6 +6072,29 @@ Here are the shop IDs
 (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "<COLOR_PINK>Crit with a Peacemaker blast out of any weapon!~%Crit chance based off your <COLOR_GREEN>luck stat~%Also makes a very special ability last longer"
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 245 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+
+(when (and 
+(= in-menu2 #t)
+(= p-crit-hits #f)
+(or
+(and (= shopid1 17) (= menu-slot 0))
+(and (= shopid2 17) (= menu-slot 2))
+(and (= shopid3 17) (= menu-slot 1))
+)
+)
+(clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_PINK>Empower your weapons by stacking orbs to increase~%the damage output off of Jak's projectiles!"
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
     (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
