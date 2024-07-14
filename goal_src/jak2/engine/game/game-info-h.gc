@@ -295,6 +295,7 @@
 (define p-sage-dark #f)
 (define p-crit-hits #f)
 (define p-reroll-mission #f)
+(define p-actual-clone #f)
 
 (define krew-completed-mission? #f)
 (define moffset-vec (new-stack-vector0))
