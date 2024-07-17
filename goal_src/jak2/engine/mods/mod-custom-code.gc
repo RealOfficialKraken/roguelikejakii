@@ -79,6 +79,180 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
     ;; Begin function defintions.
     ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(deftype metalkor (process-focusable)
+  ((trackable                        symbol)
+   (flitters                         handle            10)
+   (flitter-gem-tracker              handle)
+   (wasps                            handle            3)
+   (wasp-gem-tracker                 handle)
+   (last-flitter-launched            int8)
+   (last-wasp-launched               int8)
+   (live-flitters                    int8)
+   (live-wasps                       int8)
+   (shoot-timer                      time-frame)
+   (target-angle                     float)
+   (wave-timer                       time-frame)
+   (in-wave                          symbol)
+   (flitter-timer                    time-frame)
+   (wasp-timer                       time-frame)
+   (launching-flitters               symbol)
+   (launching-wasps                  symbol)
+   (egg-timer                        time-frame)
+   (last-close-attack                int8)
+   (last-standing-attack             int8)
+   (stage                            int8)
+   (next-stage-timer                 time-frame)
+   (initial-y                        float)
+   (shots-fired                      int16)
+   (stage-hit-points                 float)
+   (hud                              handle)
+   (lowtorso                         handle)
+   (legs                             handle)
+   (wings                            handle)
+   (kid                              handle)
+   (explode                          handle)
+   (rift-occlude                     handle)
+   (last-attack-id                   uint32)
+   (current-nav-poly                 nav-poly)
+   (shot-anticipate                  sparticle-launch-control)
+   (spinners                         handle            4)
+   (neck                             joint-mod)
+   (previous-flat-travel             vector            :inline)
+   (previous-flat-travel-timer       time-frame)
+   (previous-flat-travel-long-timer  time-frame)
+   (min-state-hit-points             float)
+   (countdown-to-roar                int8)
+   (for-back-interp                  cam-float-seeker  :inline)
+   (run-walk-interp                  cam-float-seeker  :inline)
+   (left-right-interp                cam-float-seeker  :inline)
+   (walk-turn-interp                 cam-float-seeker  :inline)
+   (idle-interp                      cam-float-seeker  :inline)
+   (tmp-hit-points                   float)
+   (reps-till-idle-alt               int8)
+   (last-rotation                    float)
+   (no-collision-timer               time-frame)
+   (egg-angle                        float             :offset 736)
+   (arm-frame                        float)
+   (been-to-entity                   symbol)
+   (flying-speed                     cam-float-seeker  :inline)
+   (wing-sound                       sound-id)
+   (wing-sound-playing               symbol)
+   (explode-sound                    sound-id)
+   (bomb-sound                       sound-id)
+   (stop-bomb-sound                  symbol)
+   (hit-ring-trans                   vector            :inline)
+   (hit-ring-offset                  vector            :inline)
+   (ring-cam-pos                     cam-float-seeker  :inline)
+   (need-teleport                    symbol)
+   )
+  (:state-methods
+    (beaten symbol)
+    explode
+    fly-to-ring
+    last-gasp
+    overload-recover
+    fall-down
+    tail-attack
+    foot-attack
+    get-close
+    standing-shot
+    chase-target
+    play-drop-movie
+    start-second-stage
+    hang-shoot-n-launch
+    hidden
+    test
+    )
+  )
+
+  (defun get-nav-control ((arg0 process-drawable) (arg1 nav-mesh))
+  (if (not arg1)
+      (set! arg1 (nav-mesh-from-res-tag (-> arg0 entity) 'nav-mesh-actor 0))
+      )
+  (if arg1
+    (add-process-drawable-to-navmesh arg1 arg0 #t)
+    (add-process-drawable-to-navmesh *default-nav-mesh* arg0 #t)
+    )
+  (none)
+  )
+
+  (defbehavior grenadier-init-by-other grenadier ((vec vector))
+  (init-enemy-collision! self)
+  (logior! (-> self mask) (process-mask actor-pause))
+  (vector-copy! (-> self root trans) vec)
+  (quaternion-identity! (-> self root quat))
+  (vector-identity! (-> self root scale))
+  (init-enemy! self)
+  (let ((nav (find-nearest-nav-mesh vec 0.0)) ;; try to find a nav mesh in the vicinity
+        ;; verts for the path
+        (cverts (new 'static 'inline-array vector 3
+                (static-vectorm 1 0 0)
+                (static-vectorm 0 1 0)
+                (static-vectorm 0 0 1)
+                )
+          )
+        )
+    ;; if a nav mesh is close by, use that, otherwise use default
+    (if nav
+      (change-to nav self)
+      (change-to *default-nav-mesh* self)
+      )
+    ;; allocate path
+    (set! (-> self path) (new 'process 'path-control self 'path 0.0 (the entity #f) #f))
+    (set! (-> self path curve cverts) cverts)
+    (set! (-> self path curve num-cverts) 3)
+    )
+  (set! (-> self hit-points) (+ (-> self enemy-info default-hit-points) 35.0))
+  (go-idle self)
+  )
+
+(defbehavior metalkor-init-by-other metalkor ((vec vector))
+  (local-vars (sv-16 res-tag))
+  (let ((metalkor-pos-quat (new 'static 'quaternion :x 0.0 :y -1.0 :z 0.0))
+        )
+    ;;manipy code
+    ;(quaternion-copy! offset-quat (quaternion-from-two-vectors! metalkor-pos-quat metalkor-pos metalkor-pos-off)) ;make a quat from target-pos 0 and the original vector
+    (let ((kor (process-spawn manipy
+                            :init
+                            manipy-init
+                            vec
+                            #f
+                            (art-group-get-by-name *level* "skel-metalkor" (the (pointer uint32) #f))
+                            #f
+                            0)
+                            ))
+    (if kor
+      (let ((torso (process-spawn manipy
+                                  :init
+                                  manipy-init
+                                  vec
+                                  #f
+                                  (art-group-get-by-name *level* "skel-metalkor-lowtorso" (the (pointer uint32) #f))
+                                  #f
+                                  0
+                                  :to
+                                  (-> kor 0))
+                                  )
+            (legs (process-spawn manipy
+                                :init
+                                manipy-init
+                                vec
+                                #f
+                                (art-group-get-by-name *level* "skel-metalkor-legs" (the (pointer uint32) #f))
+                                #f
+                                0
+                                :to
+                                (-> kor 0))
+                                ))
+                                (send-event (-> kor 0) 'rot-quat metalkor-pos-quat)
+                                (send-event (-> torso 0) 'rot-quat metalkor-pos-quat)
+                                (send-event (-> legs 0) 'rot-quat metalkor-pos-quat)
+                                )))
+  )
+  (none)
+    )
+
+
 (define matt-str (new 'global 'string 2048 (the-as string #f)))
 (define *pc-encoded-matt-str* (new 'global 'string 2048 (the-as string #f)))
 
@@ -90,7 +264,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 (define found-you #f)
 (define put-back-to-act1 #f)
 (define acti 0)
-
+(define keep-rolling-items #f)
 
 (defskelgroup skel-rift-ring-ingame rift-ring-in-game rift-ring-in-game-lod0-jg rift-ring-in-game-idle-ja
               ((rift-ring-in-game-lod0-mg (meters 999999)))
@@ -638,6 +812,8 @@ This commonly includes things such as:
   (set! (-> *mood-control* overide-weather-flag) #f)
   (set! (-> *time-of-day-context* overide-enable) #f)
   (set! in-cheat #f)
+  (set! grenadiers-spawned? #f)
+  (set! metalkor-stage-3 #f)
   (set! stat-menu-intro #f)
   (set! rngspeed (meters 5))
   (set! rngspeed2 (meters 5))
@@ -2730,6 +2906,18 @@ This commonly includes things such as:
     (set! autosave-delayed #t)
 )
 
+(when (= keep-rolling-items #t)
+  (when 
+  (and 
+  (= (-> *game-info* task-deaths) 1011111111)
+  (= (-> *game-info* continue-deaths) 1011100111)
+  (= (-> *game-info* auto-save-count) 1000000011)
+  )
+    (reset-items)
+  )
+  (set! roll-randomitem #t)
+)
+
 (when (= roll-randomitem #t) ;Get random item from board-drop
   (let (
     (random-int (rand-vu-int-range 1 (-> *game-info* total-trys)))
@@ -2812,12 +3000,12 @@ This commonly includes things such as:
      (!= (/ (mod (-> *game-info* continue-deaths) 10) 1) 1)
      )
      (+! (-> *game-info* continue-deaths) 1)
-     (when (= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 9);luck increase 1
+     #|(when (= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 9);luck increase 1
       (+! (-> *game-info* continue-deaths) 10000000)
     )
     (when (<= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 7);luck increase 2
       (+! (-> *game-info* continue-deaths) 20000000)
-    )
+    )|#
      (set! roll-randomitem #f)
     )
     (when 
@@ -2855,7 +3043,7 @@ This commonly includes things such as:
      (= random-int 15)
      (!= (/ (mod (-> *game-info* continue-deaths) 1000000) 100000) 1)
      )
-     (+! (-> *game-info* continue-deaths) 10000)
+     (+! (-> *game-info* continue-deaths) 100000)
      (set! roll-randomitem #f)
     )
     (when 
@@ -2882,7 +3070,7 @@ This commonly includes things such as:
      (+! (-> *game-info* auto-save-count) 10)
      (set! roll-randomitem #f)
     )
-    (when 
+    #|(when 
     (and 
     (>= (-> *game-info* karma) 3.0)
     (= roll-randomitem #f)
@@ -2890,7 +3078,7 @@ This commonly includes things such as:
     (rand-vu-percent? luck)
     )
       (+! (-> *game-info* task-deaths) 100000000)
-    )
+    )|#
   )
 )
 
@@ -3783,6 +3971,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
   (set! avoidc-waitb #f)
   (set! display-run #f)
   (set! avoidc-wait 0)
+  (kill-by-name "grenadier" *default-pool*)
   (stop-sound-file)
 )
 
@@ -3810,6 +3999,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
   (set! temp-skullgemamount (-> *game-info* gem))
   (set! temp-health (-> *target* fact health))
   (set! temp-orbs (-> *game-info* skill))
+  (kill-by-name "grenadier" *default-pool*)
   (set! put-back-to-act1 #t)
 )
 
@@ -3948,6 +4138,30 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
     (set! rapid-fire-int 0)
     (set! rapid-fire-blue #f)
   )
+)
+
+(when 
+(and 
+(= metalkor-stage-3 #t)
+(not *scene-player*)
+(= (pause-allowed?) #t)
+(= (paused?) #f)
+(= grenadiers-spawned? #f)
+)
+  (set! grenadiers-spawned? #t)
+  (let (
+    (v1 (new 'static 'vector :x (meters 156.5601) :y (meters 25.1243) :z (meters -441.5943) :w 1.0))
+    (v2 (new 'static 'vector :x (meters 195.2762) :y (meters 25.5937) :z (meters -389.1591) :w 1.0))
+    (v3 (new 'static 'vector :x (meters 236.4900) :y (meters 29.9912) :z (meters -415.5607) :w 1.0))
+    (v4 (new 'static 'vector :x (meters 229.2617) :y (meters 32.4623) :z (meters -452.1900) :w 1.0))
+    (v5 (new 'static 'vector :x (meters 198.4383) :y (meters 30.9960) :z (meters -471.4385) :w 1.0))
+    )
+    (process-spawn grenadier v1)
+    (process-spawn grenadier v2)
+    (process-spawn grenadier v3)
+    (process-spawn grenadier v4)
+    (process-spawn grenadier v5)
+    )
 )
 
 

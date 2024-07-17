@@ -102,7 +102,7 @@
   (let ((v1-1 (handle->process (-> self hud))))
     (when v1-1
       (set! (-> (the-as hud-metalkor v1-1) values 0 target) (-> self stage))
-      (set! (-> (the-as hud-metalkor v1-1) values 1 target) (the int (* 100.0 (-> self stage-hit-points))))
+      (set! (-> (the-as hud-metalkor v1-1) values 1 target) (the int (* 5.00 (-> self stage-hit-points))))
       )
     )
   (none)
@@ -382,7 +382,7 @@
   (if (task-node-closed? (game-task-node nest-boss-resolution))
       (set! (-> self stage) (max 5 (-> self stage)))
       )
-  (set! (-> self stage-hit-points) 1.0)
+  (set! (-> self stage-hit-points) 20.0)
   (set! (-> self next-stage-timer) 0)
   (init (-> self ring-cam-pos) 0.0 0.01 0.1 0.9)
   (when (not (handle->process (-> self rift-occlude)))
@@ -732,6 +732,9 @@
                       )
                     )
                   )
+                  (when (= (-> self stage) 3)
+                    (set! metalkor-stage-3 #t)
+                  )
                  (set! (-> self stage-hit-points) (fmax 0.0 (- (-> self stage-hit-points) f0-4)))
                  )
              )
@@ -781,10 +784,10 @@
                                               )
                                           )
                    )
-              (if (< (-> self stage-hit-points) f30-0)
+              #|(if (< (-> self stage-hit-points) f30-0)
                   (go-virtual fall-down)
                   (metalkor-ja-float (the-as art-joint-anim metalkor-hit-ja) 1.0 0.25 2.0)
-                  )
+                  )|#
               )
              )
            )
@@ -1415,6 +1418,8 @@
   :event (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
     (case message
       (('occlude-off)
+       (set! grenadiers-spawned? #f)
+       (set! metalkor-stage-3 #f)
        (let ((a0-3 (handle->process (-> self rift-occlude))))
          (if a0-3
              (deactivate a0-3)
@@ -1832,7 +1837,7 @@
   :event metalkor-handler
   :enter (behavior ()
     (set-time! (-> self state-time))
-    (set! (-> self min-state-hit-points) (+ -0.34 (-> self stage-hit-points)))
+    (set! (-> self min-state-hit-points) (+ 1.34 (-> self stage-hit-points)))
     (if (nonzero? (-> self neck))
         (set! (-> self neck flex-blend) 0.0)
         )

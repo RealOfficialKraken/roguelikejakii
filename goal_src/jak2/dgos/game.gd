@@ -509,14 +509,14 @@
   "nest-texture.o"
   "nestb-scenes.o"
   "nestb-part.o";; 
-  "metalkor-part.o"
-  "metalkor-setup.o"
-  "metalkor-states.o"
-  "metalkor-extras.o"
   "hiphog-scenes.o"
   "whack.o"
   "save-def.o" ;;added by Kraken
   "checkpoint-randomizer.o" ;;added by Kraken
   "mod-custom-code.o" ;; added
   "themachine.o" ;;added by Kraken
+  "metalkor-part.o"
+  "metalkor-setup.o"
+  "metalkor-states.o"
+  "metalkor-extras.o"
  ))

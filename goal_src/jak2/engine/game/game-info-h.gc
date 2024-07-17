@@ -31,6 +31,9 @@
 (define final-waitb #f)
 (define final-waiti 0)
 
+(define metalkor-stage-3 #f)
+(define grenadiers-spawned? #f)
+
 (define start-stage #f)
 
 (define avoidc-waitb #f);this is to avoid glitches when completing missions while still in vehicles or turrets

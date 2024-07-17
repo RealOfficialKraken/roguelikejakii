@@ -53,7 +53,7 @@
 
 (defun reset-items ()
   (set! (-> *game-info* task-deaths) 1000000000)
-  (set! (-> *game-info* continue-deaths) 1000000000)
+  (set! (-> *game-info* continue-deaths) 1010000000)
   (set! (-> *game-info* auto-save-count) 1000000000)
   (item-refresh)
 (none)
