@@ -1,6 +1,66 @@
+(in-package goal)
+
+(defun item-refresh ()
+  (set! item-ts1 "") ;set all of the lines blank
+  (set! item-ts2 "")
+  (set! item-ts3 "")
+  (set! item-ts4 "")
+  (set! item-ts5 "")
+  (set! item-ts6 "")
+  (set! item-ts7 "")
+  (set! item-ts8 "")
+  (set! item-ts9 "")
+  (set! item-ts10 "")
+  (set! item-ts11 "")
+  (set! item-ts12 "")
+  (set! item-ts13 "")
+  (set! item-ts14 "")
+  (set! item-ts15 "")
+  (set! item-ts16 "")
+  (set! item-ts17 "")
+  (set! item-ts18 "")
+  (set! item-ts19 "")
+  (set! item-ts20 "")
+  (set! item-ts21 "")
+  (set! item-ts22 "")
+  (set! item-ts23 "")
+  (set! item-ts24 "")
+  (set! item-ts25 "")
+  (set! item-ts26 "")
+  (set! item-ts27 "")
+  (set! item-tss1 "")
+  (set! item-tracker 0) ;set the list back to the first line
+  (set! p-dark-gun #f) ;set all items to false, check-stat! will immediately set it back to true and list the item on the display
+  (set! p-blue-gun #f)
+  (set! p-red-gun #f)
+  (set! p-upgrade-ammo #f)
+  (set! p-upgrade-damage #f)
+  (set! p-upgrade-red #f)
+  (set! p-upgrade-vehicles #f)
+  (set! p-double-shot #f)
+  (set! p-explode-shot #f)
+  (set! p-clover #f)
+  (set! p-drinkable #f)
+  (set! p-big-punch #f)
+  (set! p-sage-yellow #f)
+  (set! p-sage-blue #f)
+  (set! p-sage-red #f)
+  (set! p-sage-dark #f)
+  (set! p-crit-hits #f)
+  (set! p-actual-clone #f)
+(none)
+)
+
+(defun reset-items ()
+  (set! (-> *game-info* task-deaths) 1000000000)
+  (set! (-> *game-info* continue-deaths) 1000000000)
+  (set! (-> *game-info* auto-save-count) 1000000000)
+  (item-refresh)
+(none)
+)
 
 (defun check-stat! ()
-    ;Set Everything On
+    ;Check to ensure the number matches the gameplay variables listed under p-. If they dont, list the item on the display and set it to true
     (when 
     (and 
     (= p-red-gun #f)
@@ -184,7 +244,7 @@
         (set! item-tss1 "Extra Life!")
         (set! item-update #t)
     )
-    ; Set Everything Off
+    ; Check to ensure the two variables match again but in reverse, taking the item away if they don't
     (when 
     (and 
     (= p-red-gun #t)
@@ -470,7 +530,7 @@
     (none)
 )
 
-(defun give-item ((arg0 string) (arg1 int))
+(defun set-item ((arg0 string) (arg1 int))
 (when 
 (and
 (not (string= arg0 "red"))
@@ -489,6 +549,8 @@
 (not (string= arg0 "weight"))
 (not (string= arg0 "rapid"))
 (not (string= arg0 "darkupgrade"))
+(not (string= arg0 "redsage"))
+(not (string= arg0 "extralife"))
 )
 (format #t "ERROR: Unknown Item. Please use: ~%red~%blue~%dark~%redrof~%ammo~%damage~%vehicles~%double~%explosive~%clover~%2hp~%mpunch~%clone~%weight~%rapid~%darkupgrade")
 )
@@ -768,6 +830,40 @@
 )
  (-! (-> *game-info* continue-deaths) 1000000)
 )
-(set! item-refresh #t)
+
+(when 
+(and 
+(string= arg0 "redsage")
+(= arg1 1)
+(= (/ (mod (-> *game-info*  auto-save-count) 10) 1) 0)
+)
+ (+! (-> *game-info*  auto-save-count) 1)
+)
+(when 
+(and 
+(string= arg0 "redsage")
+(= arg1 0)
+(= (/ (mod (-> *game-info* auto-save-count) 10) 1) 1)
+)
+ (-! (-> *game-info*  auto-save-count) 1)
+)
+
+(when 
+(and 
+(string= arg0 "extralife")
+(= arg1 1)
+(= (/ (mod (-> *game-info*  auto-save-count) 100) 10) 0)
+)
+ (+! (-> *game-info*  auto-save-count) 10)
+)
+(when 
+(and 
+(string= arg0 "extralife")
+(= arg1 0)
+(= (/ (mod (-> *game-info* auto-save-count) 100) 10) 1)
+)
+ (-! (-> *game-info*  auto-save-count) 10)
+)
+(item-refresh)
 (none)
 )

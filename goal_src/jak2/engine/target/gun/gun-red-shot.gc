@@ -190,12 +190,12 @@
       (when (= p-crit-hits #t)
         (let* ((s5-2 (vector-! (new 'stack-no-clear 'vector) (-> v1-0 root trans) (-> this start-pos)))
              (f30-0 (* (if (< (vector-length s5-2) 24576.0)
-                           (+ (/ (-> *game-info* skill) 45) 3.0)
-                           (+ (/ (-> *game-info* skill) 45) 2.0)
+                           2.0
+                           1.0
                            )
                            (if (logtest? (game-feature gun-upgrade-damage) (-> *game-info* features))
                            (+ (/ (-> *game-info* skill) 45) 2.0)
-                           1.0
+                           (+ (/ (-> *game-info* skill) 45) 1.0)
                            )
                        )
                     )
