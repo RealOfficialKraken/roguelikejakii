@@ -165,16 +165,6 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
     )
   )
 
-  (defun get-nav-control ((arg0 process-drawable) (arg1 nav-mesh))
-  (if (not arg1)
-      (set! arg1 (nav-mesh-from-res-tag (-> arg0 entity) 'nav-mesh-actor 0))
-      )
-  (if arg1
-    (add-process-drawable-to-navmesh arg1 arg0 #t)
-    (add-process-drawable-to-navmesh *default-nav-mesh* arg0 #t)
-    )
-  (none)
-  )
 
   (defbehavior grenadier-init-by-other grenadier ((vec vector))
   (init-enemy-collision! self)
@@ -9212,6 +9202,8 @@ Here are the shop IDs
     )
     (when (and (= cm-option2 12)(= p-big-punch #f))
       (+! (-> *game-info* continue-deaths) 100)
+      (set! (-> *run-attack-mods* align-speed) 2.0)
+      (set! (-> *run-attack-mods* impact-fric) 0.0)
     )
     (when (and (= cm-option2 13)(= p-sage-yellow #f))
       (+! (-> *game-info* continue-deaths) 1000)
