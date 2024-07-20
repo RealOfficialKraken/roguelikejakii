@@ -1,0 +1,230 @@
+(in-package goal)
+
+#|
+(define update-vers "(0.84)")
+(define ub-color "<COLOR_GREEN>")
+(define ub-1 "<COLOR_WHITE>< <COLOR_ORANGE>")
+(define ub-2 "")
+(define ub-3 "")
+(define ub-4 "")
+(define ub-5 "")
+(define ub-6 "")
+(define ub-7 "")
+(define ub-8 "")
+(define ub-9 "")
+(define ub-10 "")
+(define ub-11 "")
+(define ub-12 "")
+(define ub-13 "")
+(define ub-14 "")
+(define ub-15 "")
+(define ub-16 "")
+(define ub-17 "")
+(define ub-18 "")
+(define ub-19 "")
+(define ub-20 "")
+(define ub-21 "")
+(define ub-22 "")
+(define ub-23 "")
+(define ub-24 "")
+|#
+
+(define update-vers "(0.84)")
+(define ub-color "<COLOR_GREEN>")
+(define ub-1 "<COLOR_WHITE>< <COLOR_ORANGE>Added a Challenge Machine to spice up runs with Tokens!")
+(define ub-2 "")
+(define ub-3 "<COLOR_WHITE>< <COLOR_ORANGE>1st Praxis Boss, and Final Boss reworked")
+(define ub-4 "")
+(define ub-5 "<COLOR_WHITE>< <COLOR_ORANGE>2 New item additions to runs")
+(define ub-6 "")
+(define ub-7 "<COLOR_WHITE>< <COLOR_ORANGE>Krew's Clones can be hit way more than they used to be")
+(define ub-8 "")
+(define ub-9 "<COLOR_WHITE>< <COLOR_ORANGE>Story progression reworked")
+(define ub-10 "")
+(define ub-11 "<COLOR_WHITE>< <COLOR_ORANGE>Added an Update Board")
+(define ub-12 "")
+(define ub-13 "<COLOR_WHITE>< <COLOR_ORANGE>Double Shot is more integrated with Damage, and the Blue Gun")
+(define ub-14 "")
+(define ub-15 "<COLOR_WHITE>< <COLOR_ORANGE>Fixed a load of UI bugs, as well as made")
+(define ub-16 "accessibility to support PS2 resolutions")
+(define ub-17 "")
+(define ub-18 "<COLOR_WHITE>< <COLOR_ORANGE>General bug fixes such as items disappearing from")
+(define ub-19 "collecting the roll-randomitem jetboard, or Extra Life! not doing its job")
+(define ub-20 "")
+(define ub-21 "")
+(define ub-22 "")
+(define ub-23 "")
+(define ub-24 "")
+
+(defun check-update-info ()
+(when 
+(and 
+(= in-updateboard? #f)
+(= in-hub? #t)
+(= vin-shop #f)
+(= in-menu #f)
+)
+(clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_WHITE>R1: <COLOR_ORANGE>Update Board ~s~s"
+    ub-color
+    update-vers
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 0 10 0.0 (font-color default) (font-flags shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+
+(when 
+(and 
+(= in-hub? #t)
+(= vin-shop #f)
+(= in-updateboard? #f)
+(= in-menu #f)
+(cpad-pressed? 0 r1)
+)
+(set! in-updateboard? #t)
+(set! camera-locked #t)
+)
+
+(when
+(and
+(= in-hub? #t)
+(= vin-shop #f)
+(= in-updateboard? #t)
+(= in-menu #f)
+(cpad-pressed? 0 r2)
+)
+(set! in-updateboard? #f)
+(set! camera-unlocked #t)
+)
+
+(when (= in-updateboard? #t)
+(clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_RED>Rogue-Like Jak II ~s~s~%<COLOR_YELLOW>Update Board"
+    ub-color
+    update-vers
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 35 0.0 (font-color default) (font-flags large middle shadow kerning))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+        ;
+        ;
+        ;
+        (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+  (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_ORANGE>~%~%~%~s~%~s~%~s~%~s~%~s~%~s"
+    ub-1
+    ub-2
+    ub-3
+    ub-4
+    ub-5
+    ub-6
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 40 70 0.0 (font-color default) (font-flags large shadow kerning))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+        ;
+        ;
+        ;
+        (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_ORANGE>~%~%~%~%~%~%~%~%~%~s~%~s~%~s~%~s~%~s~%~s"
+    ub-7
+    ub-8
+    ub-9
+    ub-10
+    ub-11
+    ub-12
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 40 70 0.0 (font-color default) (font-flags large shadow kerning))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+        ;
+        ;
+        ;
+        (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_ORANGE>~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~s~%~s~%~s~%~s~%~s~%~s"
+    ub-13
+    ub-14
+    ub-15
+    ub-16
+    ub-17
+    ub-18
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 40 70 0.0 (font-color default) (font-flags large shadow kerning))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+        ;
+        ;
+        ;
+        (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_ORANGE>~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~s~%~s~%~s~%~s~%~s~%~s"
+    ub-19
+    ub-20
+    ub-21
+    ub-22
+    ub-23
+    ub-24
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 40 70 0.0 (font-color default) (font-flags large shadow kerning))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+        ;
+        ;
+        ;
+        (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_ORANGE>~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%(<COLOR_WHITE>R2:<COLOR_ORANGE>): <COLOR_YELLOW>Exit~%~%<COLOR_WHITE>Check back for more additions in the future, or go to the <COLOR_ORANGE>Open<COLOR_YELLOW>GOAL<COLOR_WHITE>~%Discord for more info on updates"
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 70 0.0 (font-color default) (font-flags large middle shadow kerning))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+        ;
+        ;
+        ;
+        
+)
+
+(none)
+)

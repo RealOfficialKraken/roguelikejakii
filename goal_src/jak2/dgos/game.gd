@@ -519,4 +519,5 @@
   "metalkor-setup.o"
   "metalkor-states.o"
   "metalkor-extras.o"
+  "update-board.o"
  ))

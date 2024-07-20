@@ -256,6 +256,9 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 (define acti 0)
 (define keep-rolling-items #f)
 
+(define in-updateboard? #f)
+(define ub-select 0)
+
 (defskelgroup skel-rift-ring-ingame rift-ring-in-game rift-ring-in-game-lod0-jg rift-ring-in-game-idle-ja
               ((rift-ring-in-game-lod0-mg (meters 999999)))
               :bounds (static-spherem 0 0 0 40)
@@ -3617,6 +3620,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 (= vin-shop #f)
 (= start-stage #f)
 (= in-hub? #t)
+(= in-updateboard? #f)
 (cpad-pressed? 0 triangle)
 )
   (set! vin-shop #t)
@@ -3800,6 +3804,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
     (set! in-hub? #f)
     (set! in-menu #f)
     (set! run-in-progress #t)
+    (set! in-updateboard? #f)
   )
   (when (= waite-frame 5)
     (set! pause-menu-blocked? #f)
@@ -5614,7 +5619,7 @@ Here are the shop IDs
 ~%to put into your run. <COLOR_PINK>Tokens<COLOR_WHITE> are obtained from collecting skull gems.
 ~%
 ~%Everything is <COLOR_GREEN>a roll of the dice.
-~%<COLOR_WHITE>Things like city guard counts, enemy speed, and so many more, are completely random!
+~%<COLOR_WHITE>City guard counts, enemy speed, and so many more, are completely random!
 ~%And finally, Jak's default weapon is the Yellow Gun, meaning every other 
 ~%weapon, buff, or upgrade can be purchased or found, but not saved..
 ~%You can exit the level to <COLOR_GREEN>start your run<COLOR_WHITE>.
@@ -5747,7 +5752,7 @@ Here are the shop IDs
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
 
-(when (and (= start-stage #t)(cpad-pressed? 0 r3))
+(when (and (= in-updateboard? #f)(= start-stage #t)(cpad-pressed? 0 r3))
   (set! tutorial-completed? #t)
   (set! wait-exit #t)
   (set! start-stage #f)
@@ -6338,7 +6343,7 @@ Here are the shop IDs
 )
 
 
-(when (and (= start-stage #t)(not (cpad-hold? 0 r3)))
+(when (and (= vin-shop #f)(= in-updateboard? #f)(= start-stage #t)(not (cpad-hold? 0 r3)))
    (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "<COLOR_RED>R3<COLOR_WHITE>:<COLOR_GREEN> Start Run"
@@ -6353,7 +6358,7 @@ Here are the shop IDs
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
 
-(when (and (= start-stage #t)(cpad-hold? 0 r3))
+(when (and (= vin-shop #f)(= in-updateboard? #f)(= start-stage #t)(cpad-hold? 0 r3))
    (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "<COLOR_WHITE>R3<COLOR_WHITE>:<COLOR_YELLOW> Start Run"
@@ -6944,7 +6949,7 @@ Here are the shop IDs
     ~%This eco is part of our ticket out of here. I'll get it the second you collect it.
     ~%<COLOR_YELLOW>I also want to say, do not be discouraged if you die. Your main focus should
     ~%be on finding that shard, and getting as many skull gems and items as possible!
-    ~%
+    ~%Keep talking to me if you want more <COLOR_ORANGE>information<COLOR_YELLOW>.
     ~%
     ~%<COLOR_WHITE>Current Tokens:
     ~%<COLOR_PINK>~d
@@ -6968,7 +6973,7 @@ Here are the shop IDs
     (when (= vin-talk 2)
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>Vin:~%Listen, if we want to get out of here, we should think about getting certain items across dimensions.
+    (format matt-str "<COLOR_WHITE>Vin:~%If we want to fix everything, we should get certain items across your journey.
     ~%If you happen to see a <COLOR_YELLOW>Yellow Eco Shard<COLOR_WHITE> that a <COLOR_RED>Krimzon Guard<COLOR_WHITE> has,
     ~%don't hesitate to go and grab it. My radar indicates it's located in Act 1.
     ~%<COLOR_YELLOW>Any enemy can drop orbs via chance, this could help with purchasing items!
@@ -6998,10 +7003,10 @@ Here are the shop IDs
     (when (= vin-talk 3)
       (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>Vin:~%Remember, we need an item in order to locate the dimension where all the dark eco is concentrated.
-    ~%Right now, a <COLOR_YELLOW>Yellow Eco Shard<COLOR_WHITE> can be collected from a <COLOR_RED>Krimzon Guard<COLOR_WHITE>.
+    (format matt-str "<COLOR_WHITE>Vin:~%Remember, we need an item in order to have a chance to set things back.
+    ~%Right now, a <COLOR_YELLOW>Yellow Eco Shard<COLOR_WHITE> is on a <COLOR_RED>Krimzon Guard<COLOR_WHITE>.
     ~%It's in Act 1, if you see it, please get it for me!
-    ~%<COLOR_YELLOW>Crates have a very low chance in dropping a random item for you. So, if you see
+    ~%<COLOR_YELLOW>Crates have a chance in dropping a random item for you. So, if you see
     ~%a jetboard pop out of a crate, go grab it!
     ~%
     ~%
@@ -7063,7 +7068,7 @@ Here are the shop IDs
   (when (= vin-talk 1)
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>Vin:~%Amazing! This shard you collected is 1 of 3 pieces we need to locate the original dimension!
+    (format matt-str "<COLOR_WHITE>Vin:~%Good job on finding that for me. Only two more left.
     ~%The next item you'll need to look out for is a <COLOR_BLUE>Blue Eco Shard<COLOR_WHITE>.
     ~%Somewhere in Act 2, <COLOR_PINK>a crate<COLOR_WHITE> contains the piece we need.
     ~%
@@ -7153,7 +7158,7 @@ Here are the shop IDs
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "<COLOR_WHITE>Vin:~%Good job for finding this piece for me.
-    ~%This item is one of three, you'll need to look out for a <COLOR_BLUE>Blue Eco Shard<COLOR_WHITE> this time.
+    ~%The item is one of three, you'll need to look out for a <COLOR_BLUE>Blue Eco Shard<COLOR_WHITE> this time.
     ~%Somewhere in Act 2, my scans read that <COLOR_PINK>a crate<COLOR_WHITE> could contain this item.
     ~%
     ~%
@@ -7182,103 +7187,19 @@ Here are the shop IDs
 )
 
 (when (and (= (-> *game-info* total-deaths) 3)(= vin-shop #t))
-  (when (= vin-talk 1)
-    (clear matt-str)
-    (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>Vin:~%Nice work! We have almost all of the pieces we need!
-    ~%Now we just have to find a <COLOR_RED>Red Eco Shard<COLOR_WHITE> from Act 3.
-    ~%My energy readings say it's concentrated in the <COLOR_YELLOW>city port area.
-    ~%<COLOR_YELLOW>We're so close, Jak! This will be the last piece to locate our original dimension.
-    ~%
-    ~%
-    ~%
-    ~%
-    ~%<COLOR_WHITE>Current Tokens:
-    ~%<COLOR_PINK>~d
-    ~%
-    ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
-    ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
-    (the int (-> *game-info* fuel))
-    mod-s
-    (the int menu-value)
-    )
-    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
-    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
-      ;; reset bucket settings prior to drawing - font won't do self for us, and
-      ;; draw-raw-image can sometimes mess them up. (intro sequence)
-      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 65 0.0 (font-color default) (font-flags middle shadow kerning large))))
-        (set! (-> font-ctx scale) 0.325)
-        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+  (when 
+  (or 
+  (= vin-talk 1)
+  (= vin-talk 2)
+  (= vin-talk 3)
+  (= vin-talk 4)
   )
-  (when (= vin-talk 2)
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "<COLOR_WHITE>Vin:~%Nice work! We have almost all of the pieces we need!
     ~%Now we just have to find a <COLOR_RED>Red Eco Shard<COLOR_WHITE> from Act 3.
     ~%My energy readings say it's concentrated in the <COLOR_YELLOW>city port area.
-    ~%<COLOR_YELLOW>We're so close, Jak! This will be the last piece to locate our original dimension.
-    ~%
-    ~%
-    ~%
-    ~%
-    ~%<COLOR_WHITE>Current Tokens:
-    ~%<COLOR_PINK>~d
-    ~%
-    ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
-    ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
-    (the int (-> *game-info* fuel))
-    mod-s
-    (the int menu-value)
-    )
-    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
-    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
-      ;; reset bucket settings prior to drawing - font won't do self for us, and
-      ;; draw-raw-image can sometimes mess them up. (intro sequence)
-      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 65 0.0 (font-color default) (font-flags middle shadow kerning large))))
-        (set! (-> font-ctx scale) 0.325)
-        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
-  )
-  (when (= vin-talk 3)
-    (clear matt-str)
-    (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>Vin:~%Nice work! We have almost all of the pieces we need!
-    ~%Now we just have to find a <COLOR_RED>Red Eco Shard<COLOR_WHITE> from Act 3.
-    ~%My energy readings say it's concentrated in the <COLOR_YELLOW>city port area.
-    ~%<COLOR_YELLOW>We're so close, Jak! This will be the last piece to locate our original dimension.
-    ~%
-    ~%
-    ~%
-    ~%
-    ~%<COLOR_WHITE>Current Tokens:
-    ~%<COLOR_PINK>~d
-    ~%
-    ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
-    ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
-    (the int (-> *game-info* fuel))
-    mod-s
-    (the int menu-value)
-    )
-    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
-    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
-      ;; reset bucket settings prior to drawing - font won't do self for us, and
-      ;; draw-raw-image can sometimes mess them up. (intro sequence)
-      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 65 0.0 (font-color default) (font-flags middle shadow kerning large))))
-        (set! (-> font-ctx scale) 0.325)
-        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
-  )
-  (when (= vin-talk 4)
-    (clear matt-str)
-    (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>Vin:~%Nice work! We have almost all of the pieces we need!
-    ~%Now we just have to find a <COLOR_RED>Red Eco Shard<COLOR_WHITE> from Act 3.
-    ~%My energy readings say it's concentrated in the <COLOR_YELLOW>city port area.
-    ~%<COLOR_YELLOW>We're so close, Jak! This will be the last piece to locate our original dimension.
+    ~%<COLOR_YELLOW>My reading also say it will cost a hefty amount of orbs. Stock up!
     ~%
     ~%
     ~%
@@ -7314,10 +7235,10 @@ Here are the shop IDs
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "
-    <COLOR_WHITE>Vin:~%You did it! I've now triangulated the position of where this <COLOR_PINK>dark eco<COLOR_WHITE> is coming from!
-    ~%Wow.. there's so.. so many universes.. listen, we should travel there again. I feel like now is the time to act.
+    <COLOR_WHITE>Vin:~%I've now triangulated the position of where this <COLOR_PINK>dark eco<COLOR_WHITE> is coming from.
+    ~%We can also cloak ourselves to slip by so we can have a chance to restore things.
     ~%But be warned, you could end up playing any mission across the whole story.
-    ~%<COLOR_ORANGE>You've got to prepare accordingly<COLOR_WHITE>
+    ~%<COLOR_ORANGE>You've got to prepare to the extreme<COLOR_WHITE>
     ~%
     ~%If you're still having trouble, try saving up <COLOR_YELLOW>Skull Gems<COLOR_WHITE> to get stronger items.
     ~%We're all counting on you, Jak! <COLOR_GREEN>Beat MetalKor, and fulfill the prophecy again!
@@ -7355,8 +7276,8 @@ Here are the shop IDs
     (format matt-str "
     <COLOR_WHITE>Vin:~%Oh man! We were so close!
     ~%b-But don't worry! I've got that light eco scattered across infinity
-    ~%They're all in crates and enemies, so let's use this win to our advantage and get back there!
-    ~%
+    ~%They're all in crates and enemies, so let's use this win to our
+    ~%advantage and get back there!
     ~%
     ~%
     ~%
@@ -7420,44 +7341,6 @@ Here are the shop IDs
   )
 )
 
-(when (and (= (-> *game-info* karma) 6.0)(= (-> *game-info* total-deaths) 4)(= vin-shop #t))
-  (when (or
-    (= vin-talk 1)
-    (= vin-talk 2)
-    (= vin-talk 3)
-    (= vin-talk 4)
-  )
-    (clear matt-str)
-    (clear *pc-encoded-matt-str*)
-    (format matt-str "
-    <COLOR_RED>...~%
-    ~%
-    ~%
-    ~%
-    ~%
-    ~%
-    ~%
-    ~%
-    ~%<COLOR_WHITE>Current Tokens:
-    ~%<COLOR_PINK>~d
-    ~%
-    ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
-    ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
-    (the int (-> *game-info* fuel))
-    mod-s
-    (the int menu-value)
-    )
-    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
-    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
-      ;; reset bucket settings prior to drawing - font won't do self for us, and
-      ;; draw-raw-image can sometimes mess them up. (intro sequence)
-      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 65 0.0 (font-color default) (font-flags middle shadow kerning large))))
-        (set! (-> font-ctx scale) 0.325)
-        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
-  )
-)
 
 (when (and (= (-> *game-info* karma) 6.0)(= (-> *game-info* total-deaths) 4)(= vin-shop #t))
   (when (or
@@ -7465,17 +7348,17 @@ Here are the shop IDs
     (= vin-talk 2)
     (= vin-talk 3)
     (= vin-talk 4)
-    (= talk-rare #t)
   )
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "
-    <COLOR_RED>Yes I'm the one who put you back here.~%But I couldn't figure out how to quarantine worlds like Vin did.
-    ~%He's truly a smart creature.
+    <COLOR_RED>One remains.. The one where I rule
+    ~%The one you're stuck in, with me
+    ~%Vin may have locked me out, but this is far from over.
     ~%
-    ~%But none of that matters now, as you're trapped here with me.
-    ~%You're lucky though, you get to live out your natural life.
-    ~%...I'm here for another eternity...
+    ~%You have to understand, I'm only trying to put myself
+    ~%back together again. I must know who I am
+    ~%
     ~%
     ~%
     ~%<COLOR_WHITE>Current Tokens:
@@ -7509,6 +7392,7 @@ Here are the shop IDs
 (= in-menu #f) 
 (= start-stage #f) 
 (= in-hub? #t)
+(= in-updateboard? #f)
 (!= (-> *game-info* karma) 6.0)
 )
   (clear matt-str)
@@ -7533,6 +7417,7 @@ Here are the shop IDs
 (= in-menu #f) 
 (= start-stage #f) 
 (= in-hub? #t)
+(= in-updateboard? #f)
 (= (-> *game-info* karma) 6.0)
 )
   (clear matt-str)
@@ -7856,7 +7741,7 @@ Here are the shop IDs
   (when (and (= in-hub? #f)(not *scene-player*)(= in-intro? #t)(> curse-level 0)(= wait-tutorial #f)(= ohshit #f))
     (clear matt-str)
       (clear *pc-encoded-matt-str*)
-      (format matt-str "<COLOR_ORANGE>Buying non-vanilla items, or refreshing the shop, has a chance to make your dimension Unstable.~%While colored purple, enemies are faster, and harder to kill. Caps at level 9~%Only mission enemies are affected from the dimension's instability"
+      (format matt-str "<COLOR_ORANGE>Buying non-vanilla items, or refreshing the shop, has a chance to make your~%dimension Unstable. While colored purple, enemies are faster, and harder~%to kill. Caps at level 9. Only mission enemies are affected~%from the dimension's instability"
       )
       (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
       (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
@@ -8404,6 +8289,7 @@ Here are the shop IDs
   (set! nest-mission #t)
   (set! camera-locked #t)
   (set! see-ending #t)
+  (disable-hudmap)
 )
 
 (when 
@@ -8515,6 +8401,9 @@ Here are the shop IDs
     (set! camera-unlocked #t)
     (set! item-display? #t)
     (set! ending-loop #t)
+    (when (= p-actual-clone #t)
+      (-! (-> *game-info* auto-save-count) 10)
+    )
   )
 
 )
@@ -8593,6 +8482,7 @@ Here are the shop IDs
     (set! tin-game-wait #t)
     (set! intro-wait #f)
     (set! intro-waiti 0)
+    (disable-hudmap)
   )
 )
 
@@ -8613,6 +8503,7 @@ Here are the shop IDs
   (set! tin-game-wait #t)
   (send-event (ppointer->process *time-of-day*) 'change 'hour 20)
   (set! intro?i 0)
+  (disable-hudmap)
 )
 (when (and (cpad-pressed? 0 x)(= intro-sec 2)(= in-dialogue? #t)(= in-intro? #t)) ;teleports you to shop 1st time
   (set! intro-sec 3)
@@ -8622,6 +8513,7 @@ Here are the shop IDs
   (set! tin-game-wait #t)
   (send-event (ppointer->process *time-of-day*) 'change 'hour 6)
   (set! intro?i 0)
+  (disable-hudmap)
 )
 
 (when (and (= shop-tutorial #t) (!= (-> (level-get-target-inside *level*) name) 'hiphog)) ;teleports you to city-help-kid for 3rd and final time
@@ -8635,6 +8527,7 @@ Here are the shop IDs
   (set! camera-unlocked #t)
   (set! wait-pulloutgun #t)
   (set! intro?i 0)
+  (disable-hudmap)
 )
 
 (when (and (= wait-vintalk #t)(= in-menu #t))
@@ -8667,10 +8560,12 @@ Here are the shop IDs
     (when (= intro-sec 1)
     (dm-play-task-with-continue (game-task city-help-kid) "ctyslumb-fort")
     (set! intro?i 0)
+    (disable-hudmap)
     )
     (when (= intro-sec 2)
     (dm-play-task-with-continue (game-task city-help-kid) "ctyslumb-fort")
     (set! intro?i 0)
+    (disable-hudmap)
     )
     (when (= intro-sec 3)
       (dm-play-task-with-continue (game-task strip-drop) "ctyport-hiphog")
@@ -8683,11 +8578,13 @@ Here are the shop IDs
       (set! shopitem3 "Upgrade Damage x2 (20 orbs)")
       (set! shopid3 6)
       (set! intro?i 0)
+      (disable-hudmap)
     )
     (when (= intro-sec 5)
       (dm-play-task-with-continue (game-task city-help-kid) "consite-airlock")
     (set! wait-vintalk #t)
     (set! intro?i 0)
+    (disable-hudmap)
     )
   )
   (when (= tin-wait 121)

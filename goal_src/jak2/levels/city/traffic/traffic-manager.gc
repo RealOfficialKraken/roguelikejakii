@@ -844,6 +844,11 @@
   (kill-by-type traffic-manager *active-pool*)
   (none)
   )
+  
+(defun disable-hudmap ()
+  (kill-by-type hud-map *active-pool*)
+(none)
+)
 
 (defstate idle (traffic-manager)
   :virtual #t

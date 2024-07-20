@@ -9,6 +9,7 @@
 (defun-extern runs-every-frame (none))
 (defun-extern machine-update (none))
 (defun-extern check-stat! (none))
+(defun-extern check-update-info (none))
 
 (defun set-letterbox-frames ((arg0 time-frame))
   "Set the remaining time until letterboxing is removed.
@@ -871,6 +872,7 @@
     (runs-every-frame) ;;mod-base-change
     (machine-update) ;;rogue-like-change
     (check-stat!)
+    (check-update-info)
 
     ; ;; Run blerc to modify foreground models
     (with-profiler 'merc *profile-merc-color*
