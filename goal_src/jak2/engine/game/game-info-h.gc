@@ -10,6 +10,7 @@
 (declare-type game-save basic)
 
 (defun-extern item-refresh (none))
+(defun-extern disable-hudmap (none))
 
 (define-extern someone-fire-blue (function process-drawable vector vector (pointer process)))
 (define-extern someone-fire-red (function process-drawable vector vector (pointer process)))
