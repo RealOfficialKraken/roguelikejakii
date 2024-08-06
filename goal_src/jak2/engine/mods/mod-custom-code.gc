@@ -256,6 +256,11 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 (define acti 0)
 (define keep-rolling-items #f)
 
+(define vin-shop-wait #f)
+(define vin-shop-waiti 0)
+(define wait-kill-vin #f)
+(define vin-i 0)
+
 (define in-updateboard? #f)
 (define ub-select 0)
 
@@ -588,7 +593,7 @@ This commonly includes things such as:
 
 
 
-  (deftype vin-npc (process-taskable)
+  (deftype c-vin-npc (process-taskable)
   ()
   )
 
@@ -601,7 +606,7 @@ This commonly includes things such as:
               )
 
 
-(defmethod init-art! ((this vin-npc))
+(defmethod init-art! ((this c-vin-npc))
   "@see [[initialize-skeleton]]"
   (initialize-skeleton
     this
@@ -611,7 +616,7 @@ This commonly includes things such as:
   (none)
   )
 
-(defbehavior vin-npc-init-by-other vin-npc ((vec vector)) ;spawn vinny
+#|(defbehavior c-vin-npc-init-by-other c-vin-npc ((vec vector)) ;spawn vinny
   (stack-size-set! (-> self main-thread) 512)
   (process-taskable-method-31 self)
   (logior! (-> self mask) (process-mask actor-pause))
@@ -623,6 +628,18 @@ This commonly includes things such as:
   (process-taskable-method-32 self)
   (set! (-> self event-hook) (-> (method-of-object self idle) event))
   (go (method-of-object self hide))
+  (none)
+  )|#
+
+  (defbehavior c-vin-npc-init-by-other c-vin-npc ((vec vector)) ;spawn vinny
+  (process-spawn manipy
+                            :init
+                            manipy-init
+                            vec
+                            #f
+                            (art-group-get-by-name *level* "skel-vin" (the (pointer uint32) #f))
+                            #f
+                            0)
   (none)
   )
 
@@ -817,9 +834,6 @@ This commonly includes things such as:
   (set! krew-boss-mission? #f)
   (set! under-sig-mission? #f)
   (set! pleasewait #f)
-  (set! temp-skullgemamount 0.0)
-  (set! temp-health 8.0)
-  (set! temp-orbs 0.0)
   (color-gem)
   (set! (-> *game-info* buzzer-total) 0.0)
   (set! (-> *game-info* task-deaths) 1000000000)
@@ -1023,7 +1037,7 @@ This commonly includes things such as:
 (when (= wait-vinspawn #t)
   (+! waitspawn 1)
   (when (= waitspawn 300)
-  (process-spawn vin-npc (new 'static 'vector :x (meters 755.3596) :y (meters 18.15) :z (meters 907.9631)))
+  (process-spawn c-vin-npc (new 'static 'vector :x (meters 755.3596) :y (meters 18.15) :z (meters 907.9631)))
   (set! vin-spawned? #t)
   (set! waitspawn 0)
   (set! wait-vinspawn #f)
@@ -1170,7 +1184,7 @@ This commonly includes things such as:
 ;(script-eval '(want-load 'vinroom 'consiteb))
 ;(script-eval '(want-display 'vinroom))
 ;(script-eval '(want-display 'consiteb))
-;(set-vector! vin-npc 744.2 11.0 871.5 1.0)
+;(set-vector! c-vin-npc 744.2 11.0 871.5 1.0)
 
 
 (when 
@@ -3611,6 +3625,30 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
   (set! start-stage #f)
 )
 
+(when (= vin-shop-wait #t)
+(+! vin-shop-waiti 1)
+(when (= vin-shop-waiti 1)
+  (set-vector! (-> *target* control trans) (meters 746.0249) (meters 10.4005) (meters 872.6486) 1.0) ;teleports jak
+  (send-event *target* 'draw #f)
+  (persist-with-delay *setting-control* 'gun (seconds 0.5) 'gun #f 0.0 0)
+)
+(when (= vin-shop-waiti 5)
+    (process-spawn c-vin-npc (new 'static 'vector :x (meters 744.3240) :y (meters 18.0) :z (meters 917.0076)))
+    (send-event *camera* 'teleport-to-vector-start-string (new 'static 'vector :x (meters 744.0518) :y (meters 21.6945) :z (meters 920.7569)))
+    (set! (-> *target* cam-user-mode) 'fixed)
+    (set-setting-by-param *setting-control* 'mode-name 'cam-really-fixed 0 0)
+    (process-grab? *target* #f)
+)
+(when (= vin-shop-waiti 10)
+)
+(when (= vin-shop-waiti 30)
+
+  (set! vin-shop #t)
+  (set! vin-shop-waiti 0)
+  (set! vin-shop-wait #f)
+)
+)
+
 (when 
 (and 
 (= vin-shop #f) 
@@ -3623,8 +3661,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 (= in-updateboard? #f)
 (cpad-pressed? 0 triangle)
 )
-  (set! vin-shop #t)
-  (set! camera-locked #t)
+  (set! vin-shop-wait #t)
   (+! vin-talk 1)
   (when (>= vin-talk 5)
     (set! vin-talk 1)
@@ -3778,6 +3815,16 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 )
   (set! vin-shop #f)
   (set! camera-unlocked #t)
+  (set! wait-kill-vin #t)
+)
+
+(when (= wait-kill-vin #t)
+(+! vin-i 1)
+(when (= vin-i 30)
+  (kill-by-name "c-vin-npc" *default-pool*)
+  (set! vin-i 0)
+  (set! wait-kill-vin #f)
+)
 )
 
 ;camera menu
@@ -3799,12 +3846,12 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 
 (when (= wait-exit #t)
   (+! waite-frame 1)
-  (remove-setting-by-arg0 *setting-control* 'mode-name)
   (when (= waite-frame 1)
     (set! in-hub? #f)
     (set! in-menu #f)
     (set! run-in-progress #t)
     (set! in-updateboard? #f)
+    (set-setting-by-param *setting-control* 'mode-name 'cam-eye 0 0)
   )
   (when (= waite-frame 5)
     (set! pause-menu-blocked? #f)
@@ -3812,6 +3859,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
     (process-release? *target*)
   )
   (when (= waite-frame 10)
+    (remove-setting-by-arg0 *setting-control* 'mode-name)
     (set! wait-exit #f)
     (set! waite-frame 0)
     (set! act-stage 0)
@@ -4074,6 +4122,10 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 )
 (when (and (= p-upgrade-damage #t)(not (logtest? (-> *game-info* features) (game-feature gun-upgrade-damage))))
   (logior! (-> *game-info* features) (game-feature gun gun-upgrade-damage))
+)
+
+(when (and (= in-hub? #t) (logtest? (-> *game-info* features) (game-feature gun-yellow)))
+  (logclear! (-> *game-info* features) (game-feature gun gun-yellow))
 )
 
 (when (= metalkor-waitkill #t)
@@ -5756,6 +5808,9 @@ Here are the shop IDs
   (set! tutorial-completed? #t)
   (set! wait-exit #t)
   (set! start-stage #f)
+  (set! temp-orbs 0.0)
+  (set! temp-health 8.0)
+  (set! temp-skullgemamount 0.0)
   (set! in-hub? #f)
 )
 
@@ -7352,13 +7407,14 @@ Here are the shop IDs
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "
-    <COLOR_RED>One remains.. The one where I rule
+    <COLOR_RED>One remains.. You and I being the only ones that exist.
     ~%The one you're stuck in, with me
     ~%Vin may have locked me out, but this is far from over.
     ~%
     ~%You have to understand, I'm only trying to put myself
-    ~%back together again. I must know who I am
+    ~%back together again.
     ~%
+    ~%I must know who I am
     ~%
     ~%
     ~%<COLOR_WHITE>Current Tokens:
@@ -9125,13 +9181,13 @@ Here are the shop IDs
 )
 
 (when (and (= in-cheat #t) (= cm-select 9) (cpad-pressed? 0 left))
-(when (and (> (+ (-> *game-info* total-deaths) 1) 1))
+(when (and (>= (-> *game-info* total-deaths) 2))
   (-! (-> *game-info* total-deaths) 1)
 )
 )
 
 (when (and (= in-cheat #t) (= cm-select 9) (cpad-pressed? 0 right))
-(when (and (< (+ (-> *game-info* total-deaths) 1) 4))
+(when (and (<= (-> *game-info* total-deaths) 3))
   (+! (-> *game-info* total-deaths) 1)
 )
 )

@@ -30,6 +30,21 @@
   (none)
   )
 
+  (defbehavior vin-npc-init-by-other vin-npc ((vec vector)) ;spawn vinny
+  (stack-size-set! (-> self main-thread) 512)
+  (process-taskable-method-31 self)
+  (logior! (-> self mask) (process-mask actor-pause))
+  (vector-copy! (-> self root trans) vec)
+  (quaternion-identity! (-> self root quat))
+  (vector-identity! (-> self root scale))
+  (set! (-> self task) (new 'process 'game-task-control (game-task-actor vin-vinroom)))
+  (init-art! self)
+  (process-taskable-method-32 self)
+  (set! (-> self event-hook) (-> (method-of-object self idle) event))
+  (go (method-of-object self hide))
+  (none)
+  )
+
 (defpartgroup group-dog-piss-puddle
   :id 276
   :duration (seconds 0.017)
