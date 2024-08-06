@@ -261,6 +261,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 (define wait-kill-vin #f)
 (define vin-i 0)
 (define-extern ub-npc-wait symbol)
+(define-extern ub-npc-kill symbol)
 
 (define in-updateboard? #f)
 (define ub-select 0)
