@@ -337,7 +337,6 @@
 (= in-menu #f)
 (cpad-pressed? 0 r1)
 )
-(set! in-updateboard? #t)
 (set! ub-npc-wait #t)
 (set! ub-select 1)
 )
@@ -384,7 +383,7 @@
                             (art-group-get-by-name *level* "skel-rapid-gunner" (the (pointer uint32) #f))
                             #f
                             0)
-    (send-event *camera* 'teleport-to-vector-start-string (new 'static 'vector :x (meters 749.6548) :y (meters 22.5598) :z (meters 908.0965)))
+    (send-event *camera* 'teleport-to-vector-start-string (new 'static 'vector :x (meters 749.0048) :y (meters 22.5598) :z (meters 910.0965)))
     (set! (-> *target* cam-user-mode) 'fixed)
     (set-setting-by-param *setting-control* 'mode-name 'cam-really-fixed 0 0)
   )
