@@ -305,6 +305,8 @@ void extract_common(const ObjectFileDB& db,
   extract_single_ag("NES.DGO", "mammoth-ag", db, tex_db, tfrag_level);
   extract_single_ag("NEB.DGO", "rift-ring-in-game-ag", db, tex_db, tfrag_level);
   extract_single_ag("VIN.DGO", "vin-ag", db, tex_db, tfrag_level);
+  extract_single_ag("VIN.DGO", "crocadog-highres-ag", db, tex_db, tfrag_level);
+  extract_single_ag("VIN.DGO", "kid-highres-ag", db, tex_db, tfrag_level);
   extract_single_ag("VIN.DGO", "vin-turbine-ag", db, tex_db, tfrag_level);
   extract_single_ag("FOB.DGO", "transport-ag", db, tex_db, tfrag_level);
   extract_single_ag("CAS.DGO", "crimson-guard-ag", db, tex_db, tfrag_level);
@@ -328,8 +330,7 @@ void extract_common(const ObjectFileDB& db,
   extract_single_ag("NEB.DGO", "metalkor-fma-spinner-ag", db, tex_db, tfrag_level);
   extract_single_ag("NEB.DGO", "nestb-tail-bound-ag", db, tex_db, tfrag_level);
   extract_single_ag("NEB.DGO", "palmpilot-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "kid-highres-ag", db, tex_db, tfrag_level);
-
+  
 
   add_all_textures_from_level(tfrag_level, "ARTSPOOL", tex_db);
   extract_art_groups_from_level(db, tex_db, {}, "ARTSPOOL", tfrag_level, art_group_data);

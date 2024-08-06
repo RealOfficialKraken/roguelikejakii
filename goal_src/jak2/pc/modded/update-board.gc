@@ -114,13 +114,56 @@
   (none)
   )
 
-  (defbehavior c-crocadog-npc-init-by-other c-crocadog-npc ((vec vector)) ;spawn crocadog
+(deftype c-rapid-gunner (nav-enemy)
+  ((los               los-control  :inline)
+   (joint             joint-mod)
+   (joint-blend       float)
+   (joint-enable      symbol)
+   (shot-timer        uint64)
+   (predict-timer     uint64)
+   (target-prev-pos   vector       :inline)
+   (target-next-pos   vector       :inline)
+   (focus-dir         vector       :inline)
+   (y-diff            float)
+   (shots-fired       uint32)
+   (spin-up-angle     float)
+   (spin-up-timer     time-frame)
+   (shoot-anim-index  int32)
+   (status-flags      rapid-gunner-flags)
+   (start-pos         vector       :inline)
+   (dest-pos          vector       :inline)
+   (hop-dir           vector       :inline)
+   (roam-radius       float)
+   )
+  (:state-methods
+    attack
+    spin-attack
+    hop
+    hop-turn
+    cool-down
+    reload
+    )
+  (:methods
+    (rapid-gunner-method-184 (_type_ float) symbol)
+    (rapid-gunner-method-185 (_type_ vector float) none)
+    (rapid-gunner-method-186 (_type_ int float int int) none)
+    )
+  )
+
+
+(defskelgroup skel-rapid-gunner rapid-gunner rapid-gunner-lod0-jg rapid-gunner-idle-ja
+              ((rapid-gunner-lod0-mg (meters 20)) (rapid-gunner-lod1-mg (meters 40)) (rapid-gunner-lod2-mg (meters 999999)))
+              :bounds (static-spherem 0 1.5 0 7)
+              :shadow rapid-gunner-shadow-mg
+              )
+
+  (defbehavior c-rapid-gunner-init-by-other c-rapid-gunner ((vec vector)) ;spawn crocadog
   (process-spawn manipy
                             :init
                             manipy-init
                             vec
                             #f
-                            (art-group-get-by-name *level* "skel-crocadog-highres" (the (pointer uint32) #f))
+                            (art-group-get-by-name *level* "skel-rapid-gunner" (the (pointer uint32) #f))
                             #f
                             0)
   (none)
@@ -162,10 +205,10 @@
 (define ub-23 "")
 (define ub-24 "")
 ;PAGE 2
-(define ub-1-1 "<COLOR_WHITE>< <COLOR_ORANGE>Added more pages to Update Board")
-(define ub-2-1 "")
-(define ub-3-1 "<COLOR_WHITE>< <COLOR_ORANGE>Added <COLOR_YELLOW>vin-npc<COLOR_ORANGE> to polish Vin's Shop")
-(define ub-4-1 "")
+(define ub-1-1 "<COLOR_WHITE>< <COLOR_ORANGE>Upgraded the update board with more pages and")
+(define ub-2-1 "an NPC to compliment the polish of the hub area")
+(define ub-3-1 "")
+(define ub-4-1 "<COLOR_WHITE>< <COLOR_ORANGE>Added <COLOR_YELLOW>vin-npc<COLOR_ORANGE> to polish Vin's Shop")
 (define ub-5-1 "")
 (define ub-6-1 "")
 (define ub-7-1 "")
@@ -315,7 +358,7 @@
 
 (when (= ub-npc-kill #t)
 (+! ub-shopi 1)
-(when (= ub-shopi 20)
+(when (= ub-shopi 40)
   (kill-by-name "c-kid-npc" *default-pool*)
   (kill-by-name "manipy" *default-pool*)
   (set! ub-shopi 0)
@@ -332,8 +375,16 @@
   )
   (when (= ub-npci 5)
     ;(process-spawn c-kid-npc (new 'static 'vector :x (meters 744.3240) :y (meters 18.0) :z (meters 917.0076)))
-    (process-spawn c-crocadog-npc (new 'static 'vector :x (meters 751.4117) :y (meters 20) :z (meters 903.3818)))
-    (send-event *camera* 'teleport-to-vector-start-string (new 'static 'vector :x (meters 748.6548) :y (meters 20.5598) :z (meters 908.0965)))
+    ;(process-spawn c-crocadog-npc (new 'static 'vector :x (meters 751.4117) :y (meters 18.2) :z (meters 903.3818)))
+    (process-spawn manipy
+                            :init
+                            manipy-init
+                            (new 'static 'vector :x (meters 751.4117) :y (meters 18.2) :z (meters 903.3818))
+                            #f
+                            (art-group-get-by-name *level* "skel-rapid-gunner" (the (pointer uint32) #f))
+                            #f
+                            0)
+    (send-event *camera* 'teleport-to-vector-start-string (new 'static 'vector :x (meters 749.6548) :y (meters 22.5598) :z (meters 908.0965)))
     (set! (-> *target* cam-user-mode) 'fixed)
     (set-setting-by-param *setting-control* 'mode-name 'cam-really-fixed 0 0)
   )
