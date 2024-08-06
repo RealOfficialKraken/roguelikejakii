@@ -225,6 +225,16 @@
   (none)
   )
 
+(defenum rapid-gunner-flags
+  :bitfield #t
+  (ragflags-0)
+  (ragflags-1)
+  (ragflags-2)
+  (ragflags-3)
+  (ragflags-4)
+  (ragflags-5)
+  )
+
 (deftype c-rapid-gunner (nav-enemy)
   ((los               los-control  :inline)
    (joint             joint-mod)
