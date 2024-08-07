@@ -22,6 +22,8 @@
 
 (define frong-wait2 #f)
 (define frongi2 0)
+(define frongmenu-wait-exit #f)
+(define frongi4 0)
 
 (defun frong-checker! ()
     (when (and (= frong-spawning? #t)(= in-hub? #t))
@@ -295,6 +297,75 @@
     )
 )
 
+
+(when
+(and
+(= in-hub? #t)
+(= vin-shop #f)
+(= in-updateboard? #f)
+(= in-frongmenu? #f)
+(= in-menu #f)
+(= vin-shop-wait #f)
+(= ub-npc-wait #f)
+(= ub-npc-kill #f)
+(= frongmenu-wait #f)
+(>= (-> *game-info* total-deaths) 5)
+(cpad-pressed? 0 l2)
+)
+    (set! frongmenu-wait #t)
+)
+
+(when
+(and
+(= in-hub? #t)
+(= vin-shop #f)
+(= in-updateboard? #f)
+(= in-frongmenu? #t)
+(= in-menu #f)
+(= vin-shop-wait #f)
+(= ub-npc-wait #f)
+(= ub-npc-kill #f)
+(= frongmenu-wait #f)
+(cpad-pressed? 0 r2)
+)
+    (set! frongmenu-wait-exit #t)
+)
+
+(when (= frongmenu-wait #t)
+    (+! frongi3 1)
+    (when (= frongi3 2)
+        (set-vector! (-> *target* control trans) (meters 745.7249) (meters 8.4005) (meters 874.6486) 1.0) ;teleports jak
+        (persist-with-delay *setting-control* 'gun (seconds 0.5) 'gun #f 0.0 0)
+    )
+    (when (= frongi3 3)
+        
+        (process-spawn c-fodder (new 'static 'vector :x (meters 745.3792) :y (meters 12) :z (meters 872.0936)))
+        (send-event *camera* 'teleport-to-vector-start-string (new 'static 'vector :x (meters 746.3200) :y (meters 14.0) :z (meters 879.4559)))
+        (set! (-> *target* cam-user-mode) 'fixed)
+        (set-setting-by-param *setting-control* 'mode-name 'cam-really-fixed 0 0)
+        (send-event *target* 'draw #f)
+    )
+    (when (= frongi3 30)
+        (set! in-frongmenu? #t)
+        (set! frongi3 0)
+        (set! frongmenu-wait #f)
+        (process-grab? *target* #f)
+    )
+)
+
+(when (= frongmenu-wait-exit #t)
+    (+! frongi4 1)
+    (when (= frongi4 2)
+        (set-vector! (-> *target* control trans) (meters 754.0274) (meters 8.4005) (meters 864.5117) 1.0) ;teleports jak
+        (set! camera-unlocked #t)
+    )
+    (when (= frongi4 40)
+    (kill-by-name "c-fodder" *default-pool*)
+    (set! frongi4 0)
+    (set! frongmenu-wait-exit #f)
+    (set! in-frongmenu? #f)
+    )
+)
 
     
     (none)

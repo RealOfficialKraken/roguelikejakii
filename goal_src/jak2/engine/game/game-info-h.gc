@@ -47,6 +47,10 @@
 (define frong-spawning? #f)
 (define frong-ingame? #f)
 
+(define in-frongmenu? #f)
+(define frongmenu-wait #f)
+(define frongi3 0)
+
 (define metalkor-stage-3 #f)
 (define grenadiers-spawned? #f)
 
