@@ -10,6 +10,7 @@
 (defun-extern machine-update (none))
 (defun-extern check-stat! (none))
 (defun-extern check-update-info (none))
+(defun-extern frong-checker! (none))
 
 (defun set-letterbox-frames ((arg0 time-frame))
   "Set the remaining time until letterboxing is removed.
@@ -872,6 +873,7 @@
     (runs-every-frame) ;;mod-base-change
     (machine-update) ;;rogue-like-change
     (check-stat!)
+    (frong-checker!)
     (check-update-info)
 
     ; ;; Run blerc to modify foreground models

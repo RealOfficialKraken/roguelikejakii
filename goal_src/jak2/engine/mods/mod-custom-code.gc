@@ -322,12 +322,22 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (set! krew-boss-mission? #f)
   (set! under-sig-mission? #f)
   (set! pleasewait #f)
+  (when (= (-> *game-info* total-deaths) 4)
+    (set! frong-spawning? #t)
+  )
   (color-gem)
   (set! (-> *game-info* buzzer-total) 0.0)
   (set! (-> *game-info* task-deaths) 1000000000)
   (set! (-> *game-info* continue-deaths) 1000000000)
-  (set! (-> *game-info* auto-save-count) 1000001000)
-  (set! starter-display "<COLOR_YELLOW>BLASTER")
+  (when (= (/ (mod (-> *game-info* auto-save-count) 100) 10) 1)
+    (-! (-> *game-info* auto-save-count) 10)
+  )
+  (when (= (/ (mod (-> *game-info* auto-save-count) 10) 1) 1)
+    (-! (-> *game-info* auto-save-count) 1)
+  )
+  (when (= (/ (mod (-> *game-info* auto-save-count) 10000000) 1000000) 1)
+    (-! (-> *game-info* auto-save-count) 1000000)
+  )
   (set! autosave-delayed #t)
   (set! enemy-drop-weapon-once #f)
   (set! challenge-mission 0)
@@ -783,67 +793,299 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
         (set! (-> font-ctx scale) 0.325)
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
-
-(when ;choose starting weapon at hub
-(and 
-(= in-hub? #t)
-(= in-menu #f)
-(= vin-shop #f)
-(= in-updateboard? #f)
-(cpad-pressed? 0 up)
-(!= starter-weapon 1)
-)
-(set! (-> *game-info* auto-save-count) 1000000100)
-(sound-play "gun-takeout")
-(set! starter-display "<COLOR_RED>SCATTERGUN")
-(set! starter-weapon 1)
-)
-
 (when 
 (and 
 (= in-hub? #t)
 (= in-menu #f)
 (= vin-shop #f)
 (= in-updateboard? #f)
-(cpad-pressed? 0 down)
-(!= starter-weapon 2)
+(= gun-red-special #t)
+(= starter-weapon 1)
 )
-(set! (-> *game-info* auto-save-count) 1000001000)
-(sound-play "gun-takeout")
-(set! starter-display "<COLOR_YELLOW>BLASTER")
-(set! starter-weapon 2)
+  (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_GREEN>COMPLETED"
+    starter-display
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 35 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
-
 (when 
 (and 
 (= in-hub? #t)
 (= in-menu #f)
 (= vin-shop #f)
 (= in-updateboard? #f)
-(cpad-pressed? 0 left)
-(!= starter-weapon 3)
+(= gun-yellow-special #t)
+(= starter-weapon 2)
 )
-(set! (-> *game-info* auto-save-count) 1000010000)
-(sound-play "gun-takeout")
-(set! starter-display "<COLOR_CYAN>VULCAN")
-(set! starter-weapon 3)
+  (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_GREEN>COMPLETED"
+    starter-display
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 35 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
-
 (when 
 (and 
 (= in-hub? #t)
 (= in-menu #f)
 (= vin-shop #f)
 (= in-updateboard? #f)
-(cpad-pressed? 0 right)
-(!= starter-weapon 4)
+(= gun-blue-special #t)
+(= starter-weapon 3)
 )
-(set! (-> *game-info* auto-save-count) 1000100000)
-(sound-play "gun-takeout")
-(set! starter-display "<COLOR_PINK>PEACEMAKER")
-(set! starter-weapon 4)
+  (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_GREEN>COMPLETED"
+    starter-display
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 35 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+(when 
+(and 
+(= in-hub? #t)
+(= in-menu #f)
+(= vin-shop #f)
+(= in-updateboard? #f)
+(= gun-dark-special #t)
+(= starter-weapon 4)
+)
+  (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_GREEN>COMPLETED"
+    starter-display
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 35 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
 
+(when 
+(and 
+(= (paused?) #f)
+*target*
+(not *scene-player*)
+(= (pause-allowed?) #t)
+)
+  (when ;choose starting weapon at hub
+  (and 
+  (= in-hub? #t)
+  (= in-menu #f)
+  (= vin-shop #f)
+  (= in-updateboard? #f)
+  (cpad-pressed? 0 up)
+  (!= starter-weapon 1)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 3)
+  )
+      (-! (-> *game-info* auto-save-count) 100)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 3)
+  )
+    (-! (-> *game-info* auto-save-count) 1000)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 3)
+  )
+    (-! (-> *game-info* auto-save-count) 10000)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 3)
+  )
+    (-! (-> *game-info* auto-save-count) 100000)
+  )
+  (when (or
+  (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 0)
+  (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 2)
+  )
+    (+! (-> *game-info* auto-save-count) 100)
+  )
+  (sound-play "gun-takeout")
+  (set! starter-display "<COLOR_RED>SCATTERGUN")
+  (set! starter-weapon 1)
+  )
+
+  (when 
+  (and 
+  (= in-hub? #t)
+  (= in-menu #f)
+  (= vin-shop #f)
+  (= in-updateboard? #f)
+  (cpad-pressed? 0 down)
+  (!= starter-weapon 2)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 3)
+  )
+      (-! (-> *game-info* auto-save-count) 100)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 3)
+  )
+    (-! (-> *game-info* auto-save-count) 1000)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 3)
+  )
+    (-! (-> *game-info* auto-save-count) 10000)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 3)
+  )
+    (-! (-> *game-info* auto-save-count) 100000)
+  )
+  (when (or
+  (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 0)
+  (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 2)
+  )
+      (+! (-> *game-info* auto-save-count) 1000)
+    )
+  (sound-play "gun-takeout")
+  (set! starter-display "<COLOR_YELLOW>BLASTER")
+  (set! starter-weapon 2)
+  )
+
+  (when 
+  (and 
+  (= in-hub? #t)
+  (= in-menu #f)
+  (= vin-shop #f)
+  (= in-updateboard? #f)
+  (cpad-pressed? 0 left)
+  (!= starter-weapon 3)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 3)
+  )
+      (-! (-> *game-info* auto-save-count) 100)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 3)
+  )
+    (-! (-> *game-info* auto-save-count) 1000)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 3)
+  )
+    (-! (-> *game-info* auto-save-count) 10000)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 3)
+  )
+    (-! (-> *game-info* auto-save-count) 100000)
+  )
+  (when (or
+  (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 0)
+  (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 2)
+  )
+      (+! (-> *game-info* auto-save-count) 10000)
+    )
+  (sound-play "gun-takeout")
+  (set! starter-display "<COLOR_CYAN>VULCAN")
+  (set! starter-weapon 3)
+  )
+
+  (when 
+  (and 
+  (= in-hub? #t)
+  (= in-menu #f)
+  (= vin-shop #f)
+  (= in-updateboard? #f)
+  (cpad-pressed? 0 right)
+  (!= starter-weapon 4)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 3)
+  )
+      (-! (-> *game-info* auto-save-count) 100)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 3)
+  )
+    (-! (-> *game-info* auto-save-count) 1000)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 3)
+  )
+    (-! (-> *game-info* auto-save-count) 10000)
+  )
+  (when 
+  (or 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 1) 
+  (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 3)
+  )
+    (-! (-> *game-info* auto-save-count) 100000)
+  )
+  (when 
+  (or
+  (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 0)
+  (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 2)
+  )
+      (+! (-> *game-info* auto-save-count) 100000)
+    )
+  (sound-play "gun-takeout")
+  (set! starter-display "<COLOR_PINK>PEACEMAKER")
+  (set! starter-weapon 4)
+  )
+)
 
 
 ;self is the randomizer. It teleports the player to a random stage in a certain act, and then sets their task.
@@ -2337,6 +2579,18 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
       (when (= (-> *game-info* karma) 2.0)
         (set! (-> *game-info* karma) 3.0)
       )
+      (when (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 1)
+        (+! (-> *game-info* auto-save-count) 100)
+      )
+      (when (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 1)
+        (+! (-> *game-info* auto-save-count) 1000)
+      )
+      (when (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 1)
+        (+! (-> *game-info* auto-save-count) 10000)
+      )
+      (when (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 1)
+        (+! (-> *game-info* auto-save-count) 100000)
+      )
     )
     (when (and (< (-> *game-info* total-deaths) 4)(= (-> *game-info* buzzer-total) 16.0)(= level-completed? #t))
       (set! (-> *target* fact health) 0.0)
@@ -2346,6 +2600,18 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
       )
       (set! in-game? #t)
       (set! level-completed? #f)
+      (when (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 1)
+        (+! (-> *game-info* auto-save-count) 100)
+      )
+      (when (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 1)
+        (+! (-> *game-info* auto-save-count) 1000)
+      )
+      (when (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 1)
+        (+! (-> *game-info* auto-save-count) 10000)
+      )
+      (when (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 1)
+        (+! (-> *game-info* auto-save-count) 100000)
+      )
     )
     (when (and (>= (-> *game-info* total-deaths) 4)(= (-> *game-info* buzzer-total) 17.0)(= level-completed? #t))
       (all-randomize)
@@ -3199,6 +3465,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 (when (= vin-shop-wait #t)
 (+! vin-shop-waiti 1)
 (when (= vin-shop-waiti 1)
+  (set! start-stage #f)
   (set-vector! (-> *target* control trans) (meters 746.0249) (meters 10.4005) (meters 872.6486) 1.0) ;teleports jak
   (send-event *target* 'draw #f)
   (persist-with-delay *setting-control* 'gun (seconds 0.5) 'gun #f 0.0 0)
@@ -3703,6 +3970,18 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 
 (when (and (= in-hub? #t) (logtest? (-> *game-info* features) (game-feature gun-yellow)))
   (logclear! (-> *game-info* features) (game-feature gun gun-yellow))
+)
+
+(when (and (= in-hub? #t) (logtest? (-> *game-info* features) (game-feature gun-red)))
+  (logclear! (-> *game-info* features) (game-feature gun gun-red))
+)
+
+(when (and (= in-hub? #t) (logtest? (-> *game-info* features) (game-feature gun-blue)))
+  (logclear! (-> *game-info* features) (game-feature gun gun-blue))
+)
+
+(when (and (= in-hub? #t) (logtest? (-> *game-info* features) (game-feature gun-dark)))
+  (logclear! (-> *game-info* features) (game-feature gun gun-dark))
 )
 
 (when (= metalkor-waitkill #t)
@@ -5419,7 +5698,7 @@ Here are the shop IDs
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
 
-(when (and (= in-updateboard? #f)(= start-stage #t)(cpad-pressed? 0 r3))
+(when (and (= in-updateboard? #f)(= fodder-dialogue? #f)(= start-stage #t)(cpad-pressed? 0 r3))
   (set! tutorial-completed? #t)
   (set! wait-exit #t)
   (set! start-stage #f)
@@ -6563,11 +6842,11 @@ Here are the shop IDs
         (set! (-> font-ctx scale) 0.325)
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
-(when (and (= stat-menu #t)(!= (-> *game-info* karma) 6.0))
+(when (and (= stat-menu #t)(not *debug-segment*))
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "
-<COLOR_WHITE>Current Run:
+<COLOR_WHITE>CURRENT ~S <COLOR_WHITE>RUN:
 ~%<COLOR_ORANGE>Act ~D <COLOR_YELLOW>Stage ~D
 ~%
 ~%<COLOR_GREEN>Luck:<COLOR_ORANGE> ~F
@@ -6585,6 +6864,7 @@ Here are the shop IDs
 ~%
 ~%
 "
+    starter-display
     act-act
     print-stage
     luck
@@ -6599,11 +6879,16 @@ Here are the shop IDs
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
 
-(when (and (= stat-menu #t)(= in-cheat #f)(= (-> *game-info* karma) 6.0))
+(when 
+(and 
+(= stat-menu #t)
+(= in-cheat #f) 
+*debug-segment* 
+)
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "
-<COLOR_WHITE>Current Run:
+<COLOR_WHITE>CURRENT ~S <COLOR_WHITE>RUN:
 ~%<COLOR_ORANGE>Act ~D <COLOR_YELLOW>Stage ~D
 ~%
 ~%<COLOR_GREEN>Luck:<COLOR_ORANGE> ~F
@@ -6621,6 +6906,7 @@ Here are the shop IDs
 ~%<COLOR_ORANGE>Press <COLOR_RED>R3 <COLOR_ORANGE>to open the <COLOR_GREEN>Cheat Menu<COLOR_ORANGE>.
 ~%
 "
+    starter-display
     act-act
     print-stage
     luck
@@ -8369,6 +8655,7 @@ Here are the shop IDs
 (= (-> *game-info* karma) 6.0)
 (cpad-hold? 0 l2)
 (cpad-pressed? 0 r3)
+*debug-segment*
 (= in-hub? #f)
 (= popup-shop #f)
 (= in-menu2 #f)

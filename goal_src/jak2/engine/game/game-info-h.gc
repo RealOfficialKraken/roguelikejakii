@@ -34,6 +34,18 @@
 
 (define starter-weapon 0)
 (define starter-display "<COLOR_YELLOW>BLASTER")
+(define gun-red-special #f)
+(define gun-yellow-special #f)
+(define gun-blue-special #f)
+(define gun-dark-special #f)
+
+(define fodder-dialogue? #f)
+(define frong-position (new 'static 'vector :x (meters 0.0) :y (meters 0.0) :z (meters 0.0)))
+(define frong-position2 (new 'static 'vector :x (meters 3.0) :y (meters 0.0) :z (meters 0.0)))
+(define frong-wait #f)
+(define frongi 0)
+(define frong-spawning? #f)
+(define frong-ingame? #f)
 
 (define metalkor-stage-3 #f)
 (define grenadiers-spawned? #f)

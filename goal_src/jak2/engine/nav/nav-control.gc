@@ -196,6 +196,12 @@ Note that this doesn't actually return the nav-control, but instead adds this pr
     (if (-> arg0 entity)
         (logior! (-> arg0 entity extra perm status) (entity-perm-status error))
         )
+    ;; terrible hack
+    (declare-type c-fodder process-focusable)
+    (when (type? arg0 c-fodder)
+      (add-process-drawable-to-navmesh *default-nav-mesh* arg0 #t)
+      (return 0)
+      )
     (go process-drawable-art-error "no nav-mesh")
     (return 0)
     )

@@ -250,40 +250,115 @@
         (when 
         (and 
         (not (logtest? (-> *game-info* features) (game-feature gun-red)))
-        (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 1)
+        (or (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 1) (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 3))
         )
             (logior! (-> *game-info* features) (game-feature gun gun-red))
             (set! starter-weapon 1)
+            (set! starter-display "<COLOR_RED>SCATTERGUN")
         )
         (when 
         (and 
         (not (logtest? (-> *game-info* features) (game-feature gun-yellow)))
-        (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 1)
+        (or (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 1) (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 3))
         )
             (logior! (-> *game-info* features) (game-feature gun gun-yellow))
             (set! starter-weapon 2)
+            (set! starter-display "<COLOR_YELLOW>BLASTER")
         )
         (when 
         (and 
         (not (logtest? (-> *game-info* features) (game-feature gun-blue)))
-        (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 1)
+        (or (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 1) (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 3))
         )
             (logior! (-> *game-info* features) (game-feature gun gun-blue))
             (set! starter-weapon 3)
+            (set! starter-display "<COLOR_CYAN>VULCAN")
         )
         (when 
         (and 
         (not (logtest? (-> *game-info* features) (game-feature gun-red)))
-        (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 1)
+        (or (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 1) (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 3))
         )
             (logior! (-> *game-info* features) (game-feature gun gun-dark))
             (set! starter-weapon 4)
+            (set! starter-display "<COLOR_PINK>PEACEMAKER")
         )
     )
+    (when
+    (and
+    (or
+    (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 1)
+    (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 3)
+    )
+    (not (string= starter-display "<COLOR_RED>SCATTERGUN"))
+    )
+        (set! starter-display "<COLOR_RED>SCATTERGUN")
+    )
+    (when
+    (and
+    (or
+    (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 1)
+    (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 3)
+    )
+    (not (string= starter-display "<COLOR_YELLOW>BLASTER"))
+    )
+        (set! starter-display "<COLOR_YELLOW>BLASTER")
+    )
+    (when
+    (and
+    (or
+    (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 1)
+    (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 3)
+    )
+    (not (string= starter-display "<COLOR_CYAN>VULCAN"))
+    )
+        (set! starter-display "<COLOR_CYAN>VULCAN")
+    )
+    (when
+    (and
+    (or
+    (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 1)
+    (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 3)
+    )
+    (not (string= starter-display "<COLOR_PINK>PEACEMAKER"))
+    )
+        (set! starter-display "<COLOR_PINK>PEACEMAKER")
+    )
+    (when 
+        (or
+        (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 2)
+        (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 3)
+        )
+            (set! gun-red-special #t)
+        )
+        (when 
+        (or
+        (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 2)
+        (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 3)
+        )
+            (set! gun-yellow-special #t)
+        )
+        (when 
+        (or
+        (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 2)
+        (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 3)
+        )
+            (set! gun-blue-special #t)
+        )
+        (when 
+        (or
+        (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 2)
+        (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 3)
+        )
+            (set! gun-dark-special #t)
+        )
     (when 
         (and 
         (not (logtest? (-> *game-info* features) (game-feature gun-yellow)))
+        (or
         (= (/ (mod (-> *game-info* auto-save-count) 10000000) 1000000) 1)
+        (= (/ (mod (-> *game-info* auto-save-count) 10000000) 1000000) 3)
+        )
         )
             (logior! (-> *game-info* features) (game-feature gun gun-yellow))
             (set! item-tss1 "Blaster")

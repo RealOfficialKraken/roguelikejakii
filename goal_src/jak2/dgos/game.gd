@@ -512,7 +512,7 @@
   "hiphog-scenes.o"
   "whack.o"
   "actor-def.o"
-  "fodder.o"
+  "c-fodder.o"
   "save-def.o" ;;added by Kraken
   "checkpoint-randomizer.o" ;;added by Kraken
   "mod-custom-code.o" ;; added
@@ -521,5 +521,6 @@
   "metalkor-setup.o"
   "metalkor-states.o"
   "metalkor-extras.o"
+  "frong-modifiers.o"
   "update-board.o"
  ))
