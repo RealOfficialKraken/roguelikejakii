@@ -1,5 +1,7 @@
 (in-package goal)
 
+;save-def.gc
+
 (defun item-refresh ()
   (set! item-ts1 "") ;set all of the lines blank
   (set! item-ts2 "")
@@ -244,6 +246,49 @@
         (set! item-tss1 "Extra Life!")
         (set! item-update #t)
     )
+    (when (= in-hub? #f)
+        (when 
+        (and 
+        (not (logtest? (-> *game-info* features) (game-feature gun-red)))
+        (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 1)
+        )
+            (logior! (-> *game-info* features) (game-feature gun gun-red))
+            (set! starter-weapon 1)
+        )
+        (when 
+        (and 
+        (not (logtest? (-> *game-info* features) (game-feature gun-yellow)))
+        (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 1)
+        )
+            (logior! (-> *game-info* features) (game-feature gun gun-yellow))
+            (set! starter-weapon 2)
+        )
+        (when 
+        (and 
+        (not (logtest? (-> *game-info* features) (game-feature gun-blue)))
+        (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 1)
+        )
+            (logior! (-> *game-info* features) (game-feature gun gun-blue))
+            (set! starter-weapon 3)
+        )
+        (when 
+        (and 
+        (not (logtest? (-> *game-info* features) (game-feature gun-red)))
+        (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 1)
+        )
+            (logior! (-> *game-info* features) (game-feature gun gun-dark))
+            (set! starter-weapon 4)
+        )
+    )
+    (when 
+        (and 
+        (not (logtest? (-> *game-info* features) (game-feature gun-yellow)))
+        (= (/ (mod (-> *game-info* auto-save-count) 10000000) 1000000) 1)
+        )
+            (logior! (-> *game-info* features) (game-feature gun gun-yellow))
+            (set! item-tss1 "Blaster")
+            (set! item-update #t)
+        )
     ; Check to ensure the two variables match again but in reverse, taking the item away if they don't
     (when 
     (and 
@@ -534,6 +579,7 @@
 (when 
 (and
 (not (string= arg0 "red"))
+(not (string= arg0 "yellow"))
 (not (string= arg0 "blue"))
 (not (string= arg0 "dark"))
 (not (string= arg0 "redrof"))
@@ -569,6 +615,23 @@
 (when 
 (and 
 (string= arg0 "red")
+(= arg1 0)
+(= (/ (mod (-> *game-info* task-deaths) 10) 1) 1)
+)
+ (-! (-> *game-info* task-deaths) 1)
+)
+
+(when 
+(and 
+(string= arg0 "yellow")
+(= arg1 1)
+(= (/ (mod (-> *game-info* task-deaths) 10) 1) 0)
+)
+ (+! (-> *game-info* auto-save-count) 1000000)
+)
+(when 
+(and 
+(string= arg0 "yellow")
 (= arg1 0)
 (= (/ (mod (-> *game-info* task-deaths) 10) 1) 1)
 )

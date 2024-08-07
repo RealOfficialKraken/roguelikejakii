@@ -23,7 +23,16 @@ vv--optional ideas--vv
 - Level 9 curse will shoot guard projectiles from all directions towards jak, at rng chance.
 - Maybe after you beat the game, you unlock consite to enter into as the (black market) area, buying cursed items only.
 
-After most of the top ones, the mod will be completed and I can get on with my life
+- Have the player choose a starting weapon, red, yellow, blue, or dark. Unlock the texture for the gun after completing krew boss.
+- If the game gets completed (passed act 3) with only
+one so far, spawn a frong in the front of "start a run", go through a dialogue with selections,
+then afterwards he appears more and more throughout your run, sometimes near challenge machines.
+Get 3 frongs in runs to unlock modifiers, special game modes that can liven the gameplay up drastically. There can be a total of 9 modifiers
+Collect rare frongs spawned in the world to get more modifiers
+- disable cheat menu to save for debug-segment
+- Once all 4 starting weapons completed in runs, unlock an overpowered modifier that allows for frequent
+item drops from enemies, and you're shooting light eco at all times.
+- Create a green eco floor
 
 --------------------------------------------------------------------------------------------------
 
@@ -79,168 +88,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
     ;; Begin function defintions.
     ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(deftype metalkor (process-focusable)
-  ((trackable                        symbol)
-   (flitters                         handle            10)
-   (flitter-gem-tracker              handle)
-   (wasps                            handle            3)
-   (wasp-gem-tracker                 handle)
-   (last-flitter-launched            int8)
-   (last-wasp-launched               int8)
-   (live-flitters                    int8)
-   (live-wasps                       int8)
-   (shoot-timer                      time-frame)
-   (target-angle                     float)
-   (wave-timer                       time-frame)
-   (in-wave                          symbol)
-   (flitter-timer                    time-frame)
-   (wasp-timer                       time-frame)
-   (launching-flitters               symbol)
-   (launching-wasps                  symbol)
-   (egg-timer                        time-frame)
-   (last-close-attack                int8)
-   (last-standing-attack             int8)
-   (stage                            int8)
-   (next-stage-timer                 time-frame)
-   (initial-y                        float)
-   (shots-fired                      int16)
-   (stage-hit-points                 float)
-   (hud                              handle)
-   (lowtorso                         handle)
-   (legs                             handle)
-   (wings                            handle)
-   (kid                              handle)
-   (explode                          handle)
-   (rift-occlude                     handle)
-   (last-attack-id                   uint32)
-   (current-nav-poly                 nav-poly)
-   (shot-anticipate                  sparticle-launch-control)
-   (spinners                         handle            4)
-   (neck                             joint-mod)
-   (previous-flat-travel             vector            :inline)
-   (previous-flat-travel-timer       time-frame)
-   (previous-flat-travel-long-timer  time-frame)
-   (min-state-hit-points             float)
-   (countdown-to-roar                int8)
-   (for-back-interp                  cam-float-seeker  :inline)
-   (run-walk-interp                  cam-float-seeker  :inline)
-   (left-right-interp                cam-float-seeker  :inline)
-   (walk-turn-interp                 cam-float-seeker  :inline)
-   (idle-interp                      cam-float-seeker  :inline)
-   (tmp-hit-points                   float)
-   (reps-till-idle-alt               int8)
-   (last-rotation                    float)
-   (no-collision-timer               time-frame)
-   (egg-angle                        float             :offset 736)
-   (arm-frame                        float)
-   (been-to-entity                   symbol)
-   (flying-speed                     cam-float-seeker  :inline)
-   (wing-sound                       sound-id)
-   (wing-sound-playing               symbol)
-   (explode-sound                    sound-id)
-   (bomb-sound                       sound-id)
-   (stop-bomb-sound                  symbol)
-   (hit-ring-trans                   vector            :inline)
-   (hit-ring-offset                  vector            :inline)
-   (ring-cam-pos                     cam-float-seeker  :inline)
-   (need-teleport                    symbol)
-   )
-  (:state-methods
-    (beaten symbol)
-    explode
-    fly-to-ring
-    last-gasp
-    overload-recover
-    fall-down
-    tail-attack
-    foot-attack
-    get-close
-    standing-shot
-    chase-target
-    play-drop-movie
-    start-second-stage
-    hang-shoot-n-launch
-    hidden
-    test
-    )
-  )
 
-
-  (defbehavior grenadier-init-by-other grenadier ((vec vector))
-  (init-enemy-collision! self)
-  (logior! (-> self mask) (process-mask actor-pause))
-  (vector-copy! (-> self root trans) vec)
-  (quaternion-identity! (-> self root quat))
-  (vector-identity! (-> self root scale))
-  (init-enemy! self)
-  (let ((nav (find-nearest-nav-mesh vec 0.0)) ;; try to find a nav mesh in the vicinity
-        ;; verts for the path
-        (cverts (new 'static 'inline-array vector 3
-                (static-vectorm 1 0 0)
-                (static-vectorm 0 1 0)
-                (static-vectorm 0 0 1)
-                )
-          )
-        )
-    ;; if a nav mesh is close by, use that, otherwise use default
-    (if nav
-      (change-to nav self)
-      (change-to *default-nav-mesh* self)
-      )
-    ;; allocate path
-    (set! (-> self path) (new 'process 'path-control self 'path 0.0 (the entity #f) #f))
-    (set! (-> self path curve cverts) cverts)
-    (set! (-> self path curve num-cverts) 3)
-    )
-  (set! (-> self hit-points) (+ (-> self enemy-info default-hit-points) 35.0))
-  (go-idle self)
-  )
-
-(defbehavior metalkor-init-by-other metalkor ((vec vector))
-  (local-vars (sv-16 res-tag))
-  (let ((metalkor-pos-quat (new 'static 'quaternion :x 0.0 :y -1.0 :z 0.0))
-        )
-    ;;manipy code
-    ;(quaternion-copy! offset-quat (quaternion-from-two-vectors! metalkor-pos-quat metalkor-pos metalkor-pos-off)) ;make a quat from target-pos 0 and the original vector
-    (let ((kor (process-spawn manipy
-                            :init
-                            manipy-init
-                            vec
-                            #f
-                            (art-group-get-by-name *level* "skel-metalkor" (the (pointer uint32) #f))
-                            #f
-                            0)
-                            ))
-    (if kor
-      (let ((torso (process-spawn manipy
-                                  :init
-                                  manipy-init
-                                  vec
-                                  #f
-                                  (art-group-get-by-name *level* "skel-metalkor-lowtorso" (the (pointer uint32) #f))
-                                  #f
-                                  0
-                                  :to
-                                  (-> kor 0))
-                                  )
-            (legs (process-spawn manipy
-                                :init
-                                manipy-init
-                                vec
-                                #f
-                                (art-group-get-by-name *level* "skel-metalkor-legs" (the (pointer uint32) #f))
-                                #f
-                                0
-                                :to
-                                (-> kor 0))
-                                ))
-                                (send-event (-> kor 0) 'rot-quat metalkor-pos-quat)
-                                (send-event (-> torso 0) 'rot-quat metalkor-pos-quat)
-                                (send-event (-> legs 0) 'rot-quat metalkor-pos-quat)
-                                )))
-  )
-  (none)
-    )
 
 
 (define matt-str (new 'global 'string 2048 (the-as string #f)))
@@ -266,358 +114,6 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 (define in-updateboard? #f)
 (define ub-select 0)
 
-(defskelgroup skel-rift-ring-ingame rift-ring-in-game rift-ring-in-game-lod0-jg rift-ring-in-game-idle-ja
-              ((rift-ring-in-game-lod0-mg (meters 999999)))
-              :bounds (static-spherem 0 0 0 40)
-              )
-
-(deftype rift-ring-ingame (process-drawable)
-  ((anim-speed          delayed-rand-float  :inline)
-   (stutter             symbol)
-   (spin-sound          sound-id)
-   (spin-sound-playing  symbol)
-   )
-  (:state-methods
-    idle
-    )
-  )
-
-
-(defstate idle (rift-ring-ingame)
-  :virtual #t
-  :event (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
-    (case message
-      (('stutter)
-       (set! (-> self stutter) (the-as symbol (-> block param 0)))
-       (set-params! (-> self anim-speed) 3 15 0.25)
-       (reset! (-> self anim-speed))
-       (set! (-> self anim-speed value) -0.25)
-       )
-      )
-    )
-  :trans (behavior ()
-    (cond
-      ((-> self stutter)
-       (update! (-> self anim-speed))
-       (ja :num! (loop! (+ 0.125 (-> self anim-speed value))))
-       )
-      (else
-        (ja :num! (loop!))
-        )
-      )
-    (sound-play "warp-ring" :id (-> self spin-sound) :position (-> self root trans))
-    (set! (-> self spin-sound-playing) #t)
-    )
-  :code sleep-code
-  :post (behavior ()
-    (spawn (-> self part) (-> self root trans))
-    (ja-post)
-    )
-  )
-
-(defmethod deactivate ((this rift-ring-ingame))
-  (if (-> this spin-sound-playing)
-      (sound-stop (-> this spin-sound))
-      )
-  ((method-of-type process-drawable deactivate) this)
-  (none)
-  )
-
-
-
-  (defun metalkor-appear ()
-  (let ((metalkor-pos1 (new 'static 'vector :x (meters -292.9985) :y (meters 353.4276) :z (meters -1640.9791))))
-        (process-spawn metalkor metalkor-pos1)
-  )
-  (none)
-  )
-
-;; WARN: Return type mismatch object vs none.
-(defmethod init-from-entity! ((this rift-ring-ingame) (arg0 entity-actor))
-  "Typically the method that does the initial setup on the process, potentially using the [[entity-actor]] provided as part of that.
-This commonly includes things such as:
-- stack size
-- collision information
-- loading the skeleton group / bones
-- sounds"
-  (set! (-> this root) (new 'process 'trsqv))
-  (process-drawable-from-entity! this arg0)
-  (initialize-skeleton
-    this
-    (the-as skeleton-group (art-group-get-by-name *level* "skel-rift-ring-ingame" (the-as (pointer uint32) #f)))
-    (the-as pair 0)
-    )
-  (set! (-> this part) (create-launch-control (-> *part-group-id-table* 1236) this))
-  (set! (-> this draw light-index) (the-as uint 10))
-  (set! (-> this stutter) #f)
-  (set! (-> this spin-sound) (new-sound-id))
-  (set! (-> this spin-sound-playing) #f)
-  (go (method-of-object this idle))
-  (none)
-  )
-
-    (defbehavior rift-ring-ingame-init-by-other rift-ring-ingame ((vec vector))
-  (set! (-> self root) (new 'process 'trsqv))
-  (vector-copy! (-> self root trans) vec)
-  (quaternion-identity! (-> self root quat))
-  (vector-identity! (-> self root scale))
-    (initialize-skeleton
-    self
-    (the-as skeleton-group (art-group-get-by-name *level* "skel-rift-ring-ingame" (the-as (pointer uint32) #f)))
-    (the-as pair 0)
-    )
-  (set! (-> self part) (create-launch-control (-> *part-group-id-table* 1236) self))
-  (set! (-> self draw light-index) (the-as uint 10))
-  (set! (-> self stutter) #f)
-  (set! (-> self spin-sound) (new-sound-id))
-  (set! (-> self spin-sound-playing) #f)
-  (set! (-> self event-hook) (-> (method-of-object self idle) event))
-  (go (method-of-object self idle))
-  (set! (-> self root scale x) 10.0)
-  (set! (-> self root scale y) 10.0)
-  (set! (-> self root scale z) 10.0)
-  (none)
-    )
-
-    (deftype pal-falling-plat (process-drawable)
-  ((root  collide-shape-moving :override)
-   )
-  (:state-methods
-    idle
-    fall
-    )
-  )
-
-
-(defskelgroup skel-pal-falling-plat pal-falling-plat pal-falling-plat-lod0-jg pal-falling-plat-idle-ja
-              ((pal-falling-plat-lod0-mg (meters 999999)))
-              :bounds (static-spherem 0 0 0 5.8)
-              )
-
-(defstate idle (pal-falling-plat)
-  :virtual #t
-  :event (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
-    (case message
-      (('ridden)
-       (go-virtual fall)
-       )
-      )
-    )
-  :enter (behavior ()
-    (logior! (-> self root root-prim prim-core action) (collide-action rideable))
-    )
-  :trans rider-trans
-  :code (behavior ()
-    (ja-no-eval :group! pal-falling-plat-idle-ja :num! zero)
-    (transform-post)
-    (sleep-code)
-    )
-  :post rider-post
-  )
-
-(defstate fall (pal-falling-plat)
-  :virtual #t
-  :event (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
-    (case message
-      (('touch)
-       (when ((method-of-type touching-shapes-entry prims-touching?)
-              (the-as touching-shapes-entry (-> block param 0))
-              (-> self root)
-              (the-as uint 8)
-              )
-         (when (< 18.0 (ja-frame-num 0))
-           (let ((v1-6 (-> self skel root-channel 0)))
-             (set! (-> v1-6 num-func) num-func-identity)
-             (set! (-> v1-6 frame-num) 18.0)
-             )
-           )
-         )
-       )
-      )
-    )
-  :enter (behavior ()
-    (sound-play "pal-fall-plat")
-    )
-  :trans rider-trans
-  :code (behavior ()
-    (ja-no-eval :group! pal-falling-plat-shake-ja :num! (seek!) :frame-num 0.0)
-    (until (ja-done? 0)
-      (suspend)
-      (ja :num! (seek!))
-      )
-    (logclear! (-> self root root-prim prim-core action) (collide-action rideable))
-    (ja-no-eval :group! pal-falling-plat-idle-ja :num! (seek!) :frame-num 0.0)
-    (until (ja-done? 0)
-      (suspend)
-      (ja :num! (seek!))
-      )
-    (go-virtual idle)
-    )
-  :post rider-post
-  )
-
-;; WARN: Return type mismatch object vs none.
-(defmethod init-from-entity! ((this pal-falling-plat) (arg0 entity-actor))
-  "Typically the method that does the initial setup on the process, potentially using the [[entity-actor]] provided as part of that.
-This commonly includes things such as:
-- stack size
-- collision information
-- loading the skeleton group / bones
-- sounds"
-  (let ((s4-0 (new 'process 'collide-shape-moving this (collide-list-enum usually-hit-by-player))))
-    (set! (-> s4-0 dynam) (copy *standard-dynamics* 'process))
-    (set! (-> s4-0 reaction) cshape-reaction-default)
-    (set! (-> s4-0 no-reaction)
-          (the-as (function collide-shape-moving collide-query vector vector object) nothing)
-          )
-    (let ((s3-0 (new 'process 'collide-shape-prim-group s4-0 (the-as uint 4) 0)))
-      (set! (-> s4-0 total-prims) (the-as uint 5))
-      (set! (-> s3-0 prim-core collide-as) (collide-spec obstacle pusher))
-      (set! (-> s3-0 prim-core collide-with) (collide-spec jak bot player-list))
-      (set! (-> s3-0 prim-core action) (collide-action solid rideable))
-      (set! (-> s3-0 transform-index) 3)
-      (set-vector! (-> s3-0 local-sphere) 0.0 0.0 11059.2 20480.0)
-      (set! (-> s4-0 root-prim) s3-0)
-      )
-    (pusher-init s4-0)
-    (let ((v1-15 (new 'process 'collide-shape-prim-mesh s4-0 (the-as uint 0) (the-as uint 0))))
-      (set! (-> v1-15 prim-core collide-as) (collide-spec obstacle pusher))
-      (set! (-> v1-15 prim-core collide-with) (collide-spec jak bot player-list))
-      (set! (-> v1-15 prim-core action) (collide-action solid rideable))
-      (set! (-> v1-15 transform-index) 3)
-      (set-vector! (-> v1-15 local-sphere) 12288.0 0.0 1228.8 4096.0)
-      )
-    (let ((v1-17 (new 'process 'collide-shape-prim-mesh s4-0 (the-as uint 1) (the-as uint 0))))
-      (set! (-> v1-17 prim-core collide-as) (collide-spec obstacle pusher))
-      (set! (-> v1-17 prim-core collide-with) (collide-spec jak bot player-list))
-      (set! (-> v1-17 prim-core action) (collide-action solid rideable))
-      (set! (-> v1-17 transform-index) 3)
-      (set-vector! (-> v1-17 local-sphere) -12288.0 0.0 1228.8 4096.0)
-      )
-    (let ((v1-19 (new 'process 'collide-shape-prim-mesh s4-0 (the-as uint 2) (the-as uint 0))))
-      (set! (-> v1-19 prim-core collide-as) (collide-spec obstacle pusher))
-      (set! (-> v1-19 prim-core collide-with) (collide-spec jak bot player-list))
-      (set! (-> v1-19 prim-core action) (collide-action solid rideable))
-      (set! (-> v1-19 transform-index) 4)
-      (set-vector! (-> v1-19 local-sphere) 0.0 0.0 8192.0 19660.8)
-      )
-    (let ((v1-21 (new 'process 'collide-shape-prim-sphere s4-0 (the-as uint 8))))
-      (set! (-> v1-21 prim-core collide-as) (collide-spec obstacle))
-      (set! (-> v1-21 prim-core collide-with) (collide-spec jak player-list))
-      (set! (-> v1-21 prim-core action) (collide-action))
-      (set-vector! (-> v1-21 local-sphere) -16384.0 -4096.0 0.0 16384.0)
-      )
-    (set! (-> s4-0 nav-radius) (* 0.75 (-> s4-0 root-prim local-sphere w)))
-    (let ((v1-24 (-> s4-0 root-prim)))
-      (set! (-> s4-0 backup-collide-as) (-> v1-24 prim-core collide-as))
-      (set! (-> s4-0 backup-collide-with) (-> v1-24 prim-core collide-with))
-      )
-    (set! (-> this root) s4-0)
-    )
-  (process-drawable-from-entity! this arg0)
-  (initialize-skeleton
-    this
-    (the-as skeleton-group (art-group-get-by-name *level* "skel-pal-falling-plat" (the-as (pointer uint32) #f)))
-    (the-as pair 0)
-    )
-  (go (method-of-object this idle))
-  (none)
-  )
-
-    (defbehavior pal-falling-plat-init-by-other pal-falling-plat ((vec vector))
-  (let ((s4-0 (new 'process 'collide-shape-moving self (collide-list-enum usually-hit-by-player))))
-    (set! (-> s4-0 dynam) (copy *standard-dynamics* 'process))
-    (set! (-> s4-0 reaction) cshape-reaction-default)
-    (set! (-> s4-0 no-reaction)
-          (the-as (function collide-shape-moving collide-query vector vector object) nothing)
-          )
-    (let ((s3-0 (new 'process 'collide-shape-prim-group s4-0 (the-as uint 4) 0)))
-      (set! (-> s4-0 total-prims) (the-as uint 5))
-      (set! (-> s3-0 prim-core collide-as) (collide-spec obstacle pusher))
-      (set! (-> s3-0 prim-core collide-with) (collide-spec jak bot player-list))
-      (set! (-> s3-0 prim-core action) (collide-action solid rideable))
-      (set! (-> s3-0 transform-index) 3)
-      (set-vector! (-> s3-0 local-sphere) 0.0 0.0 11059.2 20480.0)
-      (set! (-> s4-0 root-prim) s3-0)
-      )
-    (pusher-init s4-0)
-    (let ((v1-15 (new 'process 'collide-shape-prim-mesh s4-0 (the-as uint 0) (the-as uint 0))))
-      (set! (-> v1-15 prim-core collide-as) (collide-spec obstacle pusher))
-      (set! (-> v1-15 prim-core collide-with) (collide-spec jak bot player-list))
-      (set! (-> v1-15 prim-core action) (collide-action solid rideable))
-      (set! (-> v1-15 transform-index) 3)
-      (set-vector! (-> v1-15 local-sphere) 12288.0 0.0 1228.8 4096.0)
-      )
-    (let ((v1-17 (new 'process 'collide-shape-prim-mesh s4-0 (the-as uint 1) (the-as uint 0))))
-      (set! (-> v1-17 prim-core collide-as) (collide-spec obstacle pusher))
-      (set! (-> v1-17 prim-core collide-with) (collide-spec jak bot player-list))
-      (set! (-> v1-17 prim-core action) (collide-action solid rideable))
-      (set! (-> v1-17 transform-index) 3)
-      (set-vector! (-> v1-17 local-sphere) -12288.0 0.0 1228.8 4096.0)
-      )
-    (let ((v1-19 (new 'process 'collide-shape-prim-mesh s4-0 (the-as uint 2) (the-as uint 0))))
-      (set! (-> v1-19 prim-core collide-as) (collide-spec obstacle pusher))
-      (set! (-> v1-19 prim-core collide-with) (collide-spec jak bot player-list))
-      (set! (-> v1-19 prim-core action) (collide-action solid rideable))
-      (set! (-> v1-19 transform-index) 4)
-      (set-vector! (-> v1-19 local-sphere) 0.0 0.0 8192.0 19660.8)
-      )
-    (let ((v1-21 (new 'process 'collide-shape-prim-sphere s4-0 (the-as uint 8))))
-      (set! (-> v1-21 prim-core collide-as) (collide-spec obstacle))
-      (set! (-> v1-21 prim-core collide-with) (collide-spec jak player-list))
-      (set! (-> v1-21 prim-core action) (collide-action))
-      (set-vector! (-> v1-21 local-sphere) -16384.0 -4096.0 0.0 16384.0)
-      )
-    (set! (-> s4-0 nav-radius) (* 0.75 (-> s4-0 root-prim local-sphere w)))
-    (let ((v1-24 (-> s4-0 root-prim)))
-      (set! (-> s4-0 backup-collide-as) (-> v1-24 prim-core collide-as))
-      (set! (-> s4-0 backup-collide-with) (-> v1-24 prim-core collide-with))
-      )
-    (set! (-> self root) s4-0)
-    )
-    (let ((offset-vec (new-stack-vector0)))
-      (vector-copy! (-> self root trans) vec)
-      (quaternion-identity! (-> self root quat))
-      (vector-identity! (-> self root scale))
-    )
-  (initialize-skeleton
-    self
-    (the-as skeleton-group (art-group-get-by-name *level* "skel-pal-falling-plat" (the-as (pointer uint32) #f)))
-    (the-as pair 0)
-    )
-  (go (method-of-object self idle))
-  (none)
-    )
-
-
-
-
-
-
-
-  (deftype c-vin-npc (process-taskable)
-  ()
-  )
-
-
-(defskelgroup skel-vin vin vin-lod0-jg vin-idle-ja
-              ((vin-lod0-mg (meters 999999)))
-              :bounds (static-spherem 0 0 0 10)
-              :shadow vin-shadow-mg
-              :origin-joint-index 3
-              )
-
-
-(defmethod init-art! ((this c-vin-npc))
-  "@see [[initialize-skeleton]]"
-  (initialize-skeleton
-    this
-    (the-as skeleton-group (art-group-get-by-name *level* "skel-vin" (the-as (pointer uint32) #f)))
-    (the-as pair 0)
-    )
-  (none)
-  )
-
 #|(defbehavior c-vin-npc-init-by-other c-vin-npc ((vec vector)) ;spawn vinny
   (stack-size-set! (-> self main-thread) 512)
   (process-taskable-method-31 self)
@@ -633,17 +129,7 @@ This commonly includes things such as:
   (none)
   )|#
 
-  (defbehavior c-vin-npc-init-by-other c-vin-npc ((vec vector)) ;spawn vinny
-  (process-spawn manipy
-                            :init
-                            manipy-init
-                            vec
-                            #f
-                            (art-group-get-by-name *level* "skel-vin" (the (pointer uint32) #f))
-                            #f
-                            0)
-  (none)
-  )
+
 
 ;this is to make the dm-play-task-with-continue macro work in retail-mode
 (defun debug-menu-make-task-menu ((arg0 debug-menu-context))
@@ -758,7 +244,7 @@ This commonly includes things such as:
 (= (-> (level-get-target-inside *level*) name) 'prison)
 )
   (set! wait-tutorial #t)
-  (set! (-> *game-info* total-trys) 4)
+  (set! (-> *game-info* total-trys) 5)
 )
 
 
@@ -840,7 +326,8 @@ This commonly includes things such as:
   (set! (-> *game-info* buzzer-total) 0.0)
   (set! (-> *game-info* task-deaths) 1000000000)
   (set! (-> *game-info* continue-deaths) 1000000000)
-  (set! (-> *game-info* auto-save-count) 1000000000)
+  (set! (-> *game-info* auto-save-count) 1000001000)
+  (set! starter-display "<COLOR_YELLOW>BLASTER")
   (set! autosave-delayed #t)
   (set! enemy-drop-weapon-once #f)
   (set! challenge-mission 0)
@@ -1273,6 +760,88 @@ This commonly includes things such as:
       (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 285 0.0 (font-color default) (font-flags middle shadow kerning large))))
         (set! (-> font-ctx scale) 0.325)
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+
+(when 
+(and 
+(= in-hub? #t)
+(= in-menu #f)
+(= vin-shop #f)
+(= in-updateboard? #f)
+)
+  (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_WHITE>(D-PAD)~%STARTING WEAPON: ~S"
+    starter-display
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 15 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+
+(when ;choose starting weapon at hub
+(and 
+(= in-hub? #t)
+(= in-menu #f)
+(= vin-shop #f)
+(= in-updateboard? #f)
+(cpad-pressed? 0 up)
+(!= starter-weapon 1)
+)
+(set! (-> *game-info* auto-save-count) 1000000100)
+(sound-play "gun-takeout")
+(set! starter-display "<COLOR_RED>SCATTERGUN")
+(set! starter-weapon 1)
+)
+
+(when 
+(and 
+(= in-hub? #t)
+(= in-menu #f)
+(= vin-shop #f)
+(= in-updateboard? #f)
+(cpad-pressed? 0 down)
+(!= starter-weapon 2)
+)
+(set! (-> *game-info* auto-save-count) 1000001000)
+(sound-play "gun-takeout")
+(set! starter-display "<COLOR_YELLOW>BLASTER")
+(set! starter-weapon 2)
+)
+
+(when 
+(and 
+(= in-hub? #t)
+(= in-menu #f)
+(= vin-shop #f)
+(= in-updateboard? #f)
+(cpad-pressed? 0 left)
+(!= starter-weapon 3)
+)
+(set! (-> *game-info* auto-save-count) 1000010000)
+(sound-play "gun-takeout")
+(set! starter-display "<COLOR_CYAN>VULCAN")
+(set! starter-weapon 3)
+)
+
+(when 
+(and 
+(= in-hub? #t)
+(= in-menu #f)
+(= vin-shop #f)
+(= in-updateboard? #f)
+(cpad-pressed? 0 right)
+(!= starter-weapon 4)
+)
+(set! (-> *game-info* auto-save-count) 1000100000)
+(sound-play "gun-takeout")
+(set! starter-display "<COLOR_PINK>PEACEMAKER")
+(set! starter-weapon 4)
 )
 
 
@@ -3819,7 +3388,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 (= in-hub? #t)
 (= wait-kill-vin #f)
 (= ub-npc-wait #f)
-(cpad-pressed? 0 r3)
+(cpad-pressed? 0 r2)
 )
   (set! vin-shop #f)
   (set! camera-unlocked #t)
@@ -4243,17 +3812,28 @@ Here are the shop IDs
 
 (when (= roll-shopitems #t)
   (let (
-    (shoproll1 (rand-vu-int-range 1 (-> *game-info* total-trys)))
-    (shoproll2 (rand-vu-int-range 1 (-> *game-info* total-trys)))
-    (shoproll3 (rand-vu-int-range 1 (-> *game-info* total-trys)))
+    (shoproll1 (rand-vu-int-range 0 (-> *game-info* total-trys)))
+    (shoproll2 (rand-vu-int-range 0 (-> *game-info* total-trys)))
+    (shoproll3 (rand-vu-int-range 0 (-> *game-info* total-trys)))
   )
   (when (or (= shoproll1 shoproll2)(= shoproll1 shoproll3)(= shoproll2 shoproll3)) ;if the pick is the same on two options, reroll
-    (set! shoproll1 (rand-vu-int-range 1 (-> *game-info* total-trys)))
-    (set! shoproll2 (rand-vu-int-range 1 (-> *game-info* total-trys)))
-    (set! shoproll3 (rand-vu-int-range 1 (-> *game-info* total-trys)))
+    (set! shoproll1 (rand-vu-int-range 0 (-> *game-info* total-trys)))
+    (set! shoproll2 (rand-vu-int-range 0 (-> *game-info* total-trys)))
+    (set! shoproll3 (rand-vu-int-range 0 (-> *game-info* total-trys)))
   )
 
-
+  (when (= shoproll1 0)
+    (set! shopitem1 "Blaster (25 orbs)")
+    (set! shopid1 0)
+  )
+  (when (= shoproll2 0)
+    (set! shopitem2 "Blaster (25 orbs)")
+    (set! shopid2 0)
+  )
+  (when (= shoproll3 0)
+    (set! shopitem3 "Blaster (25 orbs)")
+    (set! shopid3 0)
+  )
   (when (= shoproll1 1)
     (set! shopitem1 "Scatter Gun (25 orbs)")
     (set! shopid1 1)
@@ -4632,6 +4212,33 @@ Here are the shop IDs
 
 
 (when (and (= in-menu2 #t)(cpad-pressed? 0 x))
+    (when (and (= menu-slot 0)(not (logtest? (-> *game-info* features) (game-feature gun-yellow)))(>= (-> *game-info* skill) 25.0)(= shopid1 0))
+      (-! (-> *game-info* skill) 25.0)
+      (set! shopitem1 "(Out of Stock)")
+      (set! item-tss1 "Blaster")
+      (set-item "yellow" 1)
+      (when (= already-teleported? #f)
+        (set! autosave-delayed #t)
+      )
+    )
+    (when (and (= menu-slot 1)(not (logtest? (-> *game-info* features) (game-feature gun-yellow)))(>= (-> *game-info* skill) 25.0)(= shopid3 0))
+      (-! (-> *game-info* skill) 25.0)
+      (set! shopitem3 "(Out of Stock)")
+      (set! item-tss1 "Blaster")
+      (set-item "yellow" 1)
+      (when (= already-teleported? #f)
+        (set! autosave-delayed #t)
+      )
+    )
+    (when (and (= menu-slot 2)(not (logtest? (-> *game-info* features) (game-feature gun-yellow)))(>= (-> *game-info* skill) 25.0)(= shopid2 0))
+      (-! (-> *game-info* skill) 25.0)
+      (set! shopitem2 "(Out of Stock)")
+      (set! item-tss1 "Blaster")
+      (set-item "yellow" 1)
+      (when (= already-teleported? #f)
+        (set! autosave-delayed #t)
+      )
+    )
     (when (and (= menu-slot 0)(not (logtest? (-> *game-info* features) (game-feature gun-red)))(>= (-> *game-info* skill) 25.0)(= shopid1 1))
       (-! (-> *game-info* skill) 25.0)
       (set! shopitem1 "(Out of Stock)")
@@ -5680,8 +5287,8 @@ Here are the shop IDs
 ~%
 ~%Everything is <COLOR_GREEN>a roll of the dice.
 ~%<COLOR_WHITE>City guard counts, enemy speed, and so many more, are completely random!
-~%And finally, Jak's default weapon is the Yellow Gun, meaning every other 
-~%weapon, buff, or upgrade can be purchased or found, but not saved..
+~%Any weapon can be chosen to start with. Beat the game with different 
+~%starting weapons to unlock other addative content to the game
 ~%You can exit the level to <COLOR_GREEN>start your run<COLOR_WHITE>.
 ~%
 ~%<COLOR_BLUE>X<COLOR_GREEN> Continue"
@@ -5952,6 +5559,30 @@ Here are the shop IDs
 )
 
 
+(when (not *scene-player*)
+(when (and 
+(= in-menu2 #t)
+(not (logtest? (-> *game-info* features) (game-feature gun-yellow)))
+(or
+(and (= shopid1 0) (= menu-slot 0))
+(and (= shopid2 0) (= menu-slot 2))
+(and (= shopid3 0) (= menu-slot 1))
+)
+)
+(clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_ORANGE>Unlocks the <COLOR_YELLOW>Blaster"
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 245 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+)
 
 (when (not *scene-player*)
 (when (and 
@@ -6409,7 +6040,8 @@ Here are the shop IDs
 (when (and (= vin-shop #f)(= in-updateboard? #f)(= start-stage #t)(not (cpad-hold? 0 r3)))
    (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_RED>R3<COLOR_WHITE>:<COLOR_GREEN> Start Run"
+    (format matt-str "<COLOR_RED>R3<COLOR_WHITE>:<COLOR_GREEN> Start a ~S <COLOR_GREEN>Run"
+    starter-display
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
     (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
@@ -6424,7 +6056,8 @@ Here are the shop IDs
 (when (and (= vin-shop #f)(= in-updateboard? #f)(= start-stage #t)(cpad-hold? 0 r3))
    (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>R3<COLOR_WHITE>:<COLOR_YELLOW> Start Run"
+    (format matt-str "<COLOR_WHITE>R3<COLOR_WHITE>:<COLOR_YELLOW> Start a ~S <COLOR_YELLOW>Run"
+    starter-display
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
     (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
@@ -7019,7 +6652,7 @@ Here are the shop IDs
     ~%
     ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
     ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
+    ~%<COLOR_GREEN>Press <COLOR_RED>R2<COLOR_GREEN> to Exit"
     (the int (-> *game-info* fuel))
     mod-s
     (the int menu-value)
@@ -7049,7 +6682,7 @@ Here are the shop IDs
     ~%
     ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
     ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
+    ~%<COLOR_GREEN>Press <COLOR_RED>R2<COLOR_GREEN> to Exit"
     (the int (-> *game-info* fuel))
     mod-s
     (the int menu-value)
@@ -7079,7 +6712,7 @@ Here are the shop IDs
     ~%
     ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
     ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
+    ~%<COLOR_GREEN>Press <COLOR_RED>R2<COLOR_GREEN> to Exit"
     (the int (-> *game-info* fuel))
     mod-s
     (the int menu-value)
@@ -7110,7 +6743,7 @@ Here are the shop IDs
     ~%
     ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
     ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
+    ~%<COLOR_GREEN>Press <COLOR_RED>R2<COLOR_GREEN> to Exit"
     (the int (-> *game-info* fuel))
     mod-s
     (the int menu-value)
@@ -7144,7 +6777,7 @@ Here are the shop IDs
     ~%
     ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
     ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
+    ~%<COLOR_GREEN>Press <COLOR_RED>R2<COLOR_GREEN> to Exit"
     (the int (-> *game-info* fuel))
     mod-s
     (the int menu-value)
@@ -7173,7 +6806,7 @@ Here are the shop IDs
     ~%
     ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
     ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
+    ~%<COLOR_GREEN>Press <COLOR_RED>R2<COLOR_GREEN> to Exit"
     (the int (-> *game-info* fuel))
     mod-s
     (the int menu-value)
@@ -7203,7 +6836,7 @@ Here are the shop IDs
     ~%
     ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
     ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
+    ~%<COLOR_GREEN>Press <COLOR_RED>R2<COLOR_GREEN> to Exit"
     (the int (-> *game-info* fuel))
     mod-s
     (the int menu-value)
@@ -7233,7 +6866,7 @@ Here are the shop IDs
     ~%
     ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
     ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
+    ~%<COLOR_GREEN>Press <COLOR_RED>R2<COLOR_GREEN> to Exit"
     (the int (-> *game-info* fuel))
     mod-s
     (the int menu-value)
@@ -7272,7 +6905,7 @@ Here are the shop IDs
     ~%
     ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
     ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
+    ~%<COLOR_GREEN>Press <COLOR_RED>R2<COLOR_GREEN> to Exit"
     (the int (-> *game-info* fuel))
     mod-s
     (the int menu-value)
@@ -7311,7 +6944,7 @@ Here are the shop IDs
     ~%
     ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
     ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
+    ~%<COLOR_GREEN>Press <COLOR_RED>R2<COLOR_GREEN> to Exit"
     (the int (-> *game-info* fuel))
     mod-s
     (the int menu-value)
@@ -7350,7 +6983,7 @@ Here are the shop IDs
     ~%
     ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
     ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
+    ~%<COLOR_GREEN>Press <COLOR_RED>R2<COLOR_GREEN> to Exit"
     (the int (-> *game-info* fuel))
     mod-s
     (the int menu-value)
@@ -7388,7 +7021,7 @@ Here are the shop IDs
     ~%
     ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
     ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
+    ~%<COLOR_GREEN>Press <COLOR_RED>R2<COLOR_GREEN> to Exit"
     (the int (-> *game-info* fuel))
     mod-s
     (the int menu-value)
@@ -7430,7 +7063,7 @@ Here are the shop IDs
     ~%
     ~%<COLOR_RED>R1: <COLOR_WHITE>Buy <COLOR_GREEN>~S<COLOR_WHITE> to permenantly put in the shop for <COLOR_YELLOW>~d Tokens!
     ~%
-    ~%<COLOR_GREEN>Press <COLOR_RED>R3<COLOR_GREEN> to Exit"
+    ~%<COLOR_GREEN>Press <COLOR_RED>R2<COLOR_GREEN> to Exit"
     (the int (-> *game-info* fuel))
     mod-s
     (the int menu-value)
@@ -8339,6 +7972,7 @@ Here are the shop IDs
     (set! intro-sec 1)
     (set! item-display? #t)
     (set! display-death-screen #t)
+    (set! (-> *game-info* auto-save-count) 1000001000)
   )
 )
 

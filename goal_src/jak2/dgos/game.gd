@@ -511,6 +511,8 @@
   "nestb-part.o";; 
   "hiphog-scenes.o"
   "whack.o"
+  "actor-def.o"
+  "fodder.o"
   "save-def.o" ;;added by Kraken
   "checkpoint-randomizer.o" ;;added by Kraken
   "mod-custom-code.o" ;; added

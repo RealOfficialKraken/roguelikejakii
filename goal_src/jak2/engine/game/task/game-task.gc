@@ -1220,7 +1220,7 @@
             :borrow '()
             :open? #f
             :on-close #f
-            :add (game-task-node-command add-gun-yellow)
+            :add (game-task-node-command none)
             :description (text-id progress-missions-city-save-kid)
             )
           (new 'static 'game-task-node-info

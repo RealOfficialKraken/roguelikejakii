@@ -1,0 +1,688 @@
+(in-package goal)
+
+;actor-def.gc
+
+(deftype c-kid-npc (process-taskable)
+  ()
+  )
+
+
+(defmethod init-art! ((this c-kid-npc))
+  "@see [[initialize-skeleton]]"
+  (initialize-skeleton
+    this
+    (the-as skeleton-group (art-group-get-by-name *level* "skel-kid-highres" (the-as (pointer uint32) #f)))
+    (the-as pair 0)
+    )
+  (set! (-> this draw light-index) (the-as uint 30))
+  0
+  (none)
+  )
+
+(defmethod get-art-elem ((this c-kid-npc))
+  "Checks various things such the current actor, task status, etc to determine the right art-group data to use
+@returns the appropriate [[art-element]] for the given NPC"
+  (case (-> this task actor)
+    (((game-task-actor kid-alley))
+     (-> this draw art-group data 5)
+     )
+    (((game-task-actor kid-tomb) (game-task-actor kid-vinroom))
+     (-> this draw art-group data 4)
+     )
+    (((game-task-actor kid-hideout))
+     (-> this draw art-group data 6)
+     )
+    (else
+      (-> this draw art-group data 3)
+      )
+    )
+  )
+
+  (defbehavior c-kid-npc-init-by-other c-kid-npc ((vec vector)) ;spawn kid
+  (stack-size-set! (-> self main-thread) 512)
+  (process-taskable-method-31 self)
+  (logior! (-> self mask) (process-mask actor-pause))
+  (vector-copy! (-> self root trans) vec)
+  (quaternion-identity! (-> self root quat))
+  (vector-identity! (-> self root scale))
+  (set! (-> self task) (new 'process 'game-task-control (game-task-actor kid-vinroom)))
+  (init-art! self)
+  (process-taskable-method-32 self)
+  (set! (-> self event-hook) (-> (method-of-object self idle) event))
+  (go (method-of-object self hide))
+  (none)
+  (none)
+  )
+
+(deftype c-crocadog-npc (process-taskable)
+  ()
+  )
+
+
+(defmethod get-art-elem ((this c-crocadog-npc))
+  "Checks various things such the current actor, task status, etc to determine the right art-group data to use
+@returns the appropriate [[art-element]] for the given NPC"
+  (case (-> this task actor)
+    (((game-task-actor crocadog-vinroom))
+     (-> this draw art-group data 5)
+     )
+    (((game-task-actor crocadog-alley))
+     (-> this draw art-group data 4)
+     )
+    (else
+      (-> this draw art-group data 4)
+      )
+    )
+  )
+
+(defmethod init-art! ((this c-crocadog-npc))
+  "@see [[initialize-skeleton]]"
+  (initialize-skeleton
+    this
+    (the-as skeleton-group (art-group-get-by-name *level* "skel-crocadog-highres" (the-as (pointer uint32) #f)))
+    (the-as pair 0)
+    )
+  (set! (-> this draw light-index) (the-as uint 30))
+  0
+  (none)
+  )
+
+(defenum rapid-gunner-flags
+  :bitfield #t
+  (ragflags-0)
+  (ragflags-1)
+  (ragflags-2)
+  (ragflags-3)
+  (ragflags-4)
+  (ragflags-5)
+  )
+
+(deftype c-rapid-gunner (nav-enemy)
+  ((los               los-control  :inline)
+   (joint             joint-mod)
+   (joint-blend       float)
+   (joint-enable      symbol)
+   (shot-timer        uint64)
+   (predict-timer     uint64)
+   (target-prev-pos   vector       :inline)
+   (target-next-pos   vector       :inline)
+   (focus-dir         vector       :inline)
+   (y-diff            float)
+   (shots-fired       uint32)
+   (spin-up-angle     float)
+   (spin-up-timer     time-frame)
+   (shoot-anim-index  int32)
+   (status-flags      rapid-gunner-flags)
+   (start-pos         vector       :inline)
+   (dest-pos          vector       :inline)
+   (hop-dir           vector       :inline)
+   (roam-radius       float)
+   )
+  (:state-methods
+    attack
+    spin-attack
+    hop
+    hop-turn
+    cool-down
+    reload
+    )
+  (:methods
+    (rapid-gunner-method-184 (_type_ float) symbol)
+    (rapid-gunner-method-185 (_type_ vector float) none)
+    (rapid-gunner-method-186 (_type_ int float int int) none)
+    )
+  )
+
+
+(defskelgroup skel-rapid-gunner rapid-gunner rapid-gunner-lod0-jg rapid-gunner-idle-ja
+              ((rapid-gunner-lod0-mg (meters 20)) (rapid-gunner-lod1-mg (meters 40)) (rapid-gunner-lod2-mg (meters 999999)))
+              :bounds (static-spherem 0 1.5 0 7)
+              :shadow rapid-gunner-shadow-mg
+              )
+
+  (defbehavior c-rapid-gunner-init-by-other c-rapid-gunner ((vec vector)) ;spawn crocadog
+  (process-spawn manipy
+                            :init
+                            manipy-init
+                            vec
+                            #f
+                            (art-group-get-by-name *level* "skel-rapid-gunner" (the (pointer uint32) #f))
+                            #f
+                            0)
+  (none)
+  )
+
+
+
+
+
+  (deftype metalkor (process-focusable)
+  ((trackable                        symbol)
+   (flitters                         handle            10)
+   (flitter-gem-tracker              handle)
+   (wasps                            handle            3)
+   (wasp-gem-tracker                 handle)
+   (last-flitter-launched            int8)
+   (last-wasp-launched               int8)
+   (live-flitters                    int8)
+   (live-wasps                       int8)
+   (shoot-timer                      time-frame)
+   (target-angle                     float)
+   (wave-timer                       time-frame)
+   (in-wave                          symbol)
+   (flitter-timer                    time-frame)
+   (wasp-timer                       time-frame)
+   (launching-flitters               symbol)
+   (launching-wasps                  symbol)
+   (egg-timer                        time-frame)
+   (last-close-attack                int8)
+   (last-standing-attack             int8)
+   (stage                            int8)
+   (next-stage-timer                 time-frame)
+   (initial-y                        float)
+   (shots-fired                      int16)
+   (stage-hit-points                 float)
+   (hud                              handle)
+   (lowtorso                         handle)
+   (legs                             handle)
+   (wings                            handle)
+   (kid                              handle)
+   (explode                          handle)
+   (rift-occlude                     handle)
+   (last-attack-id                   uint32)
+   (current-nav-poly                 nav-poly)
+   (shot-anticipate                  sparticle-launch-control)
+   (spinners                         handle            4)
+   (neck                             joint-mod)
+   (previous-flat-travel             vector            :inline)
+   (previous-flat-travel-timer       time-frame)
+   (previous-flat-travel-long-timer  time-frame)
+   (min-state-hit-points             float)
+   (countdown-to-roar                int8)
+   (for-back-interp                  cam-float-seeker  :inline)
+   (run-walk-interp                  cam-float-seeker  :inline)
+   (left-right-interp                cam-float-seeker  :inline)
+   (walk-turn-interp                 cam-float-seeker  :inline)
+   (idle-interp                      cam-float-seeker  :inline)
+   (tmp-hit-points                   float)
+   (reps-till-idle-alt               int8)
+   (last-rotation                    float)
+   (no-collision-timer               time-frame)
+   (egg-angle                        float             :offset 736)
+   (arm-frame                        float)
+   (been-to-entity                   symbol)
+   (flying-speed                     cam-float-seeker  :inline)
+   (wing-sound                       sound-id)
+   (wing-sound-playing               symbol)
+   (explode-sound                    sound-id)
+   (bomb-sound                       sound-id)
+   (stop-bomb-sound                  symbol)
+   (hit-ring-trans                   vector            :inline)
+   (hit-ring-offset                  vector            :inline)
+   (ring-cam-pos                     cam-float-seeker  :inline)
+   (need-teleport                    symbol)
+   )
+  (:state-methods
+    (beaten symbol)
+    explode
+    fly-to-ring
+    last-gasp
+    overload-recover
+    fall-down
+    tail-attack
+    foot-attack
+    get-close
+    standing-shot
+    chase-target
+    play-drop-movie
+    start-second-stage
+    hang-shoot-n-launch
+    hidden
+    test
+    )
+  )
+
+  
+
+
+  (defbehavior grenadier-init-by-other grenadier ((vec vector))
+  (init-enemy-collision! self)
+  (logior! (-> self mask) (process-mask actor-pause))
+  (vector-copy! (-> self root trans) vec)
+  (quaternion-identity! (-> self root quat))
+  (vector-identity! (-> self root scale))
+  (init-enemy! self)
+  (let ((nav (find-nearest-nav-mesh vec 0.0)) ;; try to find a nav mesh in the vicinity
+        ;; verts for the path
+        (cverts (new 'static 'inline-array vector 3
+                (static-vectorm 1 0 0)
+                (static-vectorm 0 1 0)
+                (static-vectorm 0 0 1)
+                )
+          )
+        )
+    ;; if a nav mesh is close by, use that, otherwise use default
+    (if nav
+      (change-to nav self)
+      (change-to *default-nav-mesh* self)
+      )
+    ;; allocate path
+    (set! (-> self path) (new 'process 'path-control self 'path 0.0 (the entity #f) #f))
+    (set! (-> self path curve cverts) cverts)
+    (set! (-> self path curve num-cverts) 3)
+    )
+  (set! (-> self hit-points) (+ (-> self enemy-info default-hit-points) 35.0))
+  (go-idle self)
+  )
+
+(defbehavior metalkor-init-by-other metalkor ((vec vector))
+  (local-vars (sv-16 res-tag))
+  (let ((metalkor-pos-quat (new 'static 'quaternion :x 0.0 :y -1.0 :z 0.0))
+        )
+    ;;manipy code
+    ;(quaternion-copy! offset-quat (quaternion-from-two-vectors! metalkor-pos-quat metalkor-pos metalkor-pos-off)) ;make a quat from target-pos 0 and the original vector
+    (let ((kor (process-spawn manipy
+                            :init
+                            manipy-init
+                            vec
+                            #f
+                            (art-group-get-by-name *level* "skel-metalkor" (the (pointer uint32) #f))
+                            #f
+                            0)
+                            ))
+    (if kor
+      (let ((torso (process-spawn manipy
+                                  :init
+                                  manipy-init
+                                  vec
+                                  #f
+                                  (art-group-get-by-name *level* "skel-metalkor-lowtorso" (the (pointer uint32) #f))
+                                  #f
+                                  0
+                                  :to
+                                  (-> kor 0))
+                                  )
+            (legs (process-spawn manipy
+                                :init
+                                manipy-init
+                                vec
+                                #f
+                                (art-group-get-by-name *level* "skel-metalkor-legs" (the (pointer uint32) #f))
+                                #f
+                                0
+                                :to
+                                (-> kor 0))
+                                ))
+                                (send-event (-> kor 0) 'rot-quat metalkor-pos-quat)
+                                (send-event (-> torso 0) 'rot-quat metalkor-pos-quat)
+                                (send-event (-> legs 0) 'rot-quat metalkor-pos-quat)
+                                )))
+  )
+  (none)
+    )
+
+    (defskelgroup skel-rift-ring-ingame rift-ring-in-game rift-ring-in-game-lod0-jg rift-ring-in-game-idle-ja
+              ((rift-ring-in-game-lod0-mg (meters 999999)))
+              :bounds (static-spherem 0 0 0 40)
+              )
+
+
+
+    (deftype rift-ring-ingame (process-drawable)
+  ((anim-speed          delayed-rand-float  :inline)
+   (stutter             symbol)
+   (spin-sound          sound-id)
+   (spin-sound-playing  symbol)
+   )
+  (:state-methods
+    idle
+    )
+  )
+
+
+(defstate idle (rift-ring-ingame)
+  :virtual #t
+  :event (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
+    (case message
+      (('stutter)
+       (set! (-> self stutter) (the-as symbol (-> block param 0)))
+       (set-params! (-> self anim-speed) 3 15 0.25)
+       (reset! (-> self anim-speed))
+       (set! (-> self anim-speed value) -0.25)
+       )
+      )
+    )
+  :trans (behavior ()
+    (cond
+      ((-> self stutter)
+       (update! (-> self anim-speed))
+       (ja :num! (loop! (+ 0.125 (-> self anim-speed value))))
+       )
+      (else
+        (ja :num! (loop!))
+        )
+      )
+    (sound-play "warp-ring" :id (-> self spin-sound) :position (-> self root trans))
+    (set! (-> self spin-sound-playing) #t)
+    )
+  :code sleep-code
+  :post (behavior ()
+    (spawn (-> self part) (-> self root trans))
+    (ja-post)
+    )
+  )
+
+(defmethod deactivate ((this rift-ring-ingame))
+  (if (-> this spin-sound-playing)
+      (sound-stop (-> this spin-sound))
+      )
+  ((method-of-type process-drawable deactivate) this)
+  (none)
+  )
+
+
+
+  (defun metalkor-appear ()
+  (let ((metalkor-pos1 (new 'static 'vector :x (meters -292.9985) :y (meters 353.4276) :z (meters -1640.9791))))
+        (process-spawn metalkor metalkor-pos1)
+  )
+  (none)
+  )
+
+;; WARN: Return type mismatch object vs none.
+(defmethod init-from-entity! ((this rift-ring-ingame) (arg0 entity-actor))
+  "Typically the method that does the initial setup on the process, potentially using the [[entity-actor]] provided as part of that.
+This commonly includes things such as:
+- stack size
+- collision information
+- loading the skeleton group / bones
+- sounds"
+  (set! (-> this root) (new 'process 'trsqv))
+  (process-drawable-from-entity! this arg0)
+  (initialize-skeleton
+    this
+    (the-as skeleton-group (art-group-get-by-name *level* "skel-rift-ring-ingame" (the-as (pointer uint32) #f)))
+    (the-as pair 0)
+    )
+  (set! (-> this part) (create-launch-control (-> *part-group-id-table* 1236) this))
+  (set! (-> this draw light-index) (the-as uint 10))
+  (set! (-> this stutter) #f)
+  (set! (-> this spin-sound) (new-sound-id))
+  (set! (-> this spin-sound-playing) #f)
+  (go (method-of-object this idle))
+  (none)
+  )
+
+    (defbehavior rift-ring-ingame-init-by-other rift-ring-ingame ((vec vector))
+  (set! (-> self root) (new 'process 'trsqv))
+  (vector-copy! (-> self root trans) vec)
+  (quaternion-identity! (-> self root quat))
+  (vector-identity! (-> self root scale))
+    (initialize-skeleton
+    self
+    (the-as skeleton-group (art-group-get-by-name *level* "skel-rift-ring-ingame" (the-as (pointer uint32) #f)))
+    (the-as pair 0)
+    )
+  (set! (-> self part) (create-launch-control (-> *part-group-id-table* 1236) self))
+  (set! (-> self draw light-index) (the-as uint 10))
+  (set! (-> self stutter) #f)
+  (set! (-> self spin-sound) (new-sound-id))
+  (set! (-> self spin-sound-playing) #f)
+  (set! (-> self event-hook) (-> (method-of-object self idle) event))
+  (go (method-of-object self idle))
+  (set! (-> self root scale x) 10.0)
+  (set! (-> self root scale y) 10.0)
+  (set! (-> self root scale z) 10.0)
+  (none)
+    )
+
+    (deftype pal-falling-plat (process-drawable)
+  ((root  collide-shape-moving :override)
+   )
+  (:state-methods
+    idle
+    fall
+    )
+  )
+
+
+(defskelgroup skel-pal-falling-plat pal-falling-plat pal-falling-plat-lod0-jg pal-falling-plat-idle-ja
+              ((pal-falling-plat-lod0-mg (meters 999999)))
+              :bounds (static-spherem 0 0 0 5.8)
+              )
+
+(defstate idle (pal-falling-plat)
+  :virtual #t
+  :event (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
+    (case message
+      (('ridden)
+       (go-virtual fall)
+       )
+      )
+    )
+  :enter (behavior ()
+    (logior! (-> self root root-prim prim-core action) (collide-action rideable))
+    )
+  :trans rider-trans
+  :code (behavior ()
+    (ja-no-eval :group! pal-falling-plat-idle-ja :num! zero)
+    (transform-post)
+    (sleep-code)
+    )
+  :post rider-post
+  )
+
+(defstate fall (pal-falling-plat)
+  :virtual #t
+  :event (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
+    (case message
+      (('touch)
+       (when ((method-of-type touching-shapes-entry prims-touching?)
+              (the-as touching-shapes-entry (-> block param 0))
+              (-> self root)
+              (the-as uint 8)
+              )
+         (when (< 18.0 (ja-frame-num 0))
+           (let ((v1-6 (-> self skel root-channel 0)))
+             (set! (-> v1-6 num-func) num-func-identity)
+             (set! (-> v1-6 frame-num) 18.0)
+             )
+           )
+         )
+       )
+      )
+    )
+  :enter (behavior ()
+    (sound-play "pal-fall-plat")
+    )
+  :trans rider-trans
+  :code (behavior ()
+    (ja-no-eval :group! pal-falling-plat-shake-ja :num! (seek!) :frame-num 0.0)
+    (until (ja-done? 0)
+      (suspend)
+      (ja :num! (seek!))
+      )
+    (logclear! (-> self root root-prim prim-core action) (collide-action rideable))
+    (ja-no-eval :group! pal-falling-plat-idle-ja :num! (seek!) :frame-num 0.0)
+    (until (ja-done? 0)
+      (suspend)
+      (ja :num! (seek!))
+      )
+    (go-virtual idle)
+    )
+  :post rider-post
+  )
+
+;; WARN: Return type mismatch object vs none.
+(defmethod init-from-entity! ((this pal-falling-plat) (arg0 entity-actor))
+  "Typically the method that does the initial setup on the process, potentially using the [[entity-actor]] provided as part of that.
+This commonly includes things such as:
+- stack size
+- collision information
+- loading the skeleton group / bones
+- sounds"
+  (let ((s4-0 (new 'process 'collide-shape-moving this (collide-list-enum usually-hit-by-player))))
+    (set! (-> s4-0 dynam) (copy *standard-dynamics* 'process))
+    (set! (-> s4-0 reaction) cshape-reaction-default)
+    (set! (-> s4-0 no-reaction)
+          (the-as (function collide-shape-moving collide-query vector vector object) nothing)
+          )
+    (let ((s3-0 (new 'process 'collide-shape-prim-group s4-0 (the-as uint 4) 0)))
+      (set! (-> s4-0 total-prims) (the-as uint 5))
+      (set! (-> s3-0 prim-core collide-as) (collide-spec obstacle pusher))
+      (set! (-> s3-0 prim-core collide-with) (collide-spec jak bot player-list))
+      (set! (-> s3-0 prim-core action) (collide-action solid rideable))
+      (set! (-> s3-0 transform-index) 3)
+      (set-vector! (-> s3-0 local-sphere) 0.0 0.0 11059.2 20480.0)
+      (set! (-> s4-0 root-prim) s3-0)
+      )
+    (pusher-init s4-0)
+    (let ((v1-15 (new 'process 'collide-shape-prim-mesh s4-0 (the-as uint 0) (the-as uint 0))))
+      (set! (-> v1-15 prim-core collide-as) (collide-spec obstacle pusher))
+      (set! (-> v1-15 prim-core collide-with) (collide-spec jak bot player-list))
+      (set! (-> v1-15 prim-core action) (collide-action solid rideable))
+      (set! (-> v1-15 transform-index) 3)
+      (set-vector! (-> v1-15 local-sphere) 12288.0 0.0 1228.8 4096.0)
+      )
+    (let ((v1-17 (new 'process 'collide-shape-prim-mesh s4-0 (the-as uint 1) (the-as uint 0))))
+      (set! (-> v1-17 prim-core collide-as) (collide-spec obstacle pusher))
+      (set! (-> v1-17 prim-core collide-with) (collide-spec jak bot player-list))
+      (set! (-> v1-17 prim-core action) (collide-action solid rideable))
+      (set! (-> v1-17 transform-index) 3)
+      (set-vector! (-> v1-17 local-sphere) -12288.0 0.0 1228.8 4096.0)
+      )
+    (let ((v1-19 (new 'process 'collide-shape-prim-mesh s4-0 (the-as uint 2) (the-as uint 0))))
+      (set! (-> v1-19 prim-core collide-as) (collide-spec obstacle pusher))
+      (set! (-> v1-19 prim-core collide-with) (collide-spec jak bot player-list))
+      (set! (-> v1-19 prim-core action) (collide-action solid rideable))
+      (set! (-> v1-19 transform-index) 4)
+      (set-vector! (-> v1-19 local-sphere) 0.0 0.0 8192.0 19660.8)
+      )
+    (let ((v1-21 (new 'process 'collide-shape-prim-sphere s4-0 (the-as uint 8))))
+      (set! (-> v1-21 prim-core collide-as) (collide-spec obstacle))
+      (set! (-> v1-21 prim-core collide-with) (collide-spec jak player-list))
+      (set! (-> v1-21 prim-core action) (collide-action))
+      (set-vector! (-> v1-21 local-sphere) -16384.0 -4096.0 0.0 16384.0)
+      )
+    (set! (-> s4-0 nav-radius) (* 0.75 (-> s4-0 root-prim local-sphere w)))
+    (let ((v1-24 (-> s4-0 root-prim)))
+      (set! (-> s4-0 backup-collide-as) (-> v1-24 prim-core collide-as))
+      (set! (-> s4-0 backup-collide-with) (-> v1-24 prim-core collide-with))
+      )
+    (set! (-> this root) s4-0)
+    )
+  (process-drawable-from-entity! this arg0)
+  (initialize-skeleton
+    this
+    (the-as skeleton-group (art-group-get-by-name *level* "skel-pal-falling-plat" (the-as (pointer uint32) #f)))
+    (the-as pair 0)
+    )
+  (go (method-of-object this idle))
+  (none)
+  )
+
+    (defbehavior pal-falling-plat-init-by-other pal-falling-plat ((vec vector))
+  (let ((s4-0 (new 'process 'collide-shape-moving self (collide-list-enum usually-hit-by-player))))
+    (set! (-> s4-0 dynam) (copy *standard-dynamics* 'process))
+    (set! (-> s4-0 reaction) cshape-reaction-default)
+    (set! (-> s4-0 no-reaction)
+          (the-as (function collide-shape-moving collide-query vector vector object) nothing)
+          )
+    (let ((s3-0 (new 'process 'collide-shape-prim-group s4-0 (the-as uint 4) 0)))
+      (set! (-> s4-0 total-prims) (the-as uint 5))
+      (set! (-> s3-0 prim-core collide-as) (collide-spec obstacle pusher))
+      (set! (-> s3-0 prim-core collide-with) (collide-spec jak bot player-list))
+      (set! (-> s3-0 prim-core action) (collide-action solid rideable))
+      (set! (-> s3-0 transform-index) 3)
+      (set-vector! (-> s3-0 local-sphere) 0.0 0.0 11059.2 20480.0)
+      (set! (-> s4-0 root-prim) s3-0)
+      )
+    (pusher-init s4-0)
+    (let ((v1-15 (new 'process 'collide-shape-prim-mesh s4-0 (the-as uint 0) (the-as uint 0))))
+      (set! (-> v1-15 prim-core collide-as) (collide-spec obstacle pusher))
+      (set! (-> v1-15 prim-core collide-with) (collide-spec jak bot player-list))
+      (set! (-> v1-15 prim-core action) (collide-action solid rideable))
+      (set! (-> v1-15 transform-index) 3)
+      (set-vector! (-> v1-15 local-sphere) 12288.0 0.0 1228.8 4096.0)
+      )
+    (let ((v1-17 (new 'process 'collide-shape-prim-mesh s4-0 (the-as uint 1) (the-as uint 0))))
+      (set! (-> v1-17 prim-core collide-as) (collide-spec obstacle pusher))
+      (set! (-> v1-17 prim-core collide-with) (collide-spec jak bot player-list))
+      (set! (-> v1-17 prim-core action) (collide-action solid rideable))
+      (set! (-> v1-17 transform-index) 3)
+      (set-vector! (-> v1-17 local-sphere) -12288.0 0.0 1228.8 4096.0)
+      )
+    (let ((v1-19 (new 'process 'collide-shape-prim-mesh s4-0 (the-as uint 2) (the-as uint 0))))
+      (set! (-> v1-19 prim-core collide-as) (collide-spec obstacle pusher))
+      (set! (-> v1-19 prim-core collide-with) (collide-spec jak bot player-list))
+      (set! (-> v1-19 prim-core action) (collide-action solid rideable))
+      (set! (-> v1-19 transform-index) 4)
+      (set-vector! (-> v1-19 local-sphere) 0.0 0.0 8192.0 19660.8)
+      )
+    (let ((v1-21 (new 'process 'collide-shape-prim-sphere s4-0 (the-as uint 8))))
+      (set! (-> v1-21 prim-core collide-as) (collide-spec obstacle))
+      (set! (-> v1-21 prim-core collide-with) (collide-spec jak player-list))
+      (set! (-> v1-21 prim-core action) (collide-action))
+      (set-vector! (-> v1-21 local-sphere) -16384.0 -4096.0 0.0 16384.0)
+      )
+    (set! (-> s4-0 nav-radius) (* 0.75 (-> s4-0 root-prim local-sphere w)))
+    (let ((v1-24 (-> s4-0 root-prim)))
+      (set! (-> s4-0 backup-collide-as) (-> v1-24 prim-core collide-as))
+      (set! (-> s4-0 backup-collide-with) (-> v1-24 prim-core collide-with))
+      )
+    (set! (-> self root) s4-0)
+    )
+    (let ((offset-vec (new-stack-vector0)))
+      (vector-copy! (-> self root trans) vec)
+      (quaternion-identity! (-> self root quat))
+      (vector-identity! (-> self root scale))
+    )
+  (initialize-skeleton
+    self
+    (the-as skeleton-group (art-group-get-by-name *level* "skel-pal-falling-plat" (the-as (pointer uint32) #f)))
+    (the-as pair 0)
+    )
+  (go (method-of-object self idle))
+  (none)
+    )
+
+
+
+
+
+
+
+  (deftype c-vin-npc (process-taskable)
+  ()
+  )
+
+
+(defskelgroup skel-vin vin vin-lod0-jg vin-idle-ja
+              ((vin-lod0-mg (meters 999999)))
+              :bounds (static-spherem 0 0 0 10)
+              :shadow vin-shadow-mg
+              :origin-joint-index 3
+              )
+
+
+(defmethod init-art! ((this c-vin-npc))
+  "@see [[initialize-skeleton]]"
+  (initialize-skeleton
+    this
+    (the-as skeleton-group (art-group-get-by-name *level* "skel-vin" (the-as (pointer uint32) #f)))
+    (the-as pair 0)
+    )
+  (none)
+  )
+
+    (defbehavior c-vin-npc-init-by-other c-vin-npc ((vec vector)) ;spawn vinny
+  (process-spawn manipy
+                            :init
+                            manipy-init
+                            vec
+                            #f
+                            (art-group-get-by-name *level* "skel-vin" (the (pointer uint32) #f))
+                            #f
+                            0)
+  (none)
+  )

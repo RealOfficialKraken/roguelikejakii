@@ -1090,3 +1090,17 @@
 (defmethod enemy-method-99 ((this fodder) (arg0 process-focusable))
   (focus-test? arg0 mech)
   )
+
+  (defbehavior fodder-init-by-other fodder ((vec vector))
+    (process-spawn manipy :init manipy-init vec
+                            #f
+                            (art-group-get-by-name *level* "skel-fodder" (the (pointer uint32) #f))
+                            #f
+                            0)
+                            (none)
+  )
+
+  (defun spawn-frong ()
+    (process-spawn manipy :init manipy-init (new 'static 'vector :x (meters 751.4117) :y (meters 18.2) :z (meters 903.3818)) #f (art-group-get-by-name *level* "skel-fodder" (the (pointer uint32) #f)) #f 0)
+    (none)
+  )

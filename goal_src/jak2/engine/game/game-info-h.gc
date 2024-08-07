@@ -32,6 +32,9 @@
 (define final-waitb #f)
 (define final-waiti 0)
 
+(define starter-weapon 0)
+(define starter-display "<COLOR_YELLOW>BLASTER")
+
 (define metalkor-stage-3 #f)
 (define grenadiers-spawned? #f)
 

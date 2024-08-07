@@ -37,7 +37,7 @@
 (define ub-npc-kill #f)
 (define ub-npci 0)
 
-(define update-vers "(0.85)")
+(define update-vers "(0.90)")
 (define ub-color "<COLOR_CYAN>")
 ;PAGE 1
 (define ub-1 "<COLOR_WHITE>< <COLOR_ORANGE>Added a Challenge Machine to spice up runs with Tokens!")
@@ -70,13 +70,13 @@
 (define ub-3-1 "")
 (define ub-4-1 "<COLOR_WHITE>< <COLOR_ORANGE>Added <COLOR_YELLOW>vin-npc<COLOR_ORANGE> to polish Vin's Shop")
 (define ub-5-1 "")
-(define ub-6-1 "")
-(define ub-7-1 "")
-(define ub-8-1 "")
+(define ub-6-1 "<COLOR_WHITE>< <COLOR_ORANGE>Added a starter weapon to runs!")
+(define ub-7-1 "Unlock new things in the game by beating Act 3")
+(define ub-8-1 "with differnet starting weapons")
 (define ub-9-1 "")
-(define ub-10-1 "")
-(define ub-11-1 "")
-(define ub-12-1 "")
+(define ub-10-1 "<COLOR_WHITE>< <COLOR_ORANGE>Added a whole new game mechanic. Modifiers are now added")
+(define ub-11-1 "to completely change up a run, unlocked by beating Act 3")
+(define ub-12-1 "with any starter weapon")
 (define ub-13-1 "")
 (define ub-14-1 "")
 (define ub-15-1 "")
@@ -140,155 +140,6 @@
 (define ub-23-3 "")
 (define ub-24-3 "")
 
-(deftype c-kid-npc (process-taskable)
-  ()
-  )
-
-
-(defmethod init-art! ((this c-kid-npc))
-  "@see [[initialize-skeleton]]"
-  (initialize-skeleton
-    this
-    (the-as skeleton-group (art-group-get-by-name *level* "skel-kid-highres" (the-as (pointer uint32) #f)))
-    (the-as pair 0)
-    )
-  (set! (-> this draw light-index) (the-as uint 30))
-  0
-  (none)
-  )
-
-(defmethod get-art-elem ((this c-kid-npc))
-  "Checks various things such the current actor, task status, etc to determine the right art-group data to use
-@returns the appropriate [[art-element]] for the given NPC"
-  (case (-> this task actor)
-    (((game-task-actor kid-alley))
-     (-> this draw art-group data 5)
-     )
-    (((game-task-actor kid-tomb) (game-task-actor kid-vinroom))
-     (-> this draw art-group data 4)
-     )
-    (((game-task-actor kid-hideout))
-     (-> this draw art-group data 6)
-     )
-    (else
-      (-> this draw art-group data 3)
-      )
-    )
-  )
-
-  (defbehavior c-kid-npc-init-by-other c-kid-npc ((vec vector)) ;spawn kid
-  (stack-size-set! (-> self main-thread) 512)
-  (process-taskable-method-31 self)
-  (logior! (-> self mask) (process-mask actor-pause))
-  (vector-copy! (-> self root trans) vec)
-  (quaternion-identity! (-> self root quat))
-  (vector-identity! (-> self root scale))
-  (set! (-> self task) (new 'process 'game-task-control (game-task-actor kid-vinroom)))
-  (init-art! self)
-  (process-taskable-method-32 self)
-  (set! (-> self event-hook) (-> (method-of-object self idle) event))
-  (go (method-of-object self hide))
-  (none)
-  (none)
-  )
-
-(deftype c-crocadog-npc (process-taskable)
-  ()
-  )
-
-
-(defmethod get-art-elem ((this c-crocadog-npc))
-  "Checks various things such the current actor, task status, etc to determine the right art-group data to use
-@returns the appropriate [[art-element]] for the given NPC"
-  (case (-> this task actor)
-    (((game-task-actor crocadog-vinroom))
-     (-> this draw art-group data 5)
-     )
-    (((game-task-actor crocadog-alley))
-     (-> this draw art-group data 4)
-     )
-    (else
-      (-> this draw art-group data 4)
-      )
-    )
-  )
-
-(defmethod init-art! ((this c-crocadog-npc))
-  "@see [[initialize-skeleton]]"
-  (initialize-skeleton
-    this
-    (the-as skeleton-group (art-group-get-by-name *level* "skel-crocadog-highres" (the-as (pointer uint32) #f)))
-    (the-as pair 0)
-    )
-  (set! (-> this draw light-index) (the-as uint 30))
-  0
-  (none)
-  )
-
-(defenum rapid-gunner-flags
-  :bitfield #t
-  (ragflags-0)
-  (ragflags-1)
-  (ragflags-2)
-  (ragflags-3)
-  (ragflags-4)
-  (ragflags-5)
-  )
-
-(deftype c-rapid-gunner (nav-enemy)
-  ((los               los-control  :inline)
-   (joint             joint-mod)
-   (joint-blend       float)
-   (joint-enable      symbol)
-   (shot-timer        uint64)
-   (predict-timer     uint64)
-   (target-prev-pos   vector       :inline)
-   (target-next-pos   vector       :inline)
-   (focus-dir         vector       :inline)
-   (y-diff            float)
-   (shots-fired       uint32)
-   (spin-up-angle     float)
-   (spin-up-timer     time-frame)
-   (shoot-anim-index  int32)
-   (status-flags      rapid-gunner-flags)
-   (start-pos         vector       :inline)
-   (dest-pos          vector       :inline)
-   (hop-dir           vector       :inline)
-   (roam-radius       float)
-   )
-  (:state-methods
-    attack
-    spin-attack
-    hop
-    hop-turn
-    cool-down
-    reload
-    )
-  (:methods
-    (rapid-gunner-method-184 (_type_ float) symbol)
-    (rapid-gunner-method-185 (_type_ vector float) none)
-    (rapid-gunner-method-186 (_type_ int float int int) none)
-    )
-  )
-
-
-(defskelgroup skel-rapid-gunner rapid-gunner rapid-gunner-lod0-jg rapid-gunner-idle-ja
-              ((rapid-gunner-lod0-mg (meters 20)) (rapid-gunner-lod1-mg (meters 40)) (rapid-gunner-lod2-mg (meters 999999)))
-              :bounds (static-spherem 0 1.5 0 7)
-              :shadow rapid-gunner-shadow-mg
-              )
-
-  (defbehavior c-rapid-gunner-init-by-other c-rapid-gunner ((vec vector)) ;spawn crocadog
-  (process-spawn manipy
-                            :init
-                            manipy-init
-                            vec
-                            #f
-                            (art-group-get-by-name *level* "skel-rapid-gunner" (the (pointer uint32) #f))
-                            #f
-                            0)
-  (none)
-  )
 
 
 
@@ -400,6 +251,7 @@
     (send-event *camera* 'teleport-to-vector-start-string (new 'static 'vector :x (meters 749.0048) :y (meters 22.5598) :z (meters 910.0965)))
     (set! (-> *target* cam-user-mode) 'fixed)
     (set-setting-by-param *setting-control* 'mode-name 'cam-really-fixed 0 0)
+    (process-grab? *target* #f)
   )
   (when (= ub-npci 30)
     (set! in-updateboard? #t)
