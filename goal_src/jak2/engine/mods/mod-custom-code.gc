@@ -7324,7 +7324,7 @@ Here are the shop IDs
 )
 
 
-(when (and (= (-> *game-info* karma) 6.0)(= (-> *game-info* total-deaths) 4)(= vin-shop #t))
+(when (and (= (-> *game-info* karma) 6.0)(= vin-shop #t))
   (when (or
     (= vin-talk 1)
     (= vin-talk 2)

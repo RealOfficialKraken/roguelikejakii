@@ -25,7 +25,7 @@
 
 (defun frong-checker! ()
     (when (and (= frong-spawning? #t)(= in-hub? #t))
-        (when (rand-vu-percent? 0.4)
+        (when (rand-vu-percent? 0.6)
             (set! frong-spawned? #t)
         )
         (set! frong-spawning? #f)
@@ -291,6 +291,7 @@
         (set! wait-machine #t)
         (set! frong-ingame? #f)
         (+! (-> *game-info* fuel) 15.0)
+        (set! camera-unlocked #t)
     )
 )
 
