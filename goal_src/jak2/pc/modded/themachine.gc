@@ -418,6 +418,7 @@
         (set! challenge-win? #t)
         (set! challenge-mission 1)
         (set! in-dialogue? #f)
+        (set! camera-unlocked #t)
         (set! challenge-string "No Damage or Bonks")
     )
 )
@@ -465,6 +466,7 @@
         (set! pc-stored-orbs 0.0)
         (set! in-dialogue? #f)
         (set! challenge-mission 2)
+        (set! camera-unlocked #t)
         (set! challenge-string "Collect 15 orbs:")
     )
 
@@ -510,6 +512,7 @@
         (set! challenge-win? #t)
         (set! challenge-mission 3)
         (set! in-dialogue? #f)
+        (set! camera-unlocked #t)
         (set! challenge-string "No Weapons")
     )
 )
@@ -554,6 +557,7 @@
         (set! challenge-mission 4)
         (set! enemies-killed? 0)
         (set! in-dialogue? #f)
+        (set! camera-unlocked #t)
         (set! challenge-string "Kill Enemies:")
     )
 )
@@ -609,6 +613,7 @@
         (set! challenge-win? #t)
         (reset-actors 'debug)
         (set! challenge-mission 5)
+        (set! camera-unlocked #t)
         (set! challenge-string "Survive.")
     )
 
@@ -656,6 +661,7 @@
         (set! in-dialogue? #f)
         (set! challenge-mission 6)
         (set! challenge-win? #t)
+        (set! camera-unlocked #t)
         (set! challenge-string "Do not collect a single pickup")
     )
 
@@ -733,6 +739,7 @@
         (when 
     (and
         (= machine-spawning? #t)
+        (= machine-locked? #f)
         (not (ppointer->process *machine-tracker*))
         (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
     )
@@ -791,6 +798,7 @@
     (and
         (= machine-spawning? #t)
         (not (ppointer->process *machine-tracker*))
+        (= machine-locked? #f)
         (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
     )
         (process-spawn chip-whack-a-metal vec-spawn)
@@ -848,6 +856,7 @@
     (and
         (= machine-spawning? #t)
         (not (ppointer->process *machine-tracker*))
+        (= machine-locked? #f)
         (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
     )
         (process-spawn chip-whack-a-metal vec-spawn)
@@ -905,6 +914,7 @@
     (and
         (= machine-spawning? #t)
         (not (ppointer->process *machine-tracker*))
+        (= machine-locked? #f)
         (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
     )
         (process-spawn chip-whack-a-metal vec-spawn)
@@ -962,6 +972,7 @@
     (and
         (= machine-spawning? #t)
         (not (ppointer->process *machine-tracker*))
+        (= machine-locked? #f)
         (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
     )
         (process-spawn chip-whack-a-metal vec-spawn)
@@ -1019,6 +1030,7 @@
     (and
         (= machine-spawning? #t)
         (not (ppointer->process *machine-tracker*))
+        (= machine-locked? #f)
         (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
     )
         (process-spawn chip-whack-a-metal vec-spawn)
@@ -1076,6 +1088,7 @@
     (and
         (= machine-spawning? #t)
         (not (ppointer->process *machine-tracker*))
+        (= machine-locked? #f)
         (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
     )
         (process-spawn chip-whack-a-metal vec-spawn)
@@ -1133,6 +1146,7 @@
     (and
         (= machine-spawning? #t)
         (not (ppointer->process *machine-tracker*))
+        (= machine-locked? #f)
         (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
     )
         (process-spawn chip-whack-a-metal vec-spawn)
@@ -1190,6 +1204,7 @@
     (and
         (= machine-spawning? #t)
         (not (ppointer->process *machine-tracker*))
+        (= machine-locked? #f)
         (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
     )
         (process-spawn chip-whack-a-metal vec-spawn)
@@ -1247,6 +1262,7 @@
     (and
         (= machine-spawning? #t)
         (not (ppointer->process *machine-tracker*))
+        (= machine-locked? #f)
         (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
     )
         (process-spawn chip-whack-a-metal vec-spawn)
