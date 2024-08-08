@@ -295,6 +295,8 @@ void extract_common(const ObjectFileDB& db,
   extract_single_ag("RUI.DGO", "amphibian-ag", db, tex_db, tfrag_level);
   extract_single_ag("RUI.DGO", "rapid-gunner-ag", db, tex_db, tfrag_level);
   extract_single_ag("RUI.DGO", "grunt-ag", db, tex_db, tfrag_level);
+  extract_single_ag("ONINTENT.DGO", "onin-highres-ag", db, tex_db, tfrag_level);
+  extract_single_ag("ONINTENT.DGO", "onin-brain-ag", db, tex_db, tfrag_level);
   extract_single_ag("FOR.DGO", "predator-ag", db, tex_db, tfrag_level);
   extract_single_ag("RUI.DGO", "flitter-ag", db, tex_db, tfrag_level);
   extract_single_ag("MTX.DGO", "rhino-ag", db, tex_db, tfrag_level);

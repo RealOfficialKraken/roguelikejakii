@@ -302,6 +302,7 @@
 
 ;give jak his items if he has bought them but doesn't actually have them
 (define p-red-gun #f)
+(define p-yellow-gun #f)
 (define p-blue-gun #f)
 (define p-dark-gun #f)
 (define p-upgrade-ammo #f)

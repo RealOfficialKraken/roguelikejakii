@@ -25,6 +25,18 @@
 (define frongmenu-wait-exit #f)
 (define frongi4 0)
 
+(define frong-display1 "Endless Light Eco Run")
+(define frong-display2 "???")
+(define frong-display3 "???")
+(define frong-display4 "???")
+(define frong-display5 "???")
+(define frong-display6 "???")
+(define frong-display7 "???")
+(define frong-display8 "???")
+(define frong-display9 "???")
+
+(define frongmenu-select 0)
+
 (defun frong-checker! ()
     (when (and (= frong-spawning? #t)(= in-hub? #t))
         (when (rand-vu-percent? 0.6)
@@ -293,9 +305,12 @@
         (set! wait-machine #t)
         (set! frong-ingame? #f)
         (+! (-> *game-info* fuel) 15.0)
+        (set! (-> *game-info* total-deaths) 6)
         ;(set! camera-unlocked #t)
     )
 )
+
+
 
 
 (when
@@ -310,7 +325,7 @@
 (= ub-npc-kill #f)
 (= frongmenu-wait #f)
 (= start-stage #f)
-(>= (-> *game-info* total-deaths) 5)
+(>= (-> *game-info* total-deaths) 6)
 (cpad-pressed? 0 l2)
 )
     (set! frongmenu-wait #t)
@@ -351,6 +366,7 @@
         (set! in-frongmenu? #t)
         (set! frongi3 0)
         (set! frongmenu-wait #f)
+        (set! frongmenu-select 1)
         (process-grab? *target* #f)
     )
 )
@@ -358,16 +374,503 @@
 (when (= frongmenu-wait-exit #t)
     (+! frongi4 1)
     (when (= frongi4 2)
-        (set-vector! (-> *target* control trans) (meters 754.0274) (meters 8.4005) (meters 864.5117) 1.0) ;teleports jak
+        ;(set-vector! (-> *target* control trans) (meters 754.0274) (meters 8.4005) (meters 864.5117) 1.0) ;teleports jak
+        (set-vector! (-> *target* control trans) (meters 745.7249) (meters 8.4005) (meters 876.6486) 1.0)
         (set! camera-unlocked #t)
+        (set! in-frongmenu? #f)
     )
     (when (= frongi4 40)
     (kill-by-name "c-fodder" *default-pool*)
+    (kill-by-name "manipy" *default-pool*)
     (set! frongi4 0)
     (set! frongmenu-wait-exit #f)
-    (set! in-frongmenu? #f)
     )
 )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;FRONG MENU;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;controls
+(when 
+(and
+(= in-frongmenu? #t)
+(cpad-pressed? 0 down)
+)
+(when (<= frongmenu-select 9)
+    (+! frongmenu-select 1)
+)
+(when (= frongmenu-select 10)
+    (set! frongmenu-select 1)
+)
+)
+
+(when 
+(and
+(= in-frongmenu? #t)
+(cpad-pressed? 0 up)
+)
+(when (>= frongmenu-select 1)
+    (-! frongmenu-select 1)
+)
+(when (= frongmenu-select 0)
+    (set! frongmenu-select 9)
+)
+)
+
+(when 
+(and
+(= in-frongmenu? #t)
+)
+(clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_GREEN>Frong's Modifiers~%<COLOR_ORANGE>Collected Modifiers: <COLOR_YELLOW>~d/9~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%<COLOR_GREEN>Find more frongs to unlock more modifiers~%~%~%<COLOR_WHITE>R2: <COLOR_YELLOW>Exit"
+    (- (-> *game-info* total-deaths) 4)
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 15 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+
+(when (= in-frongmenu? #t) ;FRONGMENU-SELECT = 1
+    (when 
+    (and
+    (= frongmenu-select 1)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_GREEN>~s<COLOR_WHITE>~%~%~s~%~%~s~%~%~s~%~%~s~%~%~s"
+        frong-display1
+        frong-display2
+        frong-display3
+        frong-display4
+        frong-display5
+        frong-display6
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 150 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+
+    (when 
+    (and
+    (= in-frongmenu? #t)
+    (= frongmenu-select 1)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%~s~%~%~s"
+        frong-display7
+        frong-display8
+        frong-display9
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 268 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+)
+
+(when (= in-frongmenu? #t) ;FRONGMENU-SELECT = 2
+    (when 
+    (and
+    (= frongmenu-select 2)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%<COLOR_GREEN>~s<COLOR_WHITE>~%~%~s~%~%~s~%~%~s~%~%~s"
+        frong-display1
+        frong-display2
+        frong-display3
+        frong-display4
+        frong-display5
+        frong-display6
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 150 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+
+    (when 
+    (and
+    (= in-frongmenu? #t)
+    (= frongmenu-select 2)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%~s~%~%~s"
+        frong-display7
+        frong-display8
+        frong-display9
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 268 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+)
+
+(when (= in-frongmenu? #t) ;FRONGMENU-SELECT = 3
+    (when 
+    (and
+    (= frongmenu-select 3)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%~s~%~%<COLOR_GREEN>~s<COLOR_WHITE>~%~%~s~%~%~s~%~%~s"
+        frong-display1
+        frong-display2
+        frong-display3
+        frong-display4
+        frong-display5
+        frong-display6
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 150 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+
+    (when 
+    (and
+    (= in-frongmenu? #t)
+    (= frongmenu-select 3)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%~s~%~%~s"
+        frong-display7
+        frong-display8
+        frong-display9
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 268 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+)
+
+(when (= in-frongmenu? #t) ;FRONGMENU-SELECT = 4
+    (when 
+    (and
+    (= frongmenu-select 4)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%~s~%~%~s~%~%<COLOR_GREEN>~s<COLOR_WHITE>~%~%~s~%~%~s"
+        frong-display1
+        frong-display2
+        frong-display3
+        frong-display4
+        frong-display5
+        frong-display6
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 150 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+
+    (when 
+    (and
+    (= in-frongmenu? #t)
+    (= frongmenu-select 4)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%~s~%~%~s"
+        frong-display7
+        frong-display8
+        frong-display9
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 268 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+)
+
+(when (= in-frongmenu? #t) ;FRONGMENU-SELECT = 5
+    (when 
+    (and
+    (= frongmenu-select 5)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%~s~%~%~s~%~%~s~%~%<COLOR_GREEN>~s<COLOR_WHITE>~%~%~s"
+        frong-display1
+        frong-display2
+        frong-display3
+        frong-display4
+        frong-display5
+        frong-display6
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 150 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+
+    (when 
+    (and
+    (= in-frongmenu? #t)
+    (= frongmenu-select 5)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%~s~%~%~s"
+        frong-display7
+        frong-display8
+        frong-display9
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 268 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+)
+
+(when (= in-frongmenu? #t) ;FRONGMENU-SELECT = 6
+    (when 
+    (and
+    (= frongmenu-select 6)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%~s~%~%~s~%~%~s~%~%~s~%~%<COLOR_GREEN>~s<COLOR_WHITE>"
+        frong-display1
+        frong-display2
+        frong-display3
+        frong-display4
+        frong-display5
+        frong-display6
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 150 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+
+    (when 
+    (and
+    (= in-frongmenu? #t)
+    (= frongmenu-select 6)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%~s~%~%~s"
+        frong-display7
+        frong-display8
+        frong-display9
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 268 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+)
+
+(when (= in-frongmenu? #t) ;FRONGMENU-SELECT = 7
+    (when 
+    (and
+    (= frongmenu-select 7)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%~s~%~%~s~%~%~s~%~%~s~%~%~s"
+        frong-display1
+        frong-display2
+        frong-display3
+        frong-display4
+        frong-display5
+        frong-display6
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 150 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+
+    (when 
+    (and
+    (= in-frongmenu? #t)
+    (= frongmenu-select 7)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE><COLOR_GREEN>~s<COLOR_WHITE>~%~%~s~%~%~s"
+        frong-display7
+        frong-display8
+        frong-display9
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 268 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+)
+
+
+(when (= in-frongmenu? #t) ;FRONGMENU-SELECT = 8
+    (when 
+    (and
+    (= frongmenu-select 8)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%~s~%~%~s~%~%~s~%~%~s~%~%~s"
+        frong-display1
+        frong-display2
+        frong-display3
+        frong-display4
+        frong-display5
+        frong-display6
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 150 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+
+    (when 
+    (and
+    (= in-frongmenu? #t)
+    (= frongmenu-select 8)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%<COLOR_GREEN>~s<COLOR_WHITE>~%~%~s"
+        frong-display7
+        frong-display8
+        frong-display9
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 268 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+)
+
+(when (= in-frongmenu? #t) ;FRONGMENU-SELECT = 9
+    (when 
+    (and
+    (= frongmenu-select 9)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%~s~%~%~s~%~%~s~%~%~s~%~%~s"
+        frong-display1
+        frong-display2
+        frong-display3
+        frong-display4
+        frong-display5
+        frong-display6
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 150 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+
+    (when 
+    (and
+    (= in-frongmenu? #t)
+    (= frongmenu-select 9)
+    )
+    (clear matt-str)
+        (clear *pc-encoded-matt-str*)
+        (format matt-str "<COLOR_WHITE>~s~%~%~s~%~%<COLOR_GREEN>~s<COLOR_WHITE>"
+        frong-display7
+        frong-display8
+        frong-display9
+        )
+        (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+        (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 268 0.0 (font-color default) (font-flags middle shadow kerning large))))
+            (set! (-> font-ctx scale) 0.325)
+            (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    )
+)
+
+
+
+
 
     
     (none)

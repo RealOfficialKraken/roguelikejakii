@@ -357,13 +357,25 @@
         (not (logtest? (-> *game-info* features) (game-feature gun-yellow)))
         (or
         (= (/ (mod (-> *game-info* auto-save-count) 10000000) 1000000) 1)
-        (= (/ (mod (-> *game-info* auto-save-count) 10000000) 1000000) 3)
         )
         )
             (logior! (-> *game-info* features) (game-feature gun gun-yellow))
+            (set! p-yellow-gun #t)
             (set! item-tss1 "Blaster")
             (set! item-update #t)
         )
+
+        (when 
+        (and 
+        (not (logtest? (-> *game-info* features) (game-feature gun-yellow)))
+        (or
+        (not (= (/ (mod (-> *game-info* auto-save-count) 10000000) 1000000) 1))
+        )
+        )
+            (logclear! (-> *game-info* features) (game-feature gun gun-yellow))
+            (set! p-yellow-gun #f)
+        )
+        
     ; Check to ensure the two variables match again but in reverse, taking the item away if they don't
     (when 
     (and 

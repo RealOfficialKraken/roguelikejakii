@@ -649,6 +649,13 @@ This commonly includes things such as:
 
 
 
+              (defskelgroup skel-onin-highres onin-highres onin-highres-lod0-jg onin-highres-idle-ja
+              ((onin-highres-lod0-mg (meters 200)))
+              :bounds (static-spherem 0 0 0 5)
+              :shadow onin-highres-shadow-mg
+              :origin-joint-index 3
+              )
+
 
 
 
