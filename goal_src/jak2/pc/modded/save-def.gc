@@ -419,6 +419,10 @@
             (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 2)
             (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 3)
             )
+            (or 
+            (>= (-> *game-info* karma) 5.0)
+            (>= (-> *game-info* karma) 6.0)
+            )
         )
         (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 0)
         )
