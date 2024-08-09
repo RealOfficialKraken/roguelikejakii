@@ -94,7 +94,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 (define matt-str (new 'global 'string 2048 (the-as string #f)))
 (define *pc-encoded-matt-str* (new 'global 'string 2048 (the-as string #f)))
 
-(define in-debug? #f)
+(define in-debug? #t) ;change this before release
 (define metalkor-waitkill #f)
 (define m-killi 0)
 (define fog-comein #f)
@@ -322,7 +322,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (set! krew-boss-mission? #f)
   (set! under-sig-mission? #f)
   (set! pleasewait #f)
-  (when (= (-> *game-info* total-deaths) 4)
+  (when (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 1)
     (set! frong-spawning? #t)
   )
   (color-gem)
@@ -2589,16 +2589,16 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
         (set! (-> *game-info* karma) 3.0)
       )
       (when (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 1)
-        (+! (-> *game-info* auto-save-count) 100)
+        (+! (-> *game-info* auto-save-count) 200)
       )
       (when (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 1)
-        (+! (-> *game-info* auto-save-count) 1000)
+        (+! (-> *game-info* auto-save-count) 2000)
       )
       (when (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 1)
-        (+! (-> *game-info* auto-save-count) 10000)
+        (+! (-> *game-info* auto-save-count) 20000)
       )
       (when (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 1)
-        (+! (-> *game-info* auto-save-count) 100000)
+        (+! (-> *game-info* auto-save-count) 200000)
       )
     )
     (when (and (< (-> *game-info* total-deaths) 4)(= (-> *game-info* buzzer-total) 16.0)(= level-completed? #t))
@@ -2610,16 +2610,16 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
       (set! in-game? #t)
       (set! level-completed? #f)
       (when (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 1)
-        (+! (-> *game-info* auto-save-count) 100)
+        (+! (-> *game-info* auto-save-count) 200)
       )
       (when (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 1)
-        (+! (-> *game-info* auto-save-count) 1000)
+        (+! (-> *game-info* auto-save-count) 2000)
       )
       (when (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 1)
-        (+! (-> *game-info* auto-save-count) 10000)
+        (+! (-> *game-info* auto-save-count) 20000)
       )
       (when (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 1)
-        (+! (-> *game-info* auto-save-count) 100000)
+        (+! (-> *game-info* auto-save-count) 200000)
       )
     )
     (when (and (>= (-> *game-info* total-deaths) 4)(= (-> *game-info* buzzer-total) 17.0)(= level-completed? #t))
@@ -2773,8 +2773,9 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 
 (when (= roll-randomitem #t) ;Get random item from board-drop
   (let (
-    (random-int (rand-vu-int-range 1 (-> *game-info* total-trys)))
+    (random-int (rand-vu-int-range 0 (-> *game-info* total-trys)))
     )
+    
     (when 
     (and
      (= random-int 1)
@@ -3475,13 +3476,13 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 (+! vin-shop-waiti 1)
 (when (= vin-shop-waiti 1)
   (set! start-stage #f)
-  (set-vector! (-> *target* control trans) (meters 746.0249) (meters 10.4005) (meters 872.6486) 1.0) ;teleports jak
+  (set-vector! (-> *target* control trans) (meters 745.7249) (meters 8.4005) (meters 876.6486) 1.0)
   (send-event *target* 'draw #f)
   (persist-with-delay *setting-control* 'gun (seconds 0.5) 'gun #f 0.0 0)
 )
 (when (= vin-shop-waiti 5)
-    (process-spawn c-vin-npc (new 'static 'vector :x (meters 744.3240) :y (meters 18.0) :z (meters 917.0076)))
-    (send-event *camera* 'teleport-to-vector-start-string (new 'static 'vector :x (meters 744.0518) :y (meters 21.6945) :z (meters 920.7569)))
+    (process-spawn c-vin-npc (new 'static 'vector :x (meters 744.3240) :y (meters 18.5) :z (meters 917.0076)))
+    (send-event *camera* 'teleport-to-vector-start-string (new 'static 'vector :x (meters 744.0518) :y (meters 22.6945) :z (meters 920.7569)))
     (set! (-> *target* cam-user-mode) 'fixed)
     (set-setting-by-param *setting-control* 'mode-name 'cam-really-fixed 0 0)
     (process-grab? *target* #f)
@@ -3701,6 +3702,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 (when (= wait-exit #t)
   (+! waite-frame 1)
   (when (= waite-frame 1)
+    (kill-by-name "c-fodder" *default-pool*)
     (set! in-hub? #f)
     (set! in-menu #f)
     (set! run-in-progress #t)
@@ -4391,7 +4393,7 @@ Here are the shop IDs
   (set! in-menu2wait #t)
 )
 
-(when (and (cpad-pressed? 0 r3)(= avoidc-waitb #f)(= in-menu2 #t)(= (-> (level-get-target-inside *level*) name) 'hiphog))
+(when (and (cpad-pressed? 0 r2)(= avoidc-waitb #f)(= in-menu2 #t)(= (-> (level-get-target-inside *level*) name) 'hiphog))
   (set! in-menu2wait2 #t)
 )
 
@@ -5504,7 +5506,7 @@ Here are the shop IDs
 )
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>R1: <COLOR_YELLOW>Refresh Shop <COLOR_PINK>(unstable)~%<COLOR_WHITE>R3: <COLOR_YELLOW>Exit"
+    (format matt-str "<COLOR_WHITE>R1: <COLOR_YELLOW>Refresh Shop <COLOR_PINK>(unstable)~%<COLOR_WHITE>R2: <COLOR_YELLOW>Exit"
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
     (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
@@ -5522,7 +5524,7 @@ Here are the shop IDs
 )
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>R1: <COLOR_RED>Cannot Refresh Shop <COLOR_PINK>(too unstable)~%<COLOR_WHITE>R3: <COLOR_YELLOW>Exit"
+    (format matt-str "<COLOR_WHITE>R1: <COLOR_RED>Cannot Refresh Shop <COLOR_PINK>(too unstable)~%<COLOR_WHITE>R2: <COLOR_YELLOW>Exit"
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
     (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
@@ -5536,7 +5538,7 @@ Here are the shop IDs
 (when (and (= in-menu2 #t)(= in-intro? #t))
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>R3: <COLOR_YELLOW>Exit"
+    (format matt-str "<COLOR_WHITE>R2: <COLOR_YELLOW>Exit"
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
     (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
@@ -6362,10 +6364,10 @@ Here are the shop IDs
         (set! (-> font-ctx scale) 0.325)
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
-(when (and (= vin-shop #f)(= in-hub? #t)(= in-updateboard? #f)(= start-stage #f)(= in-frongmenu? #f)(= in-frongmenu? #f)(>= (-> *game-info* total-deaths) 6)(not (cpad-hold? 0 l2)))
+(when (and (= vin-shop #f)(= in-menu #f)(= in-hub? #t)(= in-updateboard? #f)(= start-stage #f)(= in-frongmenu? #f)(= in-frongmenu? #f)(= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 3)(not (cpad-hold? 0 l2)))
    (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_CYAN>L2<COLOR_WHITE>: <COLOR_GREEN>Frong's Modifiers"
+    (format matt-str "<COLOR_CYAN>L2<COLOR_WHITE>: <COLOR_GREEN>frong shop"
     starter-display
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
@@ -7408,6 +7410,7 @@ Here are the shop IDs
 (= in-hub? #t)
 (= in-updateboard? #f)
 (= in-frongmenu? #f)
+(= frongmenu-wait #f)
 (!= (-> *game-info* karma) 6.0)
 )
   (clear matt-str)
@@ -8698,8 +8701,8 @@ Here are the shop IDs
   (set! pause-menu-blocked? #t)
   (set! cm-select 0)
   (set! cm-option 1)
-  (set! cm-option2 1)
-  (set! cm-string "Explosive Yellow Shot")
+  (set! cm-option2 0)
+  (set! cm-string "Blaster")
   (set! cm-option-s "Act 1 Stage 1")
 )
 
@@ -8736,8 +8739,8 @@ Here are the shop IDs
 
 (when (and (= in-cheat #t)(= cm-select 1)(cpad-pressed? 0 left))
 (-! cm-option2 1)
-(when (<= cm-option2 0)
-  (set! cm-option2 1)
+(when (< cm-option2 0)
+  (set! cm-option2 0)
 )
 (set! cm-refresh #t)
 )
@@ -8809,6 +8812,9 @@ Here are the shop IDs
 )
 
 (when (= cm-refresh #t)
+(when (= cm-option2 0)
+    (set! cm-string "Blaster")
+  )
 (when (= cm-option2 1)
     (set! cm-string "Explosive Yellow Shot")
   )
@@ -9082,6 +9088,9 @@ Here are the shop IDs
   )
 
   (when (and (= cm-select 1)(= cm-yn #f))
+    (when (and (= cm-option2 0)(= p-yellow-gun #f))
+      (+! (-> *game-info* auto-save-count) 1000000)
+    )
     (when (and (= cm-option2 1)(= p-explode-shot #f))
       (+! (-> *game-info* task-deaths) 100000000)
     )

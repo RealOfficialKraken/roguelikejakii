@@ -2,6 +2,27 @@
 
 ;save-def.gc
 
+(define mode-lighteco? #f)
+(define mode-rngmission? #f)
+(define mode-challenge? #f)
+(define mode-allguns? #f)
+(define mode-apocalypse? #f)
+(define mode-randomshot? #f)
+(define mode-barrels? #f)
+(define mode-rngmods? #f)
+(define mode-infiniteammo? #f)
+
+(define unlock-lighteco? #f)
+(define unlock-rngmission? #f)
+(define unlock-challenge? #f)
+(define unlock-allguns? #f)
+(define unlock-apocalypse? #f)
+(define unlock-randomshot? #f)
+(define unlock-barrels? #f)
+(define unlock-rngmods? #f)
+(define unlock-infiniteammo? #f)
+
+
 (defun item-refresh ()
   (set! item-ts1 "") ;set all of the lines blank
   (set! item-ts2 "")
@@ -276,7 +297,7 @@
         )
         (when 
         (and 
-        (not (logtest? (-> *game-info* features) (game-feature gun-red)))
+        (not (logtest? (-> *game-info* features) (game-feature gun-dark)))
         (or (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 1) (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 3))
         )
             (logior! (-> *game-info* features) (game-feature gun gun-dark))
@@ -364,18 +385,120 @@
             (set! item-tss1 "Blaster")
             (set! item-update #t)
         )
-
+        
         (when 
         (and 
-        (not (logtest? (-> *game-info* features) (game-feature gun-yellow)))
-        (or
+        (= p-yellow-gun #t)
+        (and
         (not (= (/ (mod (-> *game-info* auto-save-count) 10000000) 1000000) 1))
         )
         )
             (logclear! (-> *game-info* features) (game-feature gun gun-yellow))
             (set! p-yellow-gun #f)
         )
+
+        ;(+! (-> *game-info* auto-save-count) 10000000)
         
+        ;frong stuff 10000000's place
+        (when 
+        (and 
+        (or 
+            (or
+            (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 2)
+            (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 3)
+            )
+            (or
+            (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 2)
+            (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 3)
+            )
+            (or
+            (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 2)
+            (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 3)
+            )
+            (or
+            (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 2)
+            (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 3)
+            )
+        )
+        (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 0)
+        )
+            (+! (-> *game-info* auto-save-count) 10000000)
+            (set! autosave-delayed #t)
+        )
+
+        (when 
+        (and 
+        (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 1)
+        )
+            (set! unlock-lighteco? #t)
+            (set! frong-display1 "Endless Light Eco")
+        )
+
+        (when 
+        (and 
+        (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 2)
+        )
+            (set! unlock-rngmission? #t)
+            (set! frong-display2 "All Random Missions")
+        )
+
+        (when 
+        (and 
+        (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 3)
+        )
+            (set! unlock-challenge? #t)
+            (set! frong-display3 "All Challenge Levels")
+        )
+        
+        (when 
+        (and 
+        (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 4)
+        )
+            (set! unlock-allguns? #t)
+            (set! frong-display4 "All Weapons at Start")
+        )
+
+        (when 
+        (and 
+        (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 5)
+        )
+            (set! unlock-apocalypse? #t)
+            (set! frong-display5 "Always Apocalypse")
+        )
+
+        (when 
+        (and 
+        (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 6)
+        )
+            (set! unlock-randomshot? #t)
+            (set! frong-display6 "Everyone has Random Shot")
+        )
+
+        (when 
+        (and 
+        (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 7)
+        )
+            (set! unlock-barrels? #t)
+            (set! frong-display7 "Always Raining Explosive Barrels")
+        )
+
+        (when 
+        (and 
+        (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 8)
+        )
+            (set! unlock-rngmods? #t)
+            (set! frong-display8 "Random Modifier Every Level")
+        )
+
+        (when 
+        (and 
+        (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 9)
+        )
+            (set! unlock-infiniteammo? #t)
+            (set! frong-display9 "Infinite Ammo")
+        )
+
+
     ; Check to ensure the two variables match again but in reverse, taking the item away if they don't
     (when 
     (and 

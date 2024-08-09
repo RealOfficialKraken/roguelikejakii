@@ -400,6 +400,7 @@
      (when (and (= (-> *game-info* total-deaths) 1) (= act-act 1))
         (set! main-msg-1 #t)
         (set! (-> *game-info* total-deaths) 2)
+        (+! (-> *game-info* auto-save-count) 10000000)
         (set! item-tss1 "Yellow Eco Shard")
         (set! item-update #t)
         (set! autosave-delayed #t)
