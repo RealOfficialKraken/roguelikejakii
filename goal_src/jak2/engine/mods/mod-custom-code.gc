@@ -274,6 +274,11 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (set! act-before10 0)
   (set! act-before11 0)
   (set! act-before12 0)
+  (set! ammor-dark 0)
+  (set! ammor-red 0)
+  (set! ammor-blue 0)
+  (set! ammor-yellow 0)
+  (set! praxisboss-ammo #f)
   (set! display-run #f)
   (set! p-red-gun #f)
   (set! p-blue-gun #f)
@@ -2531,10 +2536,22 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
     (when (and (= (-> *game-info* buzzer-total) 5.0)(= level-completed? #t))
       (set! act1-5 #t)
       (set! level-completed? #f)
+      (when 
+      (and
+        (= praxisboss-ammo #f)
+      (or 
+        (= starter-weapon 1)
+        (= starter-weapon 3)
+        (= starter-weapon 4)
+      )
+      )
+        (set! praxisboss-ammo #t)
+      )
     )
     (when (and (= (-> *game-info* buzzer-total) 6.0)(= level-completed? #t))
       (set! act2-1 #t)
       (set! level-completed? #f)
+      (set! praxisboss-ammo #f)
     )
     (when (and (= (-> *game-info* buzzer-total) 7.0)(= level-completed? #t))
       (set! act2-2 #t)
@@ -2656,6 +2673,17 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (when (= blue-eco-spawned? #t)
     (set! blue-eco-spawned? #f)
   )
+  (when 
+      (and
+        (= praxisboss-ammo #f)
+      (or 
+        (= starter-weapon 1)
+        (= starter-weapon 3)
+        (= starter-weapon 4)
+      )
+      )
+        (set! praxisboss-ammo #t)
+      )
 )
 
 ;wait for the in-game to not get the infinite complete mission glitch
@@ -6875,7 +6903,7 @@ Here are the shop IDs
         (set! (-> font-ctx scale) 0.325)
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
-(when (and (= stat-menu #t)(not *debug-segment*))
+(when (and (= stat-menu #t)(!= (-> *game-info* karma) 6.0))
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "
@@ -6916,6 +6944,7 @@ Here are the shop IDs
 (and 
 (= stat-menu #t)
 (= in-cheat #f) 
+(= (-> *game-info* karma) 6.0)
 *debug-segment* 
 )
   (clear matt-str)

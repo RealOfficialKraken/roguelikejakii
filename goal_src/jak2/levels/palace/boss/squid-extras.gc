@@ -456,6 +456,17 @@
   )
 
 (defmethod draw ((this hud-squid))
+  (when 
+      (and
+        (= praxisboss-ammo #f)
+      (or 
+        (= starter-weapon 1)
+        (= starter-weapon 3)
+        (= starter-weapon 4)
+      )
+      )
+        (set! praxisboss-ammo #t)
+      )
   (set-hud-piece-position! (-> this sprites 1) (the int (+ 462.0 (* 130.0 (-> this offset)))) 350)
   (set-as-offset-from! (the-as hud-sprite (-> this sprites)) (the-as vector4w (-> this sprites 1)) -32 0)
   (set-as-offset-from! (-> this sprites 2) (the-as vector4w (-> this sprites 1)) -96 0)

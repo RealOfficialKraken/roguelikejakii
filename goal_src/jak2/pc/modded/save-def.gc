@@ -2,6 +2,22 @@
 
 ;save-def.gc
 
+(define frong-display1 "???")
+(define frong-display2 "???")
+(define frong-display3 "???")
+(define frong-display4 "???")
+(define frong-display5 "???")
+(define frong-display6 "???")
+(define frong-display7 "???")
+(define frong-display8 "???")
+(define frong-display9 "???")
+
+(define ammor-dark 0)
+(define ammor-red 0)
+(define ammor-blue 0)
+(define ammor-yellow 0)
+(define praxisboss-ammo #f)
+
 (define mode-lighteco? #f)
 (define mode-rngmission? #f)
 (define mode-challenge? #f)
@@ -418,10 +434,6 @@
             (or
             (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 2)
             (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 3)
-            )
-            (or 
-            (>= (-> *game-info* karma) 5.0)
-            (>= (-> *game-info* karma) 6.0)
             )
         )
         (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 0)
