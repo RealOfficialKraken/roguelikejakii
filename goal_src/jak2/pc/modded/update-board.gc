@@ -30,7 +30,7 @@
 |#
 
 (define ub-select 0) ;current page
-(define ub-max 2) ;max number of pages
+(define ub-max 3) ;max number of pages
 
 (define ub-npc-wait #f)
 (define ub-shopi 0)
@@ -85,13 +85,13 @@
 (define ub-18-1 "")
 (define ub-19-1 "<COLOR_WHITE>< <COLOR_ORANGE>R2 is now the main way to exit any menu")
 (define ub-20-1 "")
-(define ub-21-1 "")
+(define ub-21-1 "<COLOR_WHITE>< <COLOR_ORANGE>Enemies can now drop up to 2 items per stage")
 (define ub-22-1 "")
-(define ub-23-1 "")
-(define ub-24-1 "")
+(define ub-23-1 "<COLOR_WHITE>< <COLOR_ORANGE>Item Drops are now sorted via tier, that being")
+(define ub-24-1 "tiers Red, Green, Yellow, and Dark in ascending order.")
 ;PAGE 3
-(define ub-1-2 "")
-(define ub-2-2 "")
+(define ub-1-2 "<COLOR_WHITE>< <COLOR_ORANGE>Completed starter weapons give the specified gun a permenant")
+(define ub-2-2 "upgrade. These upgrades are unique to the weapon itself")
 (define ub-3-2 "")
 (define ub-4-2 "")
 (define ub-5-2 "")

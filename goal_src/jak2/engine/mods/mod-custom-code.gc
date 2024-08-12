@@ -326,6 +326,8 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (set! tomb-boss-mission? #f)
   (set! krew-boss-mission? #f)
   (set! under-sig-mission? #f)
+  (set! board-dropped? #f)
+  (set! board-dropped2? #f)
   (set! pleasewait #f)
   (when (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 1)
     (set! frong-spawning? #t)
@@ -2502,7 +2504,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (when (and (= print-stage 4)(!= act-act 4)(= teleport-hiphog #f))
     (set! teleport-hiphog #t)
   )
-  (when (and (= (-> *game-info* total-deaths) 1)(= act-act 1))
+  #|(when (and (= (-> *game-info* total-deaths) 1)(= act-act 1))
     (set! color-floor #t)
   )
   (when (and (= (-> *game-info* total-deaths) 3)(= act-act 3))
@@ -2512,29 +2514,34 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
     (set! color-floor #f)
   )
   (when (and (= (-> *game-info* total-deaths) 3)(!= act-act 3))
-  (set! color-floor #f)
-  )
+    (set! color-floor #f)
+  )|#
     (when (= (-> *game-info* buzzer-total) 1.0)
       (set! act1-1 #t)
       (set! level-completed? #f)
+      (set! board-dropped? #f)
     )
     (when (and (= (-> *game-info* buzzer-total) 2.0)(= level-completed? #t))
       (set! act1-2 #t)
       (set! level-completed? #f)
+      (set! board-dropped? #f)
     )
     (when (and (= (-> *game-info* buzzer-total) 3.0)(= level-completed? #t))
       (set! act1-3 #t)
       (set! level-completed? #f)
+      (set! board-dropped? #f)
     )
     (when (and (= (-> *game-info* buzzer-total) 4.0)(= level-completed? #t))
       (set! act1-4 #t)
       (set! level-completed? #f)
+      (set! board-dropped? #f)
       (when (rand-vu-percent? 0.0)
         (set! boss-cursed #t)
       )
     )
     (when (and (= (-> *game-info* buzzer-total) 5.0)(= level-completed? #t))
       (set! act1-5 #t)
+      (set! board-dropped? #f)
       (set! level-completed? #f)
       (when 
       (and
@@ -2550,19 +2557,23 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
     )
     (when (and (= (-> *game-info* buzzer-total) 6.0)(= level-completed? #t))
       (set! act2-1 #t)
+      (set! board-dropped? #f)
       (set! level-completed? #f)
       (set! praxisboss-ammo #f)
     )
     (when (and (= (-> *game-info* buzzer-total) 7.0)(= level-completed? #t))
       (set! act2-2 #t)
+      (set! board-dropped? #f)
       (set! level-completed? #f)
     )
     (when (and (= (-> *game-info* buzzer-total) 8.0)(= level-completed? #t))
       (set! act2-3 #t)
+      (set! board-dropped? #f)
       (set! level-completed? #f)
     )
     (when (and (= (-> *game-info* buzzer-total) 9.0)(= level-completed? #t))
       (set! act2-4 #t)
+      (set! board-dropped? #f)
       (set! level-completed? #f)
       (when (rand-vu-percent? 0.0)
         (set! boss-cursed #t)
@@ -2570,22 +2581,27 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
     )
     (when (and (= (-> *game-info* buzzer-total) 10.0)(= level-completed? #t))
       (set! act2-5 #t)
+      (set! board-dropped? #f)
       (set! level-completed? #f)
     )
     (when (and (= (-> *game-info* buzzer-total) 11.0)(= level-completed? #t))
       (set! act3-1 #t)
+      (set! board-dropped? #f)
       (set! level-completed? #f)
     )
     (when (and (= (-> *game-info* buzzer-total) 12.0)(= level-completed? #t))
       (set! act3-2 #t)
+      (set! board-dropped? #f)
       (set! level-completed? #f)
     )
     (when (and (= (-> *game-info* buzzer-total) 13.0)(= level-completed? #t))
       (set! act3-3 #t)
+      (set! board-dropped? #f)
       (set! level-completed? #f)
     )
     (when (and (= (-> *game-info* buzzer-total) 14.0)(= level-completed? #t))
       (set! act3-4 #t)
+      (set! board-dropped? #f)
       (set! level-completed? #f)
       (when (rand-vu-percent? 0.0)
         (set! boss-cursed #t)
@@ -2593,12 +2609,14 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
     )
     (when (and (= (-> *game-info* buzzer-total) 15.0)(= level-completed? #t))
       (set! act3-5 #t)
+      (set! board-dropped? #f)
       (set! level-completed? #f)
     )
     (when (and (>= (-> *game-info* total-deaths) 4)(= (-> *game-info* buzzer-total) 16.0)(= level-completed? #t))
       (all-randomize)
       (update-nestmood)
       (set! print-stage 1)
+      (set! board-dropped? #f)
       (set! act-act 4)
       (set! level-completed? #f)
       (set! (-> *time-of-day-context* overide-enable) #f)
@@ -2620,6 +2638,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
     )
     (when (and (< (-> *game-info* total-deaths) 4)(= (-> *game-info* buzzer-total) 16.0)(= level-completed? #t))
       (set! (-> *target* fact health) 0.0)
+      (set! board-dropped? #f)
       (set! win-lose #t)
       (when (= (-> *game-info* karma) 2.0)
         (set! (-> *game-info* karma) 3.0)
@@ -2642,6 +2661,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
     (when (and (>= (-> *game-info* total-deaths) 4)(= (-> *game-info* buzzer-total) 17.0)(= level-completed? #t))
       (all-randomize)
       (update-nestmood)
+      (set! board-dropped? #f)
       (set! print-stage 2)
       (set! act-act 4)
       (set! level-completed? #f)
@@ -2649,6 +2669,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
     (when (and (>= (-> *game-info* total-deaths) 4)(= (-> *game-info* buzzer-total) 18.0)(= level-completed? #t))
       (all-randomize)
       (update-nestmood)
+      (set! board-dropped? #f)
       (set! print-stage 3)
       (set! act-act 4)
       (set! level-completed? #f)
@@ -2656,6 +2677,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
     (when (and (>= (-> *game-info* total-deaths) 4)(= (-> *game-info* buzzer-total) 19.0)(= level-completed? #t))
       (set! act4-4 #t)
       (update-nestmood)
+      (set! board-dropped? #f)
       (set! print-stage 4)
       (set! act-act 4)
       (set! level-completed? #f)
@@ -2665,15 +2687,10 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
     )
     (when (and (>= (-> *game-info* total-deaths) 4)(= (-> *game-info* buzzer-total) 20.0)(= level-completed? #t))
       (set! act4-5 #t)
+      (set! board-dropped? #f)
       (set! print-stage 5)
       (set! level-completed? #f)
-    )
-  (set! level-completed? #f)
-  (set! act-stage (the int (-> *game-info* buzzer-total)))
-  (when (= blue-eco-spawned? #t)
-    (set! blue-eco-spawned? #f)
-  )
-  (when 
+      (when 
       (and
         (= praxisboss-ammo #f)
       (or 
@@ -2684,6 +2701,15 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
       )
         (set! praxisboss-ammo #t)
       )
+    )
+  (set! roll-randomitem #f)
+  (set! level-completed? #f)
+  (set! board-dropped? #f)
+  (set! board-dropped2? #f)
+  (set! act-stage (the int (-> *game-info* buzzer-total)))
+  (when (= blue-eco-spawned? #t)
+    (set! blue-eco-spawned? #f)
+  )
 )
 
 ;wait for the in-game to not get the infinite complete mission glitch
@@ -2799,168 +2825,91 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (set! roll-randomitem #t)
 )
 
+#|
+Blaster | A, B, C, total-trys 0
+Scattergun | A, B, C, total-trys 1
+Blue Gun | A, B, C total-trys 2
+Peacemaker | A, B, C total-trys 3
+Scattergun ROF | B, C total-trys 5
+Upgpraded Ammo | B, C total-trys 6
+Upgraded Vehicles | B, C total-trys 8
++2HP per level | A, B, C total-trys 11
+Double Shot | S, A total-trys 9
+Four-Leaf Clover | S, A total-trys 10
+Upgraded Damage | S, A, B, C total-trys 7
+Mar's Punch | S, A, B total-trys 12
+Rapid Fire | S, A total-trys 15
+Gol's Unbeknowngst | S total-trys 16
+Red Sage's Blessing | S total-trys 17
+Extra Life | S total-trys 18
+
+
+
+
+
+ITEM TIERS
+
+-------------C Tier------------- tier 1, red 8 items
+
+- Scattergun
+- Blaster
+- Vulcan
+- Peacemaker
+- +2HP per level
+- Upgraded Vehicles
+- Upgpraded Ammo
+- Scattergun ROF
+
+-------------B Tier------------- tier 2, green 9 items
+
+- Scattergun
+- Blaster
+- Vulcan
+- Peacemaker
+- Mar's Punch
+- +2HP per level
+- Upgraded Vehicles
+- Upgpraded Ammo
+- Scattergun ROF
+
+-------------A Tier------------- tier 3, yellow 10 items
+
+- Scattergun
+- Blaster
+- Vulcan
+- Peacemaker
+- Rapid Fire
+- Mar's Punch
+- +2HP per level
+- Four-Leaf Clover
+- Double Shot
+- Upgraded Damage
+
+-------------S Tier------------- tier 4, dark 7 items
+
+- Extra Life
+- Red Sage's Blessing
+- Gol's Unbeknowngst
+- Four-Leaf Clover
+- Double Shot
+- Mar's Punch
+- Upgraded Damage
+
+--------------------------------
+|#
+
 (when (= roll-randomitem #t) ;Get random item from board-drop
-  (let (
-    (random-int (rand-vu-int-range 0 (-> *game-info* total-trys)))
-    )
-    
-    (when 
-    (and
-     (= random-int 1)
-     (!= (/ (mod (-> *game-info* task-deaths) 10) 1) 1)
-     )
-     (+! (-> *game-info* task-deaths) 1)
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 2)
-     (!= (/ (mod (-> *game-info* task-deaths) 100) 10) 1)
-     )
-     (+! (-> *game-info* task-deaths) 10)
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 3)
-     (!= (/ (mod (-> *game-info* task-deaths) 1000) 100) 1)
-     )
-     (+! (-> *game-info* task-deaths) 100)
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 4)
-     (!= (/ (mod (-> *game-info* task-deaths) 10000) 1000) 1)
-     )
-     (+! (-> *game-info* task-deaths) 1000)
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 5)
-     (!= (/ (mod (-> *game-info* task-deaths) 100000) 10000) 1)
-     )
-     (+! (-> *game-info* task-deaths) 10000)
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 6)
-     (!= (/ (mod (-> *game-info* task-deaths) 1000000) 100000) 1)
-     )
-     (+! (-> *game-info* task-deaths) 100000)
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 7)
-     (!= (/ (mod (-> *game-info* task-deaths) 10000000) 1000000) 1)
-     )
-     (+! (-> *game-info* task-deaths) 1000000)
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 8)
-     (!= (/ (mod (-> *game-info* task-deaths) 100000000) 10000000) 1)
-     )
-     (+! (-> *game-info* task-deaths) 10000000)
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 9)
-     (!= (/ (mod (-> *game-info* task-deaths) 100000000) 10000000) 1)
-     )
-     (+! (-> *game-info* task-deaths) 10000000)
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 10)
-     (!= (/ (mod (-> *game-info* continue-deaths) 10) 1) 1)
-     )
-     (+! (-> *game-info* continue-deaths) 1)
-     #|(when (= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 9);luck increase 1
-      (+! (-> *game-info* continue-deaths) 10000000)
-    )
-    (when (<= (/ (mod (-> *game-info* continue-deaths) 100000000) 10000000) 7);luck increase 2
-      (+! (-> *game-info* continue-deaths) 20000000)
-    )|#
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 11)
-     (!= (/ (mod (-> *game-info* continue-deaths) 100) 10) 1)
-     )
-     (+! (-> *game-info* continue-deaths) 10)
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 12)
-     (!= (/ (mod (-> *game-info* continue-deaths) 1000) 100) 1)
-     )
-     (+! (-> *game-info* continue-deaths) 100)
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 13)
-     (!= (/ (mod (-> *game-info* continue-deaths) 10000) 1000) 1)
-     )
-     (set! random-int (rand-vu-int-range 1 (-> *game-info* total-trys)))
-    )
-    (when 
-    (and
-     (= random-int 14)
-     (!= (/ (mod (-> *game-info* continue-deaths) 100000) 10000) 1)
-     )
-     (set! random-int (rand-vu-int-range 1 (-> *game-info* total-trys)))
-    )
-    (when 
-    (and
-     (= random-int 15)
-     (!= (/ (mod (-> *game-info* continue-deaths) 1000000) 100000) 1)
-     )
-     (+! (-> *game-info* continue-deaths) 100000)
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 16)
-     (!= (/ (mod (-> *game-info* continue-deaths) 10000000) 1000000) 1)
-     )
-     (+! (-> *game-info* continue-deaths) 1000000)
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 17)
-     (!= (/ (mod (-> *game-info* auto-save-count) 10) 1) 1)
-     )
-     (+! (-> *game-info* auto-save-count) 1)
-     (set! roll-randomitem #f)
-    )
-    (when 
-    (and
-     (= random-int 18)
-     (!= (/ (mod (-> *game-info* auto-save-count) 100) 10) 1)
-     )
-     (+! (-> *game-info* auto-save-count) 10)
-     (set! roll-randomitem #f)
-    )
-    #|(when 
-    (and 
-    (>= (-> *game-info* karma) 3.0)
-    (= roll-randomitem #f)
-    (!= (/ (mod (-> *game-info* task-deaths) 1000000000) 100000000) 1)
-    (rand-vu-percent? luck)
-    )
-      (+! (-> *game-info* task-deaths) 100000000)
-    )|#
+  (when (= board-tier 1) ; C, TIER 1, RED
+    (roll-tier1)
+  )
+  (when (= board-tier 2) ; B, TIER 2, GREEN
+    (roll-tier2)
+  )
+  (when (= board-tier 3) ; A, TIER 3, YELLOW
+    (roll-tier3)
+  )
+  (when (= board-tier 4) ; S, TIER 4, DARK
+    (roll-tier4)
   )
 )
 
@@ -3006,7 +2955,12 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 (/ (mod 0010000000 100000000) 10000000) = 10,000,000's (8th place, Double Shot)
 (/ (mod 0100000000 1000000000) 100000000) = 100,000,000's (9th place, Green, Red, Blue Eco Shard)
 (/ (mod 1000000000 10000000000) 100000000) = 1,000,000,000's (10th place, in-game?) 1=false 2=true
+
 |#
+
+
+
+
 
 
 (when                     ;When loading back into your run
@@ -3031,14 +2985,14 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
   (set! tutoriali 0)
   (set! display-death-screen #t)
   (set! rnginfo #t)
-  (let ((choose-chal (rand-vu-int-range 0 1)))
+  #|(let ((choose-chal (rand-vu-int-range 0 1))) ;pulled away because of crashes when loading these too quick
           (when (= choose-chal 0)
             (set! machine-spawning? #f)
           )
           (when (= choose-chal 1)
             (set! machine-spawning? #t)
           )
-        )
+        )|#
   (when 
 (and
 (task-node-closed? (game-task-node palace-boss-introduction))
@@ -4171,15 +4125,15 @@ Here are the shop IDs
     (set! shopid3 1)
   )
   (when (= shoproll1 2)
-    (set! shopitem1 "Blue Gun (32 orbs)")
+    (set! shopitem1 "Vulcan (32 orbs)")
     (set! shopid1 2)
   )
   (when (= shoproll2 2)
-    (set! shopitem2 "Blue Gun (32 orbs)")
+    (set! shopitem2 "Vulcan (32 orbs)")
     (set! shopid2 2)
   )
   (when (= shoproll3 2)
-    (set! shopitem3 "Blue Gun (32 orbs)")
+    (set! shopitem3 "Vulcan (32 orbs)")
     (set! shopid3 2)
   )
   (when (= shoproll1 5)
@@ -4593,7 +4547,7 @@ Here are the shop IDs
     (when (and (= menu-slot 0)(not (logtest? (-> *game-info* features) (game-feature gun-blue)))(>= (-> *game-info* skill) 32.0)(= shopid1 2))
       (-! (-> *game-info* skill) 32.0)
       (set! shopitem1 "(Out of Stock)")
-      (set! item-tss1 "Blue Gun")
+      (set! item-tss1 "Vulcan")
       (set-item "blue" 1)
       (when (= already-teleported? #f)
         (set! autosave-delayed #t)
@@ -4602,7 +4556,7 @@ Here are the shop IDs
     (when (and (= menu-slot 1)(not (logtest? (-> *game-info* features) (game-feature gun-blue)))(>= (-> *game-info* skill) 32.0)(= shopid3 2))
       (-! (-> *game-info* skill) 32.0)
       (set! shopitem3 "(Out of Stock)")
-      (set! item-tss1 "Blue Gun")
+      (set! item-tss1 "Vulcan")
       (set-item "blue" 1)
       (when (= already-teleported? #f)
         (set! autosave-delayed #t)
@@ -4611,7 +4565,7 @@ Here are the shop IDs
     (when (and (= menu-slot 2)(not (logtest? (-> *game-info* features) (game-feature gun-blue)))(>= (-> *game-info* skill) 32.0)(= shopid2 2))
       (-! (-> *game-info* skill) 32.0)
       (set! shopitem2 "(Out of Stock)")
-      (set! item-tss1 "Blue Gun")
+      (set! item-tss1 "Vulcan")
       (set-item "blue" 1)
       (when (= already-teleported? #f)
         (set! autosave-delayed #t)
@@ -5711,8 +5665,8 @@ Here are the shop IDs
 (when (and (= in-menu #t)(= (paused?) #f)(>= (-> *game-info* karma) 6.0)(not (cpad-pressed? 0 x)))
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "~%<COLOR_GREEN>~%You beat RogueLike Jak II!
-~%<COLOR_ORANGE>Thank you for playing!!!!
+    (format matt-str "~%<COLOR_GREEN>~%GG
+~%<COLOR_ORANGE>You defeated evil
 ~%<COLOR_WHITE>Skulls Gems turned into Tokens:
 ~%<COLOR_YELLOW>~d
 ~%
@@ -5724,11 +5678,11 @@ Here are the shop IDs
 ~%<COLOR_WHITE>Current Tokens:
 ~%<COLOR_PINK>~d
 ~%
-~%<COLOR_ORANGE>BIG GG!! <COLOR_PINK>CHEATS <COLOR_ORANGE>unlocked by holding L2 while <COLOR_GREEN>in your run!
+~%<COLOR_ORANGE>Good job!
 ~%<COLOR_WHITE>Light Eco<COLOR_ORANGE> is still present across the multiverse!
-~%<COLOR_GREEN>The Time Loop is now fixed in all dimensions! <COLOR_RED>But one still remains,
-~%The reality that's sealed from the others, with the time loop complete.
-~%A derelict reality.
+~%<COLOR_GREEN>Entity defeated, and Time Loop restored
+~%<COLOR_ORANGE>Cheat Menu unlocked by rebooting this save in debug mode!
+~%
 ~%<COLOR_GREEN>Press <COLOR_BLUE>X<COLOR_GREEN> to Continue"
     (the int temp-skullgemamount)
     (the int (-> *game-info* fuel))
@@ -7396,9 +7350,9 @@ Here are the shop IDs
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "
-    <COLOR_RED>One remains.. You and I being the only ones that exist.
-    ~%The one you're stuck in, with me
-    ~%Vin may have locked me out, but this is far from over.
+    <COLOR_RED>Don't act like you're the hero here
+    ~%You did all of Vin's work for him, and now he's left me
+    ~%with this gross vessel you're seeing on me.
     ~%
     ~%You have to understand, I'm only trying to put myself
     ~%back together again.
@@ -8851,7 +8805,7 @@ Here are the shop IDs
     (set! cm-string "Scattergun")
   )
 (when (= cm-option2 3)
-    (set! cm-string "Blue Gun")
+    (set! cm-string "Vulcan")
   )
   (when (= cm-option2 4)
     (set! cm-string "Peacemaker")

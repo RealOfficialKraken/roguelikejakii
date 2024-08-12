@@ -322,6 +322,14 @@
 (define p-reroll-mission #f)
 (define p-actual-clone #f)
 
+(define board-dropped? #f)
+(define board-dropped2? #f)
+(define board-tier 0)
+(define board-display "")
+(define board-get #f)
+(define board-i 0)
+(define board-type-display "")
+
 (define krew-completed-mission? #f)
 (define moffset-vec (new-stack-vector0))
 
