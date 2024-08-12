@@ -12,6 +12,9 @@
 (defun-extern item-refresh (none))
 (defun-extern disable-hudmap (none))
 
+(define matt-str (new 'global 'string 2048 (the-as string #f)))
+(define *pc-encoded-matt-str* (new 'global 'string 2048 (the-as string #f)))
+
 (define-extern someone-fire-blue (function process-drawable vector vector (pointer process)))
 (define-extern someone-fire-red (function process-drawable vector vector (pointer process)))
 (define-extern someone-fire-dark (function process-drawable vector vector (pointer process)))
