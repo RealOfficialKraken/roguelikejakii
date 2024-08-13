@@ -2214,14 +2214,14 @@ This commonly includes things such as:
         )
         (when 
         (and 
-          (rand-vu-percent? (/ luck 34))
+          (rand-vu-percent? (/ luck 12))
           (>= (-> *game-info* total-trys) 9)
         )
           (set! tier-select 4)
         )
         (when 
         (and 
-          (rand-vu-percent? (/ luck 12))
+          (rand-vu-percent? (/ luck 5))
           (>= (-> *game-info* total-trys) 7)
         )
           (set! tier-select 3)

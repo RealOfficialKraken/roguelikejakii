@@ -91,8 +91,8 @@
 (define ub-24-1 "tiers <COLOR_RED>Red<COLOR_ORANGE>, <COLOR_GREEN>Green<COLOR_ORANGE>, <COLOR_YELLOW>Yellow<COLOR_ORANGE>, and <COLOR_PINK>Dark<COLOR_ORANGE> in ascending order.")
 ;PAGE 3
 (define ub-1-2 "<COLOR_CYAN>< <COLOR_GREEN>Completed starter weapons<COLOR_ORANGE> will give the specified gun a <COLOR_RED>permenant")
-(define ub-2-2 "<COLOR_ORANGE>upgrade. These upgrades are unique to the weapon itself")
-(define ub-3-2 "")
+(define ub-2-2 "<COLOR_ORANGE>upgrade. These upgrades are unique to the weapon itself, and")
+(define ub-3-2 "will be present on the gun regardless if it's your starter weapon")
 (define ub-4-2 "")
 (define ub-5-2 "")
 (define ub-6-2 "")

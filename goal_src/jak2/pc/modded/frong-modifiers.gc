@@ -455,7 +455,7 @@ frong-display9 "Infinite Ammo"
 (= ub-npc-kill #f)
 (= frongmenu-wait #f)
 (= start-stage #f)
-(>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 2)
+(>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 3)
 (cpad-pressed? 0 l2)
 )
     (set! frongmenu-wait #t)

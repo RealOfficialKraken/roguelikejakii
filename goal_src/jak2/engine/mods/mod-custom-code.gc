@@ -7755,7 +7755,11 @@ Here are the shop IDs
   )
 
 ;---------------------vvvTHIS IS THE DEBUG VARSvvv--------------------
-(when (and (= in-debug? #t)*debug-segment*)
+(when 
+(and 
+(= in-debug? #t) 
+*debug-segment*
+)
   (when (= in-game? #t)
     (clear matt-str)
       (clear *pc-encoded-matt-str*)

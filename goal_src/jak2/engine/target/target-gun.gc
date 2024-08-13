@@ -656,7 +656,7 @@
          (set! (-> self gun fire-range) 327680.0)
          (set! (-> self gun track-find-range) 327680.0)
          (set! (-> self gun track-turn-range) 327680.0)
-         (set! (-> self gun track-turn-max) 910.2222)
+         (set! (-> self gun track-turn-max) 1800.2222)
          (set! (-> self gun track-tilt-range) 327680.0)
          (set! (-> self gun track-angle-mult) 1.75)
          (set! (-> self gun track-require) (the-as uint 3))
@@ -677,6 +677,9 @@
          (set! (-> self gun track-angle-mult) 1.75)
          (set! (-> self gun track-require) (the-as uint 3))
          (set! (-> self gun fire-delay) (the-as uint 96))
+         (when (= gun-yellow-special #t)
+          (set! (-> self gun fire-delay) (the-as uint 48))
+         )
          (when (= p-sage-red #t)
           (set! (-> self gun fire-delay) (the-as uint 5))
          )
@@ -2311,6 +2314,16 @@
   0
   (none)
   )
+
+  #|(if 
+          (and 
+          (rand-vu-percent? 0.33333333)
+          (= gun-blue-special #t)
+          (= arg0 2)
+          )
+          0.0
+          -1.0
+         ) |#
 
 ;; WARN: Return type mismatch symbol vs none.
 (defbehavior target-gun-fire target ((arg0 pickup-type))
