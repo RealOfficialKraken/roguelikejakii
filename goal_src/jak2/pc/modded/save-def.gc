@@ -416,7 +416,7 @@
         ;(+! (-> *game-info* auto-save-count) 10000000)
         
         ;frong stuff 10000000's place
-        (when 
+        #|(when 
         (and 
         (or 
             (or
@@ -440,7 +440,7 @@
         )
             (+! (-> *game-info* auto-save-count) 10000000)
             (set! autosave-delayed #t)
-        )
+        )|#
 
         (when 
         (and 
@@ -543,6 +543,7 @@
     (!= (/ (mod (-> *game-info* task-deaths) 10000) 1000) 1)
     )
         (set! p-upgrade-red #f)
+        (logclear! (-> *game-info* features) (game-feature gun-upgrade-speed))
     )
         (when 
     (and 
@@ -550,6 +551,7 @@
     (!= (/ (mod (-> *game-info* task-deaths) 100000) 10000) 1)
     )
         (set! p-upgrade-ammo #f)
+        (logclear! (-> *game-info* features) (game-feature gun-upgrade-ammo))
     )
 
         (when 
@@ -558,6 +560,7 @@
     (!= (/ (mod (-> *game-info* task-deaths) 1000000) 100000) 1)
     )
         (set! p-upgrade-damage #f)
+        (logclear! (-> *game-info* features) (game-feature gun-upgrade-damage))
     )
     (when 
     (and 
@@ -813,7 +816,7 @@
       ;; reset bucket settings prior to drawing - font won't do self for us, and
       ;; draw-raw-image can sometimes mess them up. (intro sequence)
       (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 75 0.0 (font-color default) (font-flags middle shadow kerning large))))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 125 0.0 (font-color default) (font-flags middle shadow kerning large))))
         (set! (-> font-ctx scale) 0.325)
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
         (when (= board-i 700)

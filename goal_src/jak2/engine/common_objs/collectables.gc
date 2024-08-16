@@ -2208,23 +2208,24 @@ This commonly includes things such as:
        )
      (set-vector! (-> this extra-trans) 0.0 2048.0 0.0 1.0)
      (logclear! (-> this flags) (collectable-flag fadeout))
-     (let 
+     (when (= firstitem-dropped? #f)
+      (let 
       (
         (tier-select (rand-vu-int-range 1 2))
         )
         (when 
         (and 
-          (rand-vu-percent? (/ luck 12))
-          (>= (-> *game-info* total-trys) 9)
-        )
-          (set! tier-select 4)
-        )
-        (when 
-        (and 
-          (rand-vu-percent? (/ luck 5))
+          (rand-vu-percent? (/ luck 2))
           (>= (-> *game-info* total-trys) 7)
         )
           (set! tier-select 3)
+        )
+        (when 
+        (and 
+          (rand-vu-percent? (/ luck 4))
+          (>= (-> *game-info* total-trys) 9)
+        )
+          (set! tier-select 4)
         )
         (when (= tier-select 1)
           (set-vector! (-> this draw color-mult) 1.0 0.0 0.7 5.0)
@@ -2244,6 +2245,7 @@ This commonly includes things such as:
         )
         (set! board-dropped? #t)
       )
+     )
      )
     (((pickup-type shield))
      (set! (-> this ammo-effect) (-> *part-group-id-table* 80))

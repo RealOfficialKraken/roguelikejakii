@@ -665,7 +665,7 @@
           (set! (-> self gun fire-delay) (the-as uint 5))
          )
          (set! (-> self gun combo-fire-delay) (the-as uint 30))
-         (set! (-> self gun track-beam-size) 2457.6)
+         (set! (-> self gun track-beam-size) 1228.0)
          (remove-setting! 'gun-min-height)
          (remove-setting! 'gun-max-height)
          )

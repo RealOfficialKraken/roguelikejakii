@@ -326,7 +326,9 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (set! krew-boss-mission? #f)
   (set! under-sig-mission? #f)
   (set! board-dropped? #f)
-  (set! board-dropped2? #f)
+  (set! firstitem-dropped? #f)
+  (logclear! (-> *game-info* features) (game-feature gun-upgrade-ammo gun-upgrade-damage gun-upgrade-speed))
+  (set! board2-dropped? #f)
   (set! pleasewait #f)
   (when (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 1)
     (set! frong-spawning? #t)
@@ -2704,8 +2706,10 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (set! roll-randomitem #f)
   (set! level-completed? #f)
   (set! board-dropped? #f)
-  (set! board-dropped2? #f)
+  (set! board2-dropped? #f)
+  (print "||||||||||||||||||||STAGE CHANGE!||||||||||||||||||||")
   (set! act-stage (the int (-> *game-info* buzzer-total)))
+  (set! firstitem-dropped? #f)
   (when (= blue-eco-spawned? #t)
     (set! blue-eco-spawned? #f)
   )
@@ -2898,17 +2902,33 @@ ITEM TIERS
 |#
 
 (when (= roll-randomitem #t) ;Get random item from board-drop
-  (when (= board-tier 1) ; C, TIER 1, RED
+  (when (= board-tier2 0)
+    (when (= board-tier 1) ; C, TIER 1, RED
     (roll-tier1)
+    )
+    (when (= board-tier 2) ; B, TIER 2, GREEN
+      (roll-tier2)
+    )
+    (when (= board-tier 3) ; A, TIER 3, YELLOW
+      (roll-tier3)
+    )
+    (when (= board-tier 4) ; S, TIER 4, DARK
+      (roll-tier4)
+    )
   )
-  (when (= board-tier 2) ; B, TIER 2, GREEN
-    (roll-tier2)
-  )
-  (when (= board-tier 3) ; A, TIER 3, YELLOW
-    (roll-tier3)
-  )
-  (when (= board-tier 4) ; S, TIER 4, DARK
-    (roll-tier4)
+  (when (!= board-tier2 0)
+    (when (= board-tier2 1) ; C, TIER 1, RED
+    (roll-tier1)
+    )
+    (when (= board-tier2 2) ; B, TIER 2, GREEN
+      (roll-tier2)
+    )
+    (when (= board-tier2 3) ; A, TIER 3, YELLOW
+      (roll-tier3)
+    )
+    (when (= board-tier2 4) ; S, TIER 4, DARK
+      (roll-tier4)
+    )
   )
 )
 

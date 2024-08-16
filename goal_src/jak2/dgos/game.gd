@@ -521,6 +521,7 @@
   "metalkor-setup.o"
   "metalkor-states.o"
   "metalkor-extras.o"
+  "thefrong.o"
   "frong-modifiers.o"
   "update-board.o"
  ))
