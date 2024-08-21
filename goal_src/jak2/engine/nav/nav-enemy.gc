@@ -1401,7 +1401,7 @@
   (when (= (-> *game-info* buzzer-total) 20.0)
     (set! (-> this hit-points) (+ (-> this enemy-info default-hit-points) 19.0))
   )
-  (when (= challenge-mission 5)
+  (when (or (= challenge-mission 5)(= mode-apocalypse? #t))
     (set! (-> this hit-points) (+ (-> this enemy-info default-hit-points) 35.0))
   )
   (when 
@@ -1488,6 +1488,7 @@ spawned-health-entity
   (when 
   (and 
     (rand-vu-percent? 0.4) ;(rand-vu-percent? (/ luck 24))
+    (= enemy-drop-weapon-once #t)
     (= board-dropped? #f)
   )
     (set! (-> this fact pickup-type) (pickup-type board))
@@ -1498,11 +1499,14 @@ spawned-health-entity
   (when 
   (and 
     (rand-vu-percent? 0.2) ;(rand-vu-percent? (/ luck 24))
+    (= board1-collected? #t)
+    (= board2-collected? #f)
+    (= board-dropped? #t)
     (= board2-dropped? #f)
   )
     (set! (-> this fact pickup-type) (pickup-type board))
     (set! (-> this fact pickup-amount) 1.0)
-    (set! board2-dropped? #t)
+    (set! board2-collected? #t)
     (print "[$$$] spawned BOARD2 on entity")
   )
   (let ((a1-9 (if (logtest? (enemy-option multi-focus) (-> this fact enemy-options))

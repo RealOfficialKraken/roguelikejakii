@@ -42,6 +42,28 @@
 (define gun-blue-special #f)
 (define gun-dark-special #f)
 
+;frong-modifiers
+(define mode-lighteco? #f)
+(define mode-rngmission? #f)
+(define mode-challenge? #f)
+(define mode-allguns? #f)
+(define mode-apocalypse? #f)
+(define mode-randomshot? #f)
+(define mode-barrels? #f)
+(define mode-rngmods? #f)
+(define mode-infiniteammo? #f)
+
+(define unlock-lighteco? #f)
+(define unlock-rngmission? #f)
+(define unlock-challenge? #f)
+(define unlock-allguns? #f)
+(define unlock-apocalypse? #f)
+(define unlock-randomshot? #f)
+(define unlock-barrels? #f)
+(define unlock-rngmods? #f)
+(define unlock-infiniteammo? #f)
+
+
 (define fodder-dialogue? #f)
 (define frong-position (new 'static 'vector :x (meters 0.0) :y (meters 0.0) :z (meters 0.0)))
 (define frong-position2 (new 'static 'vector :x (meters 3.0) :y (meters 0.0) :z (meters 0.0)))
@@ -325,8 +347,11 @@
 (define p-reroll-mission #f)
 (define p-actual-clone #f)
 
+(define collect-weapon-crate #f)
 (define board-dropped? #f)
 (define board2-dropped? #f)
+(define board1-collected? #f)
+(define board2-collected? #f)
 (define board-tier 0)
 (define board-tier2 0)
 (define board-display "")

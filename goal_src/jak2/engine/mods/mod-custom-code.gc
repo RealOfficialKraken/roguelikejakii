@@ -2707,6 +2707,8 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (set! level-completed? #f)
   (set! board-dropped? #f)
   (set! board2-dropped? #f)
+  (set! board1-collected? #f)
+  (set! board2-collected? #f)
   (print "||||||||||||||||||||STAGE CHANGE!||||||||||||||||||||")
   (set! act-stage (the int (-> *game-info* buzzer-total)))
   (set! firstitem-dropped? #f)
@@ -2902,33 +2904,17 @@ ITEM TIERS
 |#
 
 (when (= roll-randomitem #t) ;Get random item from board-drop
-  (when (= board-tier2 0)
-    (when (= board-tier 1) ; C, TIER 1, RED
-    (roll-tier1)
-    )
-    (when (= board-tier 2) ; B, TIER 2, GREEN
-      (roll-tier2)
-    )
-    (when (= board-tier 3) ; A, TIER 3, YELLOW
-      (roll-tier3)
-    )
-    (when (= board-tier 4) ; S, TIER 4, DARK
-      (roll-tier4)
-    )
+  (when (= board-tier 1) ; C, TIER 1, RED
+  (roll-tier1)
   )
-  (when (!= board-tier2 0)
-    (when (= board-tier2 1) ; C, TIER 1, RED
-    (roll-tier1)
-    )
-    (when (= board-tier2 2) ; B, TIER 2, GREEN
-      (roll-tier2)
-    )
-    (when (= board-tier2 3) ; A, TIER 3, YELLOW
-      (roll-tier3)
-    )
-    (when (= board-tier2 4) ; S, TIER 4, DARK
-      (roll-tier4)
-    )
+  (when (= board-tier 2) ; B, TIER 2, GREEN
+    (roll-tier2)
+  )
+  (when (= board-tier 3) ; A, TIER 3, YELLOW
+    (roll-tier3)
+  )
+  (when (= board-tier 4) ; S, TIER 4, DARK
+    (roll-tier4)
   )
 )
 
