@@ -1501,6 +1501,7 @@ spawned-health-entity
     (rand-vu-percent? 0.2) ;(rand-vu-percent? (/ luck 24))
     (= board1-collected? #t)
     (= board2-collected? #f)
+    (= enemy-drop-weapon-once #t)
     (= board-dropped? #t)
     (= board2-dropped? #f)
   )

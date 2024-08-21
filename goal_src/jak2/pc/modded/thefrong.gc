@@ -20,7 +20,7 @@
 (define frongv-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
 (define frongv-cam-final frong-current-pos)
 (define *frong-tracker* (the (pointer rift-ring-ingame) #f))
-
+#|
 (defun frong-update ()
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;MACHINE PARAMS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -589,4 +589,4 @@
     (set! in-dialogue? #f)
     (set! in-frong? #f)
     (none)
-)
+)|#

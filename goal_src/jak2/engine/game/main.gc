@@ -875,7 +875,7 @@
     (machine-update) ;;rogue-like-change
     (check-stat!)
     (frong-checker!)
-    (frong-update)
+    ;(frong-update)
     (check-update-info)
 
     ; ;; Run blerc to modify foreground models

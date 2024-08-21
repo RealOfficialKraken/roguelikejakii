@@ -10,15 +10,14 @@
 (define frong-display6 "???")
 (define frong-display7 "???")
 (define frong-display8 "???")
-(define frong-display9 "???")
+(define frong-display9 "None")
+(define frongmenu-refresh #f)
 
 (define ammor-dark 0)
 (define ammor-red 0)
 (define ammor-blue 0)
 (define ammor-yellow 0)
 (define praxisboss-ammo #f)
-
-
 
 
 (defun item-refresh ()
@@ -398,6 +397,32 @@
         ;(+! (-> *game-info* auto-save-count) 10000000)
         
         ;frong stuff 10000000's place
+
+        (when 
+        (and 
+        (or 
+            (or
+            (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 2)
+            (= (/ (mod (-> *game-info* auto-save-count) 1000000) 100000) 3)
+            )
+            (or
+            (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 2)
+            (= (/ (mod (-> *game-info* auto-save-count) 100000) 10000) 3)
+            )
+            (or
+            (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 2)
+            (= (/ (mod (-> *game-info* auto-save-count) 10000) 1000) 3)
+            )
+            (or
+            (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 2)
+            (= (/ (mod (-> *game-info* auto-save-count) 1000) 100) 3)
+            )
+        )
+        (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 0)
+        )
+            (+! (-> *game-info* auto-save-count) 10000000)
+            (set! autosave-delayed #t)
+        )
         
 
         (when 
@@ -413,6 +438,7 @@
         (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 2)
         )
             (set! unlock-rngmission? #t)
+            (set! unlock-lighteco? #t)
             (set! frong-display2 "All Random Missions")
         )
 
@@ -421,6 +447,8 @@
         (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 3)
         )
             (set! unlock-challenge? #t)
+            (set! unlock-rngmission? #t)
+            (set! unlock-lighteco? #t)
             (set! frong-display3 "All Challenge Levels")
         )
         
@@ -429,6 +457,9 @@
         (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 4)
         )
             (set! unlock-allguns? #t)
+            (set! unlock-challenge? #t)
+            (set! unlock-rngmission? #t)
+            (set! unlock-lighteco? #t)
             (set! frong-display4 "All Weapons at Start")
         )
 
@@ -437,6 +468,10 @@
         (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 5)
         )
             (set! unlock-apocalypse? #t)
+            (set! unlock-allguns? #t)
+            (set! unlock-challenge? #t)
+            (set! unlock-rngmission? #t)
+            (set! unlock-lighteco? #t)
             (set! frong-display5 "Always Apocalypse")
         )
 
@@ -445,6 +480,11 @@
         (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 6)
         )
             (set! unlock-randomshot? #t)
+            (set! unlock-apocalypse? #t)
+            (set! unlock-allguns? #t)
+            (set! unlock-challenge? #t)
+            (set! unlock-rngmission? #t)
+            (set! unlock-lighteco? #t)
             (set! frong-display6 "Everyone has Random Shot")
         )
 
@@ -453,6 +493,12 @@
         (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 7)
         )
             (set! unlock-barrels? #t)
+            (set! unlock-randomshot? #t)
+            (set! unlock-apocalypse? #t)
+            (set! unlock-allguns? #t)
+            (set! unlock-challenge? #t)
+            (set! unlock-rngmission? #t)
+            (set! unlock-lighteco? #t)
             (set! frong-display7 "Always Raining Explosive Barrels")
         )
 
@@ -461,15 +507,216 @@
         (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 8)
         )
             (set! unlock-rngmods? #t)
+            (set! unlock-barrels? #t)
+            (set! unlock-randomshot? #t)
+            (set! unlock-apocalypse? #t)
+            (set! unlock-allguns? #t)
+            (set! unlock-challenge? #t)
+            (set! unlock-rngmission? #t)
+            (set! unlock-lighteco? #t)
             (set! frong-display8 "Random Modifier Every Level")
         )
 
-        (when 
+        #|(when 
         (and 
         (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 9)
         )
             (set! unlock-infiniteammo? #t)
-            (set! frong-display9 "Infinite Ammo")
+            (set! unlock-rngmods? #t)
+            (set! unlock-barrels? #t)
+            (set! unlock-randomshot? #t)
+            (set! unlock-apocalypse? #t)
+            (set! unlock-allguns? #t)
+            (set! unlock-challenge? #t)
+            (set! unlock-rngmission? #t)
+            (set! unlock-lighteco? #t)
+            (set! frong-display9 "None")
+        )|#
+
+
+        ;v define the active mod v
+        ;TURN ON
+
+        (when 
+        (and 
+        (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 1)
+        )
+            (set! mode-lighteco? #t)
+            (set! frong-activemod "Endless Light Eco")
+            (set! frong-display1 "<COLOR_GREEN>< <COLOR_WHITE>Endless Light Eco")
+        )
+
+        (when 
+        (and 
+        (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 2)
+        )
+            (set! mode-rngmission? #t)
+            (set! frong-activemod "All Random Missions")
+            (set! frong-display2 "<COLOR_GREEN>< <COLOR_WHITE>All Random Missions")
+        )
+
+        (when 
+        (and 
+        (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 3)
+        )
+            (set! mode-challenge? #t)
+            (set! frong-activemod "All Challenge Levels")
+            (set! frong-display3 "<COLOR_GREEN>< <COLOR_WHITE>All Challenge Levels")
+        )
+        
+        (when 
+        (and 
+        (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 4)
+        )
+            (set! mode-allguns? #t)
+            (set! frong-activemod "All Weapons at Start")
+            (set! frong-display4 "<COLOR_GREEN>< <COLOR_WHITE>All Weapons at Start")
+        )
+
+        (when 
+        (and 
+        (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 5)
+        )
+            (set! mode-apocalypse? #t)
+            (set! frong-activemod "Always Apocalypse")
+            (set! frong-display5 "<COLOR_GREEN>< <COLOR_WHITE>Always Apocalypse")
+        )
+
+        (when 
+        (and 
+        (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 6)
+        )
+            (set! mode-randomshot? #t)
+            (set! frong-activemod "Everyone has Random Shot")
+            (set! frong-display6 "<COLOR_GREEN>< <COLOR_WHITE>Everyone has Random Shot")
+        )
+
+        (when 
+        (and 
+        (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 7)
+        )
+            (set! mode-barrels? #t)
+            (set! frong-activemod "Always Raining Explosive Barrels")
+            (set! frong-display8 "<COLOR_GREEN>< <COLOR_WHITE>Always Raining Explosive Barrels")
+        )
+
+        (when 
+        (and 
+        (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 8)
+        )
+            (set! mode-rngmods? #t)
+            (set! frong-activemod "Random Modifier Every Level")
+            (set! frong-display8 "<COLOR_GREEN>< <COLOR_WHITE>Random Modifier Every Level")
+        )
+
+        ;TURN OFF
+
+        (when 
+        (and 
+        (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 1)
+        )
+            (set! mode-lighteco? #f)
+        )
+
+        (when 
+        (and 
+        (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 2)
+        )
+            (set! mode-rngmission? #f)
+        )
+
+        (when 
+        (and 
+        (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 3)
+        )
+            (set! mode-challenge? #f)
+        )
+        
+        (when 
+        (and 
+        (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 4)
+        )
+            (set! mode-allguns? #f)
+        )
+
+        (when 
+        (and 
+        (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 5)
+        )
+            (set! mode-apocalypse? #f)
+        )
+
+        (when 
+        (and 
+        (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 6)
+        )
+            (set! mode-randomshot? #f)
+        )
+
+        (when 
+        (and 
+        (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 7)
+        )
+            (set! mode-barrels? #f)
+        )
+
+        (when 
+        (and 
+        (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 8)
+        )
+            (set! mode-rngmods? #f)
+        )
+
+        #|(when 
+        (and 
+        (>= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 9)
+        )
+            ;(set! mode-infiniteammo? #t)
+            (set! frong-activemod "None")
+        )|#
+
+        (when 
+        (and 
+        (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 0)
+        )
+            ;(set! mode-infiniteammo? #f)
+            (set! mode-rngmods? #f)
+            (set! mode-barrels? #f)
+            (set! mode-randomshot? #f)
+            (set! mode-apocalypse? #f)
+            (set! mode-allguns? #f)
+            (set! mode-challenge? #f)
+            (set! mode-rngmission? #f)
+            (set! mode-lighteco? #f)
+            (set! frong-activemod "None")
+        )
+
+        (when (= frongmenu-refresh #t)
+            (when (>= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 1)
+                (set! frong-display1 "Endless Light Eco")
+            )
+            (when (>= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 1)
+                (set! frong-display2 "All Random Missions")
+            )
+            (when (>= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 1)
+                (set! frong-display3 "All Challenge Levels")
+            )
+            (when (>= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 1)
+                (set! frong-display4 "All Weapons at Start")
+            )
+            (when (>= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 1)
+                (set! frong-display5 "Always Apocalypse")
+            )
+            (when (>= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 1)
+                (set! frong-display6 "Everyone has Random Shot")
+            )
+            (when (>= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 1)
+                (set! frong-display7 "Always Raining Explosive Barrels")
+            )
+            (when (>= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 1)
+                (set! frong-display8 "Random Modifier Every Level")
+            )
+            (set! frongmenu-refresh #f)
         )
 
 

@@ -544,6 +544,50 @@ frong-display9 "Infinite Ammo"
 )
 )
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;MENU SELECTION;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when 
+    (and
+    (= in-frongmenu? #t)
+    (cpad-pressed? 0 x)
+    )
+        (until (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 9)
+                (+! (-> *game-info* auto-save-count) 100000000)
+            )
+            (when (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 9)
+                (-! (-> *game-info* auto-save-count) 900000000)
+            )
+        (when (and (= frongmenu-select 1)(= unlock-lighteco? #t)(= mode-lighteco? #f))
+            (+! (-> *game-info* auto-save-count) 100000000)
+        )
+        (when (and (= frongmenu-select 2)(= unlock-rngmission? #t)(= mode-rngmission? #f))
+            (+! (-> *game-info* auto-save-count) 200000000)
+        )
+        (when (and (= frongmenu-select 3)(= unlock-challenge? #t)(= mode-challenge? #f))
+            (+! (-> *game-info* auto-save-count) 300000000)
+        )
+        (when (and (= frongmenu-select 4)(= unlock-allguns? #t)(= mode-allguns? #f))
+            (+! (-> *game-info* auto-save-count) 400000000)
+        )
+        (when (and (= frongmenu-select 5)(= unlock-apocalypse? #t)(= mode-apocalypse? #f))
+            (+! (-> *game-info* auto-save-count) 500000000)
+        )
+        (when (and (= frongmenu-select 6)(= unlock-randomshot? #t)(= mode-randomshot? #f))
+            (+! (-> *game-info* auto-save-count) 600000000)
+        )
+        (when (and (= frongmenu-select 7)(= unlock-barrels? #t)(= mode-barrels? #f))
+            (+! (-> *game-info* auto-save-count) 700000000)
+        )
+        (when (and (= frongmenu-select 8)(= unlock-rngmods? #t)(= mode-rngmods? #f))
+            (+! (-> *game-info* auto-save-count) 800000000)
+        )
+        (when (= frongmenu-select 9)
+            (set! frong-activemod "None")
+        )
+    )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;MENU DRAWS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (when 
 (and
 (= in-frongmenu? #t)

@@ -43,6 +43,8 @@
 (define gun-dark-special #f)
 
 ;frong-modifiers
+(define frong-activemod "")
+
 (define mode-lighteco? #f)
 (define mode-rngmission? #f)
 (define mode-challenge? #f)
@@ -51,7 +53,7 @@
 (define mode-randomshot? #f)
 (define mode-barrels? #f)
 (define mode-rngmods? #f)
-(define mode-infiniteammo? #f)
+;(define mode-infiniteammo? #f)
 
 (define unlock-lighteco? #f)
 (define unlock-rngmission? #f)
@@ -61,7 +63,7 @@
 (define unlock-randomshot? #f)
 (define unlock-barrels? #f)
 (define unlock-rngmods? #f)
-(define unlock-infiniteammo? #f)
+;(define unlock-infiniteammo? #f)
 
 
 (define fodder-dialogue? #f)
