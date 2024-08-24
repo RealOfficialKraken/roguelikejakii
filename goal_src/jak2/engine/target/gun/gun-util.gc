@@ -858,6 +858,19 @@
                                         )
           )
     )
+    #|(when 
+    (and 
+    (= (-> *target* gun gun-type)(pickup-type eco-dark))
+    (= gun-dark-special #t)
+    )
+      (set-vector! (-> self draw color-mult) 0.0 1.0 1.0 1.0)
+    )
+    (when 
+    (and 
+    (!= (-> *target* gun gun-type)(pickup-type eco-dark))
+    )
+      (set-vector! (-> self draw color-mult) 1.0 1.0 1.0 1.0)
+    )|#
   (go-virtual idle)
   (none)
   )

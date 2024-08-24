@@ -709,11 +709,6 @@
                        )
                  )
             (when s4-1
-            (when (= p-crit-hits #t)
-              (let ((crit-dmg-1 (+ (/ (-> *game-info* skill) 45) 16.0)))
-                (set! crit-dark crit-dmg-1)
-              )
-            )
               (send-event s4-1 'attack #f (static-attack-info ((id (new-attack-id)) (mode 'explode) (damage crit-dark))))
               (process-spawn-function
                 process
