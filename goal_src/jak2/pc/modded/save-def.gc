@@ -842,7 +842,7 @@
         )
 
     ;Check to see if challenge-mod is off, and set challenge-mission to 0
-    (when 
+    #|(when 
     (and
     (!= challenge-mission 0)
     (= mode-challenge? #f)
@@ -852,7 +852,7 @@
     (= mode-rngmods? #t)
     )
         (set! challenge-mission 0)
-    )    
+    ) |#   
 
 
     ; Check to ensure the two variables match again but in reverse, taking the item away if they don't

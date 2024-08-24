@@ -3493,6 +3493,12 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
   )
   )
 
+  (when (and (= mode-lighteco? #f)(= powered? #t))
+    (set! powered? #f)
+    (set! power-dur 0)
+    (reset-gun-part)
+  )
+
 (when (= mode-lighteco? #f)
 (clear matt-str)
     (clear *pc-encoded-matt-str*)
