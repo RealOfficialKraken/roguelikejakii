@@ -1,5 +1,5 @@
-;;-*-Lisp-*-
 (in-package goal)
+;projectile-def.gc
 
 ;; name: guard-projectile.gc
 ;; name in dgo: guard-projectile
@@ -310,14 +310,14 @@
   :parts ((sp-item 209))
   )
 
-(deftype guard-shot (projectile)
+(deftype c-guard-shot (projectile)
   ((hit-actor?  symbol)
    (tail-pos    vector  :inline)
    )
   )
 
 
-(defmethod deal-damage! ((this guard-shot) (arg0 process) (arg1 event-message-block))
+(defmethod deal-damage! ((this c-guard-shot) (arg0 process) (arg1 event-message-block))
   "Constructs an [[attack-info]] according to the projectile's `options`"
   (let ((t9-0 (method-of-type projectile deal-damage!)))
     (when (t9-0 this arg0 arg1)
@@ -327,7 +327,7 @@
     )
   )
 
-(defmethod draw-laser-sight ((this guard-shot))
+(defmethod draw-laser-sight ((this c-guard-shot))
   "TODO - confirm If applicable, draw the laser sight particles"
   (draw-beam (-> *part-id-table* 610) (-> this tail-pos) (-> this starting-dir) #f #t)
   (let* ((a0-3 (vector-normalize-copy! (new 'stack-no-clear 'vector) (-> this starting-dir) 2048.0))
@@ -344,7 +344,7 @@
   (none)
   )
 
-(defmethod spawn-impact-particles ((this guard-shot))
+(defmethod spawn-impact-particles ((this c-guard-shot))
   "Spawns associated particles with the projectile if applicable"
   (rlet ((acc :class vf)
          (vf0 :class vf)
@@ -401,7 +401,7 @@
     )
   )
 
-(defmethod spawn-shell-particles ((this guard-shot))
+(defmethod spawn-shell-particles ((this c-guard-shot))
   "TODO - confirm"
   (let* ((s4-0 (-> this root))
          (v1-1 (vector-normalize! (vector-! (new 'stack-no-clear 'vector) (-> this tail-pos) (-> s4-0 trans)) 2048.0))
@@ -490,7 +490,7 @@
   (none)
   )
 
-(defmethod play-impact-sound ((this guard-shot) (arg0 projectile-options))
+(defmethod play-impact-sound ((this c-guard-shot) (arg0 projectile-options))
   (let ((v1-0 arg0))
     (cond
       ((zero? v1-0)
@@ -530,7 +530,7 @@
     )
   )
 
-(defun guard-shot-move ((arg0 guard-shot))
+(defun c-guard-shot-move ((arg0 c-guard-shot))
   (projectile-move-fill-line-sphere arg0)
   (let ((s5-0 (-> arg0 root)))
     (let ((s4-0 (new 'stack-no-clear 'vector)))
@@ -553,7 +553,7 @@
   (none)
   )
 
-(defmethod made-impact? ((this guard-shot))
+(defmethod made-impact? ((this c-guard-shot))
   "TODO - queries the collision cache, return true/false"
   (let ((v1-0 (-> this root))
         (t1-0 (new 'stack-no-clear 'collide-query))
@@ -575,7 +575,7 @@
     )
   )
 
-(defmethod init-proj-collision! ((this guard-shot))
+(defmethod init-proj-collision! ((this c-guard-shot))
   "Init the [[projectile]]'s [[collide-shape]]"
   (let ((s5-0 (new 'process 'collide-shape-moving this (collide-list-enum hit-by-player))))
     (set! (-> s5-0 dynam) (copy *standard-dynamics* 'process))
@@ -590,7 +590,7 @@
       (set! (-> s5-0 total-prims) (the-as uint 3))
       (set! (-> s4-0 prim-core collide-as) (collide-spec projectile))
       (set! (-> s4-0 prim-core collide-with)
-            (collide-spec backgnd jak bot crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list)
+            (collide-spec backgnd bot crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list)
             )
       (set! (-> s4-0 prim-core action) (collide-action solid))
       (set-vector! (-> s4-0 local-sphere) 0.0 0.0 0.0 2457.6)
@@ -599,7 +599,7 @@
     (let ((v1-13 (new 'process 'collide-shape-prim-sphere s5-0 (the-as uint 0))))
       (set! (-> v1-13 prim-core collide-as) (collide-spec projectile))
       (set! (-> v1-13 prim-core collide-with)
-            (collide-spec backgnd jak bot crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list)
+            (collide-spec backgnd bot crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list)
             )
       (set! (-> v1-13 prim-core action) (collide-action solid deadly))
       (set-vector! (-> v1-13 local-sphere) 0.0 0.0 0.0 819.2)
@@ -607,7 +607,7 @@
     (let ((v1-15 (new 'process 'collide-shape-prim-sphere s5-0 (the-as uint 0))))
       (set! (-> v1-15 prim-core collide-as) (collide-spec projectile))
       (set! (-> v1-15 prim-core collide-with)
-            (collide-spec jak bot crate civilian enemy vehicle-sphere hit-by-others-list player-list)
+            (collide-spec bot crate civilian enemy vehicle-sphere hit-by-others-list player-list)
             )
       (set! (-> v1-15 prim-core action) (collide-action deadly))
       (set-vector! (-> v1-15 local-sphere) 0.0 0.0 0.0 2457.6)
@@ -628,13 +628,13 @@
   (none)
   )
 
-(defmethod init-proj-settings! ((this guard-shot))
+(defmethod init-proj-settings! ((this c-guard-shot))
   "Init relevant settings for the [[projectile]] such as gravity, speed, timeout, etc"
   (set! (-> this hit-actor?) #f)
   (set! (-> this tail-pos quad) (-> this root trans quad))
   (set! (-> this attack-mode) 'guard-shot)
   (set! (-> this max-speed) 819200.0)
-  (set! (-> this move) guard-shot-move)
+  (set! (-> this move) c-guard-shot-move)
   (set! (-> this update-velocity) projectile-update-velocity-space-wars)
   (set! (-> this timeout) (seconds 0.5))
   (logior! (-> this options) (projectile-options account-for-target-velocity))
@@ -642,7 +642,7 @@
   (none)
   )
 
-(deftype vehicle-grenade (projectile-bounce)
+(deftype c-vehicle-grenade (projectile-bounce)
   ((blast-radius  float)
    )
   )
@@ -654,7 +654,7 @@
               :texture-level 6
               )
 
-(defmethod play-impact-sound ((this vehicle-grenade) (arg0 projectile-options))
+(defmethod play-impact-sound ((this c-vehicle-grenade) (arg0 projectile-options))
   (let ((v1-0 arg0))
     (cond
       ((zero? v1-0)
@@ -669,7 +669,7 @@
   (none)
   )
 
-(defmethod init-proj-collision! ((this vehicle-grenade))
+(defmethod init-proj-collision! ((this c-vehicle-grenade))
   "Init the [[projectile]]'s [[collide-shape]]"
   (let ((s5-0 (new 'process 'collide-shape-moving this (collide-list-enum hit-by-player))))
     (set! (-> s5-0 dynam) (copy *standard-dynamics* 'process))
@@ -695,7 +695,7 @@
     )
   (set-collide-with!
     (-> this root)
-    (collide-spec backgnd crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
+    (collide-spec jak backgnd crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
     )
   (set-collide-as! (-> this root) (collide-spec enemy))
   (set! (-> this root pat-ignore-mask)
@@ -704,7 +704,7 @@
   (none)
   )
 
-(defmethod init-proj-settings! ((this vehicle-grenade))
+(defmethod init-proj-settings! ((this c-vehicle-grenade))
   "Init relevant settings for the [[projectile]] such as gravity, speed, timeout, etc"
   (set! (-> this attack-mode) 'eco-dark)
   (initialize-skeleton
@@ -718,14 +718,14 @@
   (set! (-> this part) (create-launch-control (-> *part-group-id-table* 138) this))
   (set! (-> this blast-radius) 16384.0)
   (set! (-> this max-speed) 90112.0)
-  (set! (-> this timeout) (seconds 0))
+  (set! (-> this timeout) (seconds 4))
   (set! (-> this damage) 6.0)
   (logior! (-> this options) (projectile-options deal-damage))
   0
   (none)
   )
 
-(defmethod spawn-impact-particles ((this vehicle-grenade))
+(defmethod spawn-impact-particles ((this c-vehicle-grenade))
   "Spawns associated particles with the projectile if applicable"
   (spawn (-> this part) (-> this root trans))
   (ja-post)
@@ -733,7 +733,7 @@
   (none)
   )
 
-(defmethod noop ((this vehicle-grenade))
+(defmethod noop ((this c-vehicle-grenade))
   "Does nothing"
   (spawn (-> this part) (-> this root trans))
   0
@@ -741,7 +741,7 @@
   )
 
 ;; WARN: Return type mismatch sound-id vs none.
-(defmethod play-impact-sound! ((this vehicle-grenade))
+(defmethod play-impact-sound! ((this c-vehicle-grenade))
   "Plays impact sound"
   (let* ((a2-0 (-> this root))
          (v1-0 (-> a2-0 status))
@@ -759,7 +759,7 @@
   (none)
   )
 
-(defstate impact (vehicle-grenade)
+(defstate impact (c-vehicle-grenade)
   :virtual #t
   :event (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
     (case message
@@ -777,7 +777,7 @@
       (set! (-> gp-0 radius) (-> self blast-radius))
       (set! (-> gp-0 group) (-> *part-group-id-table* 76))
       (set! (-> gp-0 collide-with)
-            (collide-spec backgnd crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
+            (collide-spec jak backgnd crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
             )
       (set! (-> gp-0 penetrate-using) (penetrate explode))
       (explosion-spawn self explosion gp-0)
@@ -892,7 +892,7 @@
 
 (defmethod made-impact? ((this guard-lazer-shot))
   "TODO - queries the collision cache, return true/false"
-    (let ((gp-0 (-> this root))
+  (let ((gp-0 (-> this root))
         (s5-0 (new 'stack-no-clear 'collide-query))
         )
     (let ((v1-0 s5-0))
@@ -983,3 +983,52 @@
   0
   (none)
   )
+
+
+
+(defun someone-fire-c-guard-grenade ((arg0 process-drawable) (arg1 vector) (arg2 vector))
+  (let ((a1-9 (new 'stack-no-clear 'projectile-init-by-other-params)))
+          (set! (-> a1-9 ent) (-> arg0 entity))
+          (set! (-> a1-9 charge) 1.0)
+          (set! (-> a1-9 options) (projectile-options account-for-target-velocity proj-options-8000))
+          (set! (-> a1-9 pos quad) (-> arg1 quad))
+          (set! (-> a1-9 notify-handle) (the-as handle #f))
+          (set! (-> a1-9 owner-handle) (the-as handle #f))
+          (set! (-> a1-9 ignore-handle) (process->handle (the-as process (send-event *target* 'get-vehicle))))
+          (let* ((v1-24 *game-info*)
+                 (a0-23 (+ (-> v1-24 attack-id) 1))
+                 )
+            (set! (-> v1-24 attack-id) a0-23)
+            (set! (-> a1-9 attack-id) a0-23)
+            )
+          (set! (-> a1-9 timeout) (seconds 4))
+          (vector-normalize-copy! (-> a1-9 vel) arg2 819200.0)
+          (spawn-projectile c-vehicle-grenade a1-9 arg0 *default-dead-pool*)
+          )
+  )
+
+  (defun someone-fire-c-guard-shot ((arg0 process-drawable) (arg1 vector) (arg2 vector))
+  (let ((s4-1 (new 'stack-no-clear 'projectile-init-by-other-params)))
+            (set! (-> s4-1 ent) (-> arg0 entity))
+            (set! (-> s4-1 charge) 1.0)
+            (set! (-> s4-1 options) (projectile-options account-for-target-velocity proj-options-8000))
+            (set! (-> s4-1 pos quad) (-> arg1 quad))
+            (set! (-> s4-1 vel quad) (-> arg2 quad))
+            (set! (-> s4-1 notify-handle) (the-as handle #f))
+            (set! (-> s4-1 owner-handle) (the-as handle #f))
+            (set! (-> s4-1 ignore-handle) (process->handle (the-as process (send-event *target* 'get-vehicle))))
+            (let* ((a0-13 *game-info*)
+            (a1-12 (+ (-> a0-13 attack-id) 1))
+            )
+        (set! (-> a0-13 attack-id) a1-12)
+        (set! (-> s4-1 attack-id) a1-12)
+        )
+      (set! (-> s4-1 timeout) (seconds 4))
+      (vector-normalize! (-> s4-1 vel) 819200.0)
+      (spawn-projectile c-guard-shot s4-1 arg0 *default-dead-pool*)
+      )
+  )
+
+  
+
+

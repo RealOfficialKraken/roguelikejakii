@@ -185,7 +185,7 @@
   (when (= (-> *game-info* buzzer-total) 20.0)
     (set! (-> this hit-points) (+ (-> this enemy-info default-hit-points) 19.0))
   )
-  (when (= challenge-mission 5)
+  (when (or (= challenge-mission 5)(= mode-apocalypse? #t))
     (set! (-> this hit-points) (+ (-> this enemy-info default-hit-points) 35.0))
   )
       (set! (-> this hit-points) (rand-vu-int-range 1 4))

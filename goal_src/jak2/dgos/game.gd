@@ -517,11 +517,17 @@
   "checkpoint-randomizer.o" ;;added by Kraken
   "mod-custom-code.o" ;; added
   "themachine.o" ;;added by Kraken
+  "c-projectile-def.o" ;;added by Kraken
   "metalkor-part.o"
   "metalkor-setup.o"
   "metalkor-states.o"
   "metalkor-extras.o"
+  "enemy-blue-shot.o"
+  "enemy-red-shot.o"
+  "enemy-yellow-shot.o"
+  "enemy-dark-shot.o"
   "thefrong.o"
   "frong-modifiers.o"
   "update-board.o"
+  "debug-text.o"
  ))

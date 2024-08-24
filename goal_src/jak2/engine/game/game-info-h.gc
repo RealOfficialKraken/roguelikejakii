@@ -19,6 +19,7 @@
 (define-extern someone-fire-red (function process-drawable vector vector (pointer process)))
 (define-extern someone-fire-dark (function process-drawable vector vector (pointer process)))
 (define-extern someone-fire-guard-grenade (function process-drawable vector vector (pointer process)))
+(define init-randomshot #f)
 (define in-game? #f)
 (define tin-game? #f)
 (define tin-game-wait #f)
@@ -63,7 +64,18 @@
 (define unlock-randomshot? #f)
 (define unlock-barrels? #f)
 (define unlock-rngmods? #f)
+
+(define frong-rndmod "")
+(define-extern challenge-string string)
 ;(define unlock-infiniteammo? #f)
+
+(defun-extern someone-fire-c-yellow process-drawable vector vector (pointer process))
+(defun-extern someone-fire-c-blue process-drawable vector vector (pointer process))
+(defun-extern someone-fire-c-red process-drawable vector vector (pointer process))
+(defun-extern someone-fire-c-dark process-drawable vector vector (pointer process))
+(defun-extern someone-fire-c-guard-grenade process-drawable vector vector (pointer process))
+
+(define in-challenge? #f)
 
 
 (define fodder-dialogue? #f)

@@ -94,7 +94,7 @@
 (define ub-2-2 "<COLOR_ORANGE>upgrade. These upgrades are unique to the weapon itself, and")
 (define ub-3-2 "will be present on the gun regardless if it's your starter weapon")
 (define ub-4-2 "")
-(define ub-5-2 "")
+(define ub-5-2 "<COLOR_CYAN>< <COLOR_ORANGE>Added <COLOR_GREEN>Modifiers<COLOR_ORANGE>, unlocked via reward")
 (define ub-6-2 "")
 (define ub-7-2 "")
 (define ub-8-2 "")

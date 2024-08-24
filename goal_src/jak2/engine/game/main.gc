@@ -12,6 +12,7 @@
 (defun-extern check-update-info (none))
 (defun-extern frong-checker! (none))
 (defun-extern frong-update (none))
+(defun-extern debug-texting (none))
 
 (defun set-letterbox-frames ((arg0 time-frame))
   "Set the remaining time until letterboxing is removed.
@@ -876,6 +877,9 @@
     (check-stat!)
     (frong-checker!)
     ;(frong-update)
+    (when *debug-segment*
+      (debug-texting)
+    )
     (check-update-info)
 
     ; ;; Run blerc to modify foreground models

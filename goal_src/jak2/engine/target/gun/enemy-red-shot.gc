@@ -1,17 +1,17 @@
 ;;-*-Lisp-*-
 (in-package goal)
 
-;; name: gun-red-shot.gc
-;; name in dgo: gun-red-shot
+;; name: c-gun-red-shot.gc
+;; name in dgo: c-gun-red-shot
 ;; dgos: ENGINE, GAME
 
-(declare-type gun-red-shot process-drawable)
-(define-extern gun-red-shot-init-by-other (function vector vector gun-red-shot :behavior gun-red-shot))
+(declare-type c-gun-red-shot process-drawable)
+(define-extern c-gun-red-shot-init-by-other (function vector vector c-gun-red-shot :behavior c-gun-red-shot))
 (define crit-red 3.0)
 
 ;; DECOMP BEGINS
 
-(deftype gun-red-shot (process-drawable)
+(deftype c-gun-red-shot (process-drawable)
   ((root         collide-shape-moving :override)
    (probe-count  int32)
    (probe-mask   uint32)
@@ -34,105 +34,13 @@
     (gun-red-shot-method-26 (_type_) none)
     (gun-red-shot-method-27 (_type_) none)
     (gun-red-shot-method-28 (_type_ vector) sound-id)
-    (fire! (_type_ process-drawable int) object :behavior gun-red-shot)
+    (fire! (_type_ process-drawable int) object :behavior c-gun-red-shot)
     )
   )
 
 
-;; WARN: Return type mismatch (pointer process) vs (pointer gun-red-shot).
-(defbehavior target-gun-fire-red target ()
-  (rlet ((acc :class vf)
-         (vf0 :class vf)
-         (vf4 :class vf)
-         (vf5 :class vf)
-         (vf6 :class vf)
-         (vf7 :class vf)
-         )
-    (init-vf0-vector)
-    (let ((gp-0 (-> self gun)))
-      (let ((s5-0 (-> *part-id-table* 190)))
-        (get-field-spec-by-id s5-0 (sp-field-id spt-omega))
-        (let ((s5-1 (get-field-spec-by-id s5-0 (sp-field-id spt-rotate-y))))
-          (if s5-1
-              (set! (-> s5-1 initial-valuef) (y-angle (-> self control)))
-              )
-          )
-        )
-      (launch-particles (-> *part-id-table* 190) (-> gp-0 fire-point))
-      (let ((s5-2 (new 'stack-no-clear 'vector)))
-        (let ((v1-10 (-> gp-0 fire-point)))
-          (let ((a0-4 (-> gp-0 fire-dir-out)))
-            (let ((a1-4 24576.0))
-              (.mov vf7 a1-4)
-              )
-            (.lvf vf5 (&-> a0-4 quad))
-            )
-          (.lvf vf4 (&-> v1-10 quad))
-          )
-        (.add.x.vf vf6 vf0 vf0 :mask #b1000)
-        (.mul.x.vf acc vf5 vf7 :mask #b111)
-        (.add.mul.w.vf vf6 vf4 vf0 acc :mask #b111)
-        (.svf (&-> s5-2 quad) vf6)
-        (set! (-> s5-2 w) 24576.0)
-        (when (and (sphere-in-view-frustum? (the-as sphere s5-2))
-                   (< 24576.0 (vector-vector-distance s5-2 (math-camera-pos)))
-                   )
-          (let ((s5-3 (process-spawn
-                        manipy
-                        :init manipy-init
-                        (-> gp-0 fire-point)
-                        (-> self entity)
-                        (art-group-get-by-name *level* "skel-gun-red-cone" (the-as (pointer uint32) #f))
-                        #f
-                        0
-                        :to self
-                        )
-                      )
-                )
-            (when s5-3
-                (send-event (ppointer->process s5-3) 'anim-mode 'play1)
-                (send-event (ppointer->process s5-3) 'anim "idle")
-              (forward-up->quaternion
-                (-> (the-as process-drawable (-> s5-3 0)) root quat)
-                (-> gp-0 fire-dir-out)
-                *up-vector*
-                )
-              (let ((f30-1 (vector-dot
-                             (-> gp-0 fire-dir-out)
-                             (vector-! (new 'stack-no-clear 'vector) (-> gp-0 fire-point) (math-camera-pos))
-                             )
-                           )
-                    (f0-5 (vector-vector-xz-distance (-> gp-0 fire-point) (math-camera-pos)))
-                    )
-                (when (and (< f30-1 0.0) (< f0-5 32768.0))
-                  (set! (-> (the-as process-drawable (-> s5-3 0)) root scale z)
-                        (lerp-scale 0.2 1.0 (fabs f0-5) 20480.0 32768.0)
-                        )
-                  (set! (-> (the-as process-drawable (-> s5-3 0)) root scale x)
-                        (-> (the-as process-drawable (-> s5-3 0)) root scale z)
-                        )
-                  )
-                )
-              )
-            )
-          )
-        )
-        (when (= p-double-shot #t)
-        (set! dshotwait-r #t)
-      )
-      (when (= powered? #t)
-          (set! power-shot-r #t)
-          (set! power-shoti-r 0)
-        )
-        (when (= challenge-mission 3)
-          (challenge-mission-fail)
-        )
-        (process-spawn gun-red-shot (-> gp-0 fire-point) (-> gp-0 fire-dir-out) :to (ppointer->process (-> gp-0 gun)))
-      )
-    )
-  )
 
-(defbehavior gun-red-shot-event-handler gun-red-shot ((arg0 process-drawable) (arg1 int) (arg2 symbol) (arg3 event-message-block))
+(defbehavior c-gun-red-shot-event-handler c-gun-red-shot ((arg0 process-drawable) (arg1 int) (arg2 symbol) (arg3 event-message-block))
   (case arg2
     (('touched)
      (fire! self arg0 (the-as int (-> arg3 param 0)))
@@ -140,7 +48,7 @@
     )
   )
 
-(defmethod fire! ((this gun-red-shot) (arg0 process-drawable) (arg1 int))
+(defmethod fire! ((this c-gun-red-shot) (arg0 process-drawable) (arg1 int))
   (let* ((s5-0 arg0)
          (v1-0 (if (type? s5-0 process-drawable)
                    s5-0
@@ -230,13 +138,13 @@
     )
   )
 
-(defmethod noop ((this gun-red-shot))
+(defmethod noop ((this c-gun-red-shot))
   "Does nothing"
   0
   (none)
   )
 
-(defmethod init-probes! ((this gun-red-shot) (arg0 collide-shape))
+(defmethod init-probes! ((this c-gun-red-shot) (arg0 collide-shape))
   "Create all 19 probe vectors"
   (let ((s5-0 (-> this probe-count)))
     (when (< s5-0 19)
@@ -279,7 +187,7 @@
   (none)
   )
 
-(defmethod gun-red-shot-method-26 ((this gun-red-shot))
+(defmethod gun-red-shot-method-26 ((this c-gun-red-shot))
   (local-vars (a2-5 float) (a2-12 float))
   (rlet ((vf1 :class vf)
          (vf2 :class vf)
@@ -392,7 +300,7 @@
     )
   )
 
-(defmethod gun-red-shot-method-27 ((this gun-red-shot))
+(defmethod gun-red-shot-method-27 ((this c-gun-red-shot))
   (gun-red-shot-method-26 this)
   (let ((s5-0 (-> this probe-count)))
     (while (< s5-0 19)
@@ -412,7 +320,7 @@
   (none)
   )
 
-(defmethod gun-red-shot-method-28 ((this gun-red-shot) (arg0 vector))
+(defmethod gun-red-shot-method-28 ((this c-gun-red-shot) (arg0 vector))
   (local-vars (at-0 int))
   (with-pp
     (rlet ((vf0 :class vf)
@@ -455,7 +363,7 @@
     )
   )
 
-(defmethod gun-red-shot-method-24 ((this gun-red-shot))
+(defmethod gun-red-shot-method-24 ((this c-gun-red-shot))
   (let ((v1-0 (-> this root))
         (t1-0 (new 'stack-no-clear 'collide-query))
         )
@@ -473,7 +381,7 @@
     )
   )
 
-(defstate debug-idle (gun-red-shot)
+(defstate debug-idle (c-gun-red-shot)
   :virtual #t
   :code (behavior ()
     (set-time! (-> self state-time))
@@ -507,18 +415,18 @@
     )
   )
 
-(defstate blocked (gun-red-shot)
+(defstate blocked (c-gun-red-shot)
   :virtual #t
-  :event gun-red-shot-event-handler
+  :event c-gun-red-shot-event-handler
   :code (behavior ()
     (suspend)
     0
     )
   )
 
-(defstate idle (gun-red-shot)
+(defstate idle (c-gun-red-shot)
   :virtual #t
-  :event gun-red-shot-event-handler
+  :event c-gun-red-shot-event-handler
   :code (behavior ()
     (let ((gp-0 0))
       (countdown (s5-0 3)
@@ -534,8 +442,8 @@
     )
   )
 
-;; WARN: Return type mismatch object vs gun-red-shot.
-(defbehavior gun-red-shot-init-by-other gun-red-shot ((arg0 vector) (arg1 vector))
+;; WARN: Return type mismatch object vs c-gun-red-shot.
+(defbehavior c-gun-red-shot-init-by-other c-gun-red-shot ((arg0 vector) (arg1 vector))
   (set! (-> self start-pos quad) (-> arg0 quad))
   (set! (-> self start-dir quad) (-> arg1 quad))
   (rot-zxy-from-vector! (-> self start-rot) arg1)
@@ -557,7 +465,7 @@
     (let ((v1-10 (new 'process 'collide-shape-prim-sphere s5-0 (the-as uint 0))))
       (set! (-> v1-10 prim-core collide-as) (collide-spec projectile))
       (set! (-> v1-10 prim-core collide-with)
-            (collide-spec backgnd bot crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
+            (collide-spec jak backgnd bot crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
             )
       (set! (-> v1-10 prim-core action) (collide-action solid))
       (set-vector! (-> v1-10 local-sphere) 0.0 0.0 0.0 819.2)
@@ -579,7 +487,7 @@
     (vector-identity! (-> s5-1 scale))
     )
   (update-transforms (-> self root))
-  (set! (-> self event-hook) gun-red-shot-event-handler)
+  (set! (-> self event-hook) c-gun-red-shot-event-handler)
   (logior! (-> self mask) (process-mask projectile))
   (logclear! (-> self mask) (process-mask enemy))
   (gun-red-shot-method-27 self)
@@ -622,7 +530,7 @@
   (draw-beam (-> *part-id-table* 187) (-> self start-pos) (-> self start-dir) #f #t)
   (sound-play "red-shot-fire")
   (vector-float*! (-> self root transv) (-> self start-dir) 61440.0)
-  (the-as gun-red-shot (if (gun-red-shot-method-24 self)
+  (the-as c-gun-red-shot (if (gun-red-shot-method-24 self)
                            (go-virtual blocked)
                            (go-virtual idle)
                            )
@@ -630,7 +538,7 @@
   )
 
 
-(defun someone-fire-red ((arg0 process-drawable) (arg1 vector) (arg2 vector))
+(defun someone-fire-c-red ((arg0 process-drawable) (arg1 vector) (arg2 vector))
   (rlet ((acc :class vf)
          (vf0 :class vf)
          (vf4 :class vf)
@@ -710,7 +618,7 @@
         (when (and (rand-vu-percent? luck)(= p-sage-dark #t))
           (someone-fire-dark arg0 arg1 arg2)
         )
-        (process-spawn gun-red-shot arg1 arg2)
+        (process-spawn c-gun-red-shot arg1 arg2)
     )
   )
 )

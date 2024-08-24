@@ -7,6 +7,12 @@
 
 ;; DECOMP BEGINS
 
+(defun-extern someone-fire-yellow process-drawable vector vector (pointer process))
+(defun-extern someone-fire-blue process-drawable vector vector (pointer process))
+(defun-extern someone-fire-red process-drawable vector vector (pointer process))
+(defun-extern someone-fire-dark process-drawable vector vector (pointer process))
+(defun-extern someone-fire-guard-grenade process-drawable vector vector (pointer process))
+
 
 (deftype guard-shot (projectile)
   ((hit-actor?  symbol)
@@ -83,7 +89,7 @@
     )
   (set-collide-with!
     (-> this root)
-    (collide-spec backgnd jak crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
+    (collide-spec backgnd crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
     )
   (set-collide-as! (-> this root) (collide-spec enemy))
   (set! (-> this root pat-ignore-mask)
@@ -146,7 +152,7 @@
       (set! (-> gp-0 radius) (-> self blast-radius))
       (set! (-> gp-0 group) (-> *part-group-id-table* 76))
       (set! (-> gp-0 collide-with)
-            (collide-spec backgnd jak crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
+            (collide-spec backgnd crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
             )
       (set! (-> gp-0 penetrate-using) (penetrate explode))
       (explosion-spawn self explosion gp-0)
@@ -314,7 +320,7 @@
         (set! (-> s4-1 attack-id) a0-15)
         )
       (set! (-> s4-1 timeout) (seconds 4))
-      (spawn-projectile gun-blue-shot s4-1 (ppointer->process (-> gp-0 gun)) *default-dead-pool*)
+        (spawn-projectile gun-blue-shot s4-1 arg0 *default-dead-pool*)
       )
     )
     )

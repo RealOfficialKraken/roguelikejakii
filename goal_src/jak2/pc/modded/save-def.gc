@@ -540,8 +540,10 @@
         (when 
         (and 
         (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 1)
+        (= mode-rngmods? #f)
         )
             (set! mode-lighteco? #t)
+            (set! mode-rngmods? #f)
             (set! frong-activemod "Endless Light Eco")
             (set! frong-display1 "<COLOR_GREEN>< <COLOR_WHITE>Endless Light Eco")
         )
@@ -549,8 +551,10 @@
         (when 
         (and 
         (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 2)
+        (= mode-rngmods? #f)
         )
             (set! mode-rngmission? #t)
+            (set! mode-rngmods? #f)
             (set! frong-activemod "All Random Missions")
             (set! frong-display2 "<COLOR_GREEN>< <COLOR_WHITE>All Random Missions")
         )
@@ -558,8 +562,10 @@
         (when 
         (and 
         (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 3)
+        (= mode-rngmods? #f)
         )
             (set! mode-challenge? #t)
+            (set! mode-rngmods? #f)
             (set! frong-activemod "All Challenge Levels")
             (set! frong-display3 "<COLOR_GREEN>< <COLOR_WHITE>All Challenge Levels")
         )
@@ -567,17 +573,21 @@
         (when 
         (and 
         (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 4)
+        (= mode-rngmods? #f)
         )
             (set! mode-allguns? #t)
-            (set! frong-activemod "All Weapons at Start")
+            (set! mode-rngmods? #f)
+            (set! frong-activemod "All Weapons")
             (set! frong-display4 "<COLOR_GREEN>< <COLOR_WHITE>All Weapons at Start")
         )
 
         (when 
         (and 
         (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 5)
+        (= mode-rngmods? #f)
         )
             (set! mode-apocalypse? #t)
+            (set! mode-rngmods? #f)
             (set! frong-activemod "Always Apocalypse")
             (set! frong-display5 "<COLOR_GREEN>< <COLOR_WHITE>Always Apocalypse")
         )
@@ -585,8 +595,10 @@
         (when 
         (and 
         (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 6)
+        (= mode-rngmods? #f)
         )
             (set! mode-randomshot? #t)
+            (set! mode-rngmods? #f)
             (set! frong-activemod "Everyone has Random Shot")
             (set! frong-display6 "<COLOR_GREEN>< <COLOR_WHITE>Everyone has Random Shot")
         )
@@ -594,18 +606,36 @@
         (when 
         (and 
         (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 7)
+        (= mode-rngmods? #f)
         )
             (set! mode-barrels? #t)
+            (set! mode-rngmods? #f)
             (set! frong-activemod "Always Raining Explosive Barrels")
-            (set! frong-display8 "<COLOR_GREEN>< <COLOR_WHITE>Always Raining Explosive Barrels")
+            (set! frong-display7 "<COLOR_GREEN>< <COLOR_WHITE>Always Raining Explosive Barrels")
         )
 
         (when 
         (and 
         (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 8)
+        (= mode-rngmods? #f)
         )
             (set! mode-rngmods? #t)
+            (set! mode-lighteco? #f)
+            (set! mode-barrels? #f)
+            (set! mode-randomshot? #f)
+            (set! mode-apocalypse? #f)
+            (set! mode-allguns? #f)
+            (set! mode-challenge? #f)
+            (set! mode-rngmission? #f)
             (set! frong-activemod "Random Modifier Every Level")
+            (set! frong-display8 "<COLOR_GREEN>< <COLOR_WHITE>Random Modifier Every Level")
+        )
+
+        (when 
+        (and 
+        (= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 8)
+        (= mode-rngmods? #t)
+        )
             (set! frong-display8 "<COLOR_GREEN>< <COLOR_WHITE>Random Modifier Every Level")
         )
 
@@ -614,57 +644,149 @@
         (when 
         (and 
         (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 1)
+        (= mode-lighteco? #t)
+        (= mode-rngmods? #f)
         )
             (set! mode-lighteco? #f)
+            (set! mode-barrels? #f)
+            (set! mode-randomshot? #f)
+            (set! mode-apocalypse? #f)
+            (set! mode-allguns? #f)
+            (set! mode-challenge? #f)
+            (set! mode-rngmission? #f)
+            (reset-gun-part)
+            (set! powered? #f)
         )
 
         (when 
         (and 
         (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 2)
+        (= mode-rngmission? #t)
+        (= mode-rngmods? #f)
         )
             (set! mode-rngmission? #f)
+            (set! mode-lighteco? #f)
+            (set! mode-barrels? #f)
+            (set! mode-randomshot? #f)
+            (set! mode-apocalypse? #f)
+            (set! mode-allguns? #f)
+            (set! mode-challenge? #f)
+            (set! mode-lighteco? #f)
+            (reset-gun-part)
+            (set! powered? #f)
         )
 
         (when 
         (and 
         (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 3)
+        (= mode-challenge? #t)
+        (= mode-rngmods? #f)
         )
             (set! mode-challenge? #f)
+            (set! mode-lighteco? #f)
+            (set! mode-barrels? #f)
+            (set! mode-randomshot? #f)
+            (set! mode-apocalypse? #f)
+            (set! mode-allguns? #f)
+            (set! mode-rngmission? #f)
+            (set! mode-lighteco? #f)
+            (reset-gun-part)
+            (set! powered? #f)
         )
         
         (when 
         (and 
         (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 4)
+        (= mode-allguns? #t)
+        (= mode-rngmods? #f)
         )
             (set! mode-allguns? #f)
+            (set! mode-lighteco? #f)
+            (set! mode-barrels? #f)
+            (set! mode-randomshot? #f)
+            (set! mode-apocalypse? #f)
+            (set! mode-challenge? #f)
+            (set! mode-rngmission? #f)
+            (set! mode-lighteco? #f)
+            (reset-gun-part)
+            (set! powered? #f)
         )
 
         (when 
         (and 
         (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 5)
+        (= mode-apocalypse? #t)
+        (= mode-rngmods? #f)
         )
             (set! mode-apocalypse? #f)
+            (set! mode-lighteco? #f)
+            (set! mode-barrels? #f)
+            (set! mode-randomshot? #f)
+            (set! mode-allguns? #f)
+            (set! mode-challenge? #f)
+            (set! mode-rngmission? #f)
+            (set! mode-lighteco? #f)
+            (reset-gun-part)
+            (set! powered? #f)
         )
 
         (when 
         (and 
         (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 6)
+        (= mode-randomshot? #t)
+        (= mode-rngmods? #f)
         )
             (set! mode-randomshot? #f)
+            (set! mode-lighteco? #f)
+            (set! mode-barrels? #f)
+            (set! mode-apocalypse? #f)
+            (set! mode-allguns? #f)
+            (set! mode-challenge? #f)
+            (set! mode-rngmission? #f)
+            (set! mode-lighteco? #f)
+            (reset-gun-part)
+            (set! powered? #f)
         )
 
         (when 
         (and 
         (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 7)
+        (= mode-barrels? #t)
+        (= mode-rngmods? #f)
         )
             (set! mode-barrels? #f)
-        )
+            (set! mode-lighteco? #f)
+            (set! mode-randomshot? #f)
+            (set! mode-apocalypse? #f)
+            (set! mode-allguns? #f)
+            (set! mode-challenge? #f)
+            (set! mode-rngmission? #f)
+            (set! mode-lighteco? #f)
+            (reset-gun-part)
+            (set! powered? #f)
+        ) 
+        
+
+
+
 
         (when 
         (and 
         (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 8)
+        (= mode-rngmods? #t)
+        (= mode-rngmods? #f)
         )
             (set! mode-rngmods? #f)
+            (set! mode-lighteco? #f)
+            (set! mode-barrels? #f)
+            (set! mode-randomshot? #f)
+            (set! mode-apocalypse? #f)
+            (set! mode-allguns? #f)
+            (set! mode-challenge? #f)
+            (set! mode-rngmission? #f)
+            (set! mode-lighteco? #f)
+            (reset-gun-part)
+            (set! powered? #f)
         )
 
         #|(when 
@@ -718,6 +840,19 @@
             )
             (set! frongmenu-refresh #f)
         )
+
+    ;Check to see if challenge-mod is off, and set challenge-mission to 0
+    (when 
+    (and
+    (!= challenge-mission 0)
+    (= mode-challenge? #f)
+    (= machine-locked? #t)
+    (= in-machine? #f)
+    (= in-challenge? #f)
+    (= mode-rngmods? #t)
+    )
+        (set! challenge-mission 0)
+    )    
 
 
     ; Check to ensure the two variables match again but in reverse, taking the item away if they don't

@@ -135,9 +135,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;MACHINE PARAMS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (and (= in-challenge? #f) (!= challenge-mission 0))
-    (set! in-challenge? #t)
-)
 
 (when (and (= in-challenge? #t) (= challenge-mission 0))
     (set! in-challenge? #f)
@@ -151,6 +148,7 @@
 (= popup-shop #f)
 (= avoidc-waitb #f)
 (= machine-prompt? #f)
+(= mode-challenge? #f)
 )
 (set! machine-prompt? #t)
 )
@@ -198,6 +196,10 @@
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
 
+(when (and (= d-challenge-failed #t)(= mode-challenge? #t))
+    (set! (-> *target* fact health) 0.0)
+)
+
 (when (and (= d-challenge-failed #t)(= (paused?) #f)(= (pause-allowed?) #t) *target* (= in-hub? #f))
     (+! d-cfi 1)
     (clear matt-str)
@@ -239,7 +241,17 @@
         )
 )
 
-(when (and (= in-challenge? #t)(!= challenge-mission 2)(!= challenge-mission 4))
+(when 
+    (and 
+        (or 
+        (= mode-challenge? #t) 
+            (and 
+            (!= challenge-mission 0)
+            (!= challenge-mission 2)
+            (!= challenge-mission 4)
+            )
+        )
+    )
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "<COLOR_WHITE>Current Challenge:~%<COLOR_ORANGE>~s"
@@ -255,7 +267,7 @@
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
 
-(when (and (= in-challenge? #t)(!= challenge-mission 2)(= challenge-mission 4))
+(when (and (!= challenge-mission 0)(!= challenge-mission 2)(= challenge-mission 4))
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "<COLOR_WHITE>Current Challenge:~%<COLOR_ORANGE>~s <COLOR_YELLOW>~d/50"
@@ -272,7 +284,7 @@
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
 
-(when (and (= in-challenge? #t)(= challenge-mission 2)(!= challenge-mission 4))
+(when (and (!= challenge-mission 0)(= challenge-mission 2)(!= challenge-mission 4))
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "<COLOR_WHITE>Current Challenge:~%<COLOR_ORANGE>~s <COLOR_YELLOW>~d/15"
@@ -415,11 +427,13 @@
         (set! di-s3 "")
         (set! di-s4 "")
         (set! waite-machine #t)
+        (set! in-challenge? #t)
         (set! challenge-win? #t)
         (set! challenge-mission 1)
         (set! in-dialogue? #f)
         (set! camera-unlocked #t)
         (set! challenge-string "No Damage or Bonks")
+        (set! in-challenge? #t)
     )
 )
 
@@ -463,11 +477,13 @@
         (set! di-s3 "")
         (set! di-s4 "")
         (set! waite-machine #t)
+        (set! in-challenge? #t)
         (set! pc-stored-orbs 0.0)
         (set! in-dialogue? #f)
         (set! challenge-mission 2)
         (set! camera-unlocked #t)
         (set! challenge-string "Collect 15 orbs:")
+        (set! in-challenge? #t)
     )
 
 )
@@ -509,11 +525,13 @@
         (set! di-s3 "")
         (set! di-s4 "")
         (set! waite-machine #t)
+        (set! in-challenge? #t)
         (set! challenge-win? #t)
         (set! challenge-mission 3)
         (set! in-dialogue? #f)
         (set! camera-unlocked #t)
         (set! challenge-string "No Weapons")
+        (set! in-challenge? #t)
     )
 )
 
@@ -554,11 +572,13 @@
         (set! di-s3 "")
         (set! di-s4 "")
         (set! waite-machine #t)
+        (set! in-challenge? #t)
         (set! challenge-mission 4)
         (set! enemies-killed? 0)
         (set! in-dialogue? #f)
         (set! camera-unlocked #t)
         (set! challenge-string "Kill Enemies:")
+        (set! in-challenge? #t)
     )
 )
 
@@ -611,10 +631,12 @@
         (set! (-> *mood-control* overide cloud) 1.0)
         (set! dark-mode #t)
         (set! challenge-win? #t)
+        (set! in-challenge? #t)
         (reset-actors 'debug)
         (set! challenge-mission 5)
         (set! camera-unlocked #t)
         (set! challenge-string "Survive.")
+        (set! in-challenge? #t)
     )
 
 )
@@ -658,11 +680,13 @@
         (set! di-s3 "")
         (set! di-s4 "")
         (set! waite-machine #t)
+        (set! in-challenge? #t)
         (set! in-dialogue? #f)
         (set! challenge-mission 6)
         (set! challenge-win? #t)
         (set! camera-unlocked #t)
         (set! challenge-string "Do not collect a single pickup")
+        (set! in-challenge? #t)
     )
 
 )

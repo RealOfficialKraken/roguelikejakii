@@ -1,49 +1,20 @@
 ;;-*-Lisp-*-
 (in-package goal)
 
-;; name: gun-yellow-shot.gc
-;; name in dgo: gun-yellow-shot
+;; name: c-gun-yellow-shot.gc
+;; name in dgo: c-gun-yellow-shot
 ;; dgos: ENGINE, GAME
 
 ;; DECOMP BEGINS
 
-(defbehavior target-gun-fire-yellow target ()
-  (let ((s5-0 (-> self gun))
-        (gp-0 (new 'stack-no-clear 'projectile-init-by-other-params))
-        )
-    (set! (-> gp-0 ent) (-> self entity))
-    (set! (-> gp-0 charge) 1.0)
-    (set! (-> gp-0 options) (projectile-options account-for-target-velocity deal-damage proj-options-8000))
-    (set! (-> gp-0 pos quad) (-> s5-0 fire-point quad))
-    (set! (-> gp-0 notify-handle) (the-as handle #f))
-    (set! (-> gp-0 owner-handle) (the-as handle #f))
-    (set! (-> gp-0 ignore-handle) (process->handle (the-as process (send-event self 'get-vehicle))))
-    (when (= p-double-shot #t)
-        (set! dshotwait-y #t)
-      )
-    (let* ((v1-9 *game-info*)
-           (a0-9 (+ (-> v1-9 attack-id) 1))
-           )
-      (set! (-> v1-9 attack-id) a0-9)
-      (set! (-> gp-0 attack-id) a0-9)
-      )
-    (set! (-> gp-0 timeout) (seconds 4))
-    (vector-float*! (-> gp-0 vel) (-> s5-0 fire-dir-out) 819200.0)
-    (when (and (rand-vu-percent? (/ luck 4))(= p-sage-dark #t))
-          (someone-fire-dark *target* (-> *target* gun fire-point) (-> *target* gun fire-dir-out))
-        )
-        (when (= powered? #t)
-          (set! power-shot-y #t)
-          (set! power-shoti-y 0)
-        )
-        (when (= challenge-mission 3)
-          (challenge-mission-fail)
-        )
-      (spawn-projectile gun-yellow-shot gp-0 (ppointer->process (-> s5-0 gun)) *default-dead-pool*)
-    )
+(deftype c-gun-yellow-shot (projectile)
+  ((hit-actor?  symbol)
+   (tail-pos    vector  :inline)
+   (hit-pos     vector  :inline)
+   )
   )
 
-(defun someone-fire-yellow ((arg0 process-drawable) (arg1 vector) (arg2 vector))
+(defun someone-fire-c-yellow ((arg0 process-drawable) (arg1 vector) (arg2 vector))
   (let ((gp-0 (new 'stack-no-clear 'projectile-init-by-other-params)))
     (set! (-> gp-0 ent) (-> arg0 entity))
     (set! (-> gp-0 charge) 1.0)
@@ -60,26 +31,13 @@
       )
     (set! (-> gp-0 timeout) (seconds 4))
     (vector-normalize-copy! (-> gp-0 vel) arg2 819200.0)
-    (spawn-projectile gun-yellow-shot gp-0 (ppointer->process (-> (-> *target* gun) gun)) *default-dead-pool*)
+    (spawn-projectile c-gun-yellow-shot gp-0 arg0 *default-dead-pool*)
     )
   )
 
-(deftype gun-yellow-shot (projectile)
-  ((hit-actor?  symbol)
-   (tail-pos    vector  :inline)
-   (hit-pos     vector  :inline)
-   )
-  )
 
 
-(defmethod draw-laser-sight ((this gun-yellow-shot))
-  "TODO - confirm If applicable, draw the laser sight particles"
-  (draw-beam (-> *part-id-table* 227) (-> this tail-pos) (-> this starting-dir) #f #t)
-  0
-  (none)
-  )
-
-(defmethod spawn-impact-particles ((this gun-yellow-shot))
+(defmethod spawn-impact-particles ((this c-gun-yellow-shot))
   "Spawns associated particles with the projectile if applicable"
   (rlet ((acc :class vf)
          (vf0 :class vf)
@@ -145,7 +103,7 @@
     )
   )
 
-(defmethod deal-damage! ((this gun-yellow-shot) (arg0 process) (arg1 event-message-block))
+(defmethod deal-damage! ((this c-gun-yellow-shot) (arg0 process) (arg1 event-message-block))
   "Constructs an [[attack-info]] according to the projectile's `options`"
   (let ((t9-0 (method-of-type projectile deal-damage!)))
     (when (t9-0 this arg0 arg1)
@@ -155,7 +113,7 @@
     )
   )
 
-(defmethod spawn-shell-particles ((this gun-yellow-shot))
+(defmethod spawn-shell-particles ((this c-gun-yellow-shot))
   "TODO - confirm"
   (cond
     ((-> this hit-actor?)
@@ -238,7 +196,7 @@
   )
 
 ;; WARN: Return type mismatch sound-id vs none.
-(defmethod play-impact-sound ((this gun-yellow-shot) (arg0 projectile-options))
+(defmethod play-impact-sound ((this c-gun-yellow-shot) (arg0 projectile-options))
   (let ((v1-0 arg0))
     (cond
       ((zero? v1-0)
@@ -258,7 +216,7 @@
   (none)
   )
 
-(defmethod made-impact? ((this gun-yellow-shot))
+(defmethod made-impact? ((this c-gun-yellow-shot))
   "TODO - queries the collision cache, return true/false"
   (let ((v1-0 (-> this root))
         (t1-0 (new 'stack-no-clear 'collide-query))
@@ -280,7 +238,7 @@
     )
   )
 
-(defun gun-yellow-shot-move ((arg0 gun-yellow-shot))
+(defun c-gun-yellow-shot-move ((arg0 c-gun-yellow-shot))
   (projectile-move-fill-line-sphere arg0)
   (let ((s5-0 (-> arg0 root)))
     (let ((s4-0 (new 'stack-no-clear 'vector)))
@@ -313,7 +271,7 @@
   (none)
   )
 
-(defmethod init-proj-collision! ((this gun-yellow-shot))
+(defmethod init-proj-collision! ((this c-gun-yellow-shot))
   "Init the [[projectile]]'s [[collide-shape]]"
   (let ((s5-0 (new 'process 'collide-shape-moving this (collide-list-enum hit-by-player))))
     (set! (-> s5-0 dynam) (copy *standard-dynamics* 'process))
@@ -328,7 +286,7 @@
       (set! (-> s5-0 total-prims) (the-as uint 3))
       (set! (-> s4-0 prim-core collide-as) (collide-spec projectile))
       (set! (-> s4-0 prim-core collide-with)
-            (collide-spec backgnd bot crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
+            (collide-spec backgnd bot crate civilian obstacle vehicle-sphere hit-by-others-list player-list pusher)
             )
       (set! (-> s4-0 prim-core action) (collide-action solid))
       (set-vector! (-> s4-0 local-sphere) 0.0 0.0 0.0 4096.0)
@@ -337,7 +295,7 @@
     (let ((v1-13 (new 'process 'collide-shape-prim-sphere s5-0 (the-as uint 0))))
       (set! (-> v1-13 prim-core collide-as) (collide-spec projectile))
       (set! (-> v1-13 prim-core collide-with)
-            (collide-spec backgnd bot crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
+            (collide-spec backgnd bot crate civilian obstacle vehicle-sphere hit-by-others-list player-list pusher)
             )
       (set! (-> v1-13 prim-core action) (collide-action solid))
       (set-vector! (-> v1-13 local-sphere) 0.0 0.0 0.0 819.2)
@@ -345,7 +303,7 @@
     (let ((v1-15 (new 'process 'collide-shape-prim-sphere s5-0 (the-as uint 0))))
       (set! (-> v1-15 prim-core collide-as) (collide-spec projectile))
       (set! (-> v1-15 prim-core collide-with)
-            (collide-spec bot crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
+            (collide-spec bot crate civilian obstacle vehicle-sphere hit-by-others-list player-list pusher)
             )
       (set-vector! (-> v1-15 local-sphere) 0.0 0.0 0.0 4096.0)
       )
@@ -365,14 +323,14 @@
   (none)
   )
 
-(defmethod init-proj-settings! ((this gun-yellow-shot))
+(defmethod init-proj-settings! ((this c-gun-yellow-shot))
   "Init relevant settings for the [[projectile]] such as gravity, speed, timeout, etc"
   (set! (-> this hit-actor?) #f)
   (set! (-> this tail-pos quad) (-> this root trans quad))
   (cpad-set-buzz! (-> *cpad-list* cpads 0) 1 204 (seconds 0.1))
   (set! (-> this attack-mode) 'eco-yellow)
   (set! (-> this max-speed) 819200.0)
-  (set! (-> this move) gun-yellow-shot-move)
+  (set! (-> this move) c-gun-yellow-shot-move)
   (set! (-> this timeout) (seconds 0.5))
   (set! (-> this sound-id) (new-sound-id))
   (set! (-> this damage) (if (logtest? (game-feature gun-upgrade-damage) (-> *game-info* features))
