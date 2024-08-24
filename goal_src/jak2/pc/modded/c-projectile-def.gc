@@ -994,7 +994,7 @@
           (set! (-> a1-9 pos quad) (-> arg1 quad))
           (set! (-> a1-9 notify-handle) (the-as handle #f))
           (set! (-> a1-9 owner-handle) (the-as handle #f))
-          (set! (-> a1-9 ignore-handle) (process->handle (the-as process (send-event *target* 'get-vehicle))))
+          (set! (-> a1-9 ignore-handle) (process->handle arg0))
           (let* ((v1-24 *game-info*)
                  (a0-23 (+ (-> v1-24 attack-id) 1))
                  )

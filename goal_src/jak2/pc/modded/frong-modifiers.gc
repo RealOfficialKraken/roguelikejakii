@@ -595,7 +595,7 @@ frong-display9 "Infinite Ammo"
 )
 (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_GREEN>Frong's Modifiers~%<COLOR_ORANGE>Collected Modifiers: <COLOR_YELLOW>~d/8~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%<COLOR_GREEN>find more frong to collect more modje~%~%~%<COLOR_WHITE>R2: <COLOR_YELLOW>Exit"
+    (format matt-str "<COLOR_GREEN>Frong's Modifiers~%<COLOR_ORANGE>Collected Modifiers: <COLOR_YELLOW>~d/8~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%<COLOR_GREEN>find more frong to collect more modje~%look in tight corners, and dark places. frong no~%want to be seen.~%~%<COLOR_WHITE>R2: <COLOR_YELLOW>Exit"
     (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000)
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
@@ -615,7 +615,7 @@ frong-display9 "Infinite Ammo"
 )
 (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_GREEN>Frong's Modifiers~%<COLOR_ORANGE>Collected Modifiers: <COLOR_YELLOW>~d/8~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%<COLOR_GREEN>pres r1 to select all at once <COLOR_RED>(no survive mode mode)~%~%~%<COLOR_WHITE>R2: <COLOR_YELLOW>Exit"
+    (format matt-str "<COLOR_GREEN>Frong's Modifiers~%<COLOR_ORANGE>Collected Modifiers: <COLOR_YELLOW>~d/8~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%~%<COLOR_GREEN>thank u for getting my brothers. frong will rember. big friendje~%~%~%<COLOR_WHITE>R2: <COLOR_YELLOW>Exit"
     (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000)
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)

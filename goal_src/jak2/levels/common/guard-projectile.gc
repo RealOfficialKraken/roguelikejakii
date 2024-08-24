@@ -697,7 +697,7 @@
     (-> this root)
     (collide-spec backgnd crate civilian enemy obstacle vehicle-sphere hit-by-others-list player-list pusher)
     )
-  (set-collide-as! (-> this root) (collide-spec enemy))
+  ;(set-collide-as! (-> this root) (collide-spec enemy))
   (set! (-> this root pat-ignore-mask)
         (new 'static 'pat-surface :noentity #x1 :nojak #x1 :probe #x1 :noproj #x1 :noendlessfall #x1)
         )

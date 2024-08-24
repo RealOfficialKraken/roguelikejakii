@@ -93,7 +93,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 
 
 
-(define in-debug? #t) ;change this before release
+(define in-debug? #f) ;change this before release
 (define metalkor-waitkill #f)
 (define m-killi 0)
 (define fog-comein #f)
@@ -338,6 +338,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (logclear! (-> *game-info* features) (game-feature gun-upgrade-ammo gun-upgrade-damage gun-upgrade-speed))
   (set! board2-dropped? #f)
   (set! pleasewait #f)
+  (set! challenge-mission 0)
   (when (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 1)
     (set! frong-spawning? #t)
   )

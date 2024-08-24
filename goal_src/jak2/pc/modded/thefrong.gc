@@ -3,15 +3,79 @@
 
 ;; name: themachine.gc
 
-(define frong-current-pos (new 'static 'vector :x (meters 0.0) :y (meters 0.0) :z (meters 0.0) :w 1.0))
+(define 
+    frong-current-pos 
+        (new 'static 'vector 
+            :x (meters 0.0) 
+            :y (meters 0.0) 
+            :z (meters 0.0) 
+            :w 1.0
+        )
+    )
 
-(define port-frong-spawn-pos (new 'static 'vector :x (meters -62.8353) :y (meters 8.9) :z (meters 1323.0412) :w 1.0))
-(define sewer-frong-spawn-pos (new 'static 'vector :x (meters 1352.5213) :y (meters -42.85) :z (meters 483.4087) :w 1.0))
-(define strip-frong-spawn-pos (new 'static 'vector :x (meters 2373.8669) :y (meters 69.8985) :z (meters -35.3681) :w 1.0))
-(define mountain-frong-spawn-pos (new 'static 'vector :x (meters -741.1651) :y (meters 80.9000) :z (meters 13.4026) :w 1.0))
-(define ruins-machine-spawn-pos (new 'static 'vector :x (meters 907.4705) :y (meters 0.1) :z (meters -400.1474) :w 1.0))
-(define atoll-machine-spawn-pos (new 'static 'vector :x (meters 579.5821) :y (meters 0.6) :z (meters -851.6854) :w 1.0))
-(define forest-machine-spawn-pos (new 'static 'vector :x (meters -598.8101) :y (meters 30.8) :z (meters 579.3311) :w 1.0))
+(define 
+    port-frong-spawn-pos 
+        (new 'static 'vector 
+            :x (meters -62.8353) 
+            :y (meters 8.9) 
+            :z (meters 1323.0412) 
+            :w 1.0
+        )
+    )
+(define 
+    sewer-frong-spawn-pos 
+        (new 'static 'vector 
+            :x (meters 1352.5213) 
+            :y (meters -42.85) 
+            :z (meters 483.4087) 
+            :w 1.0
+        )
+    )
+(define 
+    strip-frong-spawn-pos 
+        (new 'static 'vector 
+            :x (meters 2373.8669) 
+            :y (meters 69.8985) 
+            :z (meters -35.3681) 
+            :w 1.0
+        )
+    )
+(define 
+    mountain-frong-spawn-pos 
+        (new 'static 'vector 
+            :x (meters -741.1651) 
+            :y (meters 80.9000) 
+            :z (meters 13.4026) 
+            :w 1.0
+        )
+    )
+(define 
+    ruins-frong-spawn-pos 
+        (new 'static 'vector 
+            :x (meters 907.4705) 
+            :y (meters 0.1) 
+            :z (meters -400.1474) 
+            :w 1.0
+        )
+    )
+(define ;done
+    atoll-frong-spawn-pos 
+        (new 'static 'vector 
+            :x (meters 433.1818) 
+            :y (meters 15.79) 
+            :z (meters -1390.2536) 
+            :w 1.0
+        )
+    )
+(define 
+    forest-frong-spawn-pos 
+        (new 'static 'vector 
+            :x (meters -598.8101) 
+            :y (meters 30.8) 
+            :z (meters 579.3311) 
+            :w 1.0
+        )
+    )
 
 (define frong-prompt? #f)
 (define in-frong? #f)

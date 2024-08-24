@@ -693,7 +693,6 @@
       (spawn-projectile guard-shot s4-0 this *default-dead-pool*)
     )
     (when (= mode-randomshot? #t)
-    (print "|||||||||||||||||PROJECTILE fort-turret||||||||||||||||||")
       (let ((rngshot (rand-vu-int-range 1 6)))
         (when (= rngshot 1)
           (someone-fire-c-guard-grenade this (-> s4-0 pos) (-> s4-0 vel))

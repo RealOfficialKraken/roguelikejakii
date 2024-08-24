@@ -827,7 +827,7 @@
     (set! (-> gp-0 vel quad) (-> arg2 quad))
     (set! (-> gp-0 notify-handle) (the-as handle #f))
     (set! (-> gp-0 owner-handle) (the-as handle #f))
-    (set! (-> gp-0 ignore-handle) (process->handle (the-as process (send-event *target* 'get-vehicle))))
+    (set! (-> gp-0 ignore-handle) (process->handle arg0))
     (let* ((v1-8 *game-info*)
            (a0-11 (+ (-> v1-8 attack-id) 1))
            )

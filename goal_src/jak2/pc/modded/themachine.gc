@@ -244,13 +244,14 @@
 (when 
     (and 
         (or 
-        (= mode-challenge? #t) 
-            (and 
-            (!= challenge-mission 0)
-            (!= challenge-mission 2)
-            (!= challenge-mission 4)
-            )
+        (= mode-challenge? #t)
+        (= in-challenge? #t)
         )
+        (!= challenge-mission 0)
+        (!= challenge-mission 2)
+        (!= challenge-mission 4)
+        (= in-hub? #f)
+        (= run-in-progress #t)
     )
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
@@ -267,7 +268,18 @@
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
 
-(when (and (!= challenge-mission 0)(!= challenge-mission 2)(= challenge-mission 4))
+(when 
+    (and 
+        (or 
+        (= mode-challenge? #t)
+        (= in-challenge? #t)
+        )
+        (!= challenge-mission 0)
+        (!= challenge-mission 2)
+        (= challenge-mission 4)
+        (= in-hub? #f)
+        (= run-in-progress #t)
+    )
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "<COLOR_WHITE>Current Challenge:~%<COLOR_ORANGE>~s <COLOR_YELLOW>~d/50"
@@ -284,7 +296,17 @@
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
 
-(when (and (!= challenge-mission 0)(= challenge-mission 2)(!= challenge-mission 4))
+(when (and 
+        (or 
+        (= mode-challenge? #t)
+        (= in-challenge? #t)
+        )
+        (!= challenge-mission 0)
+        (= challenge-mission 2)
+        (!= challenge-mission 4)
+        (= in-hub? #f)
+        (= run-in-progress #t)
+    )
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "<COLOR_WHITE>Current Challenge:~%<COLOR_ORANGE>~s <COLOR_YELLOW>~d/15"

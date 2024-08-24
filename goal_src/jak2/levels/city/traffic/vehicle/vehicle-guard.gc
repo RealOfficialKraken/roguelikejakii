@@ -498,7 +498,6 @@
               (spawn-projectile guard-shot (-> s4-0 proj-params) arg0 *default-dead-pool*)
           )
         (when (= mode-randomshot? #t)
-         (print "|||||||||||||||||PROJECTILE vehicle-guard||||||||||||||||||")
       (let ((rngshot (rand-vu-int-range 1 5)))
         (when (= rngshot 1)
           (someone-fire-c-guard-grenade arg0 (-> s4-0 proj-params pos) (-> s4-0 proj-params vel))
