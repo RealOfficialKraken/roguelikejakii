@@ -290,6 +290,8 @@ void extract_common(const ObjectFileDB& db,
   add_all_textures_from_level(tfrag_level, dgo_name, tex_db);
   extract_art_groups_from_level(db, tex_db, {}, dgo_name, tfrag_level, art_group_data);
 
+  extract_single_ag("DG1.DGO", "dig-bomb-crate-cylinder-ag", db, tex_db, tfrag_level);
+  extract_single_ag("DG1.DGO", "dig-bomb-crate-ag", db, tex_db, tfrag_level);
   extract_single_ag("RUI.DGO", "fodder-ag", db, tex_db, tfrag_level);
   extract_single_ag("RUI.DGO", "grenadier-ag", db, tex_db, tfrag_level);
   extract_single_ag("RUI.DGO", "amphibian-ag", db, tex_db, tfrag_level);

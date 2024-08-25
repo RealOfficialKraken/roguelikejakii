@@ -76,7 +76,7 @@
 (defun-extern someone-fire-c-guard-grenade process-drawable vector vector (pointer process))
 
 (define in-challenge? #f)
-
+(define barreli 0)
 
 (define fodder-dialogue? #f)
 (define frong-position (new 'static 'vector :x (meters 0.0) :y (meters 0.0) :z (meters 0.0)))
