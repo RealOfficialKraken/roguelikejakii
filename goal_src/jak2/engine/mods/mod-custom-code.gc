@@ -826,7 +826,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 )
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_GREEN>COMPLETED"
+    (format matt-str "<COLOR_CYAN>Red Shot is always x2 bigger"
     starter-display
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
@@ -849,7 +849,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 )
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>>ACTIVE MODIFIER: <COLOR_ORANGE>~S"
+    (format matt-str "<COLOR_WHITE>ACTIVE MODIFIER: <COLOR_ORANGE>~S"
     frong-activemod
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
@@ -857,7 +857,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
       ;; reset bucket settings prior to drawing - font won't do self for us, and
       ;; draw-raw-image can sometimes mess them up. (intro sequence)
       (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 510 45 0.0 (font-color default) (font-flags right shadow kerning large))))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 510 405 0.0 (font-color default) (font-flags right shadow kerning large))))
         (set! (-> font-ctx scale) 0.325)
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
@@ -874,7 +874,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 )
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_GREEN>COMPLETED"
+    (format matt-str "<COLOR_CYAN>Base Rate of Fire increased x2"
     starter-display
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
@@ -899,7 +899,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 )
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_GREEN>COMPLETED"
+    (format matt-str "<COLOR_CYAN>Shots from jaks gun has~%33.33 percent chance~%to refill a vulcan ammo"
     starter-display
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
@@ -924,7 +924,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 )
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_GREEN>COMPLETED"
+    (format matt-str "<COLOR_CYAN>Dark Ammo gets refilled over time"
     starter-display
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
