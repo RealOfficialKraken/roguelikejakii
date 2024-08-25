@@ -65,6 +65,17 @@
 (define unlock-barrels? #f)
 (define unlock-rngmods? #f)
 
+;music
+(define menu-music #f)
+(define mm-sec 0)
+(when *debug-segment*
+  (define mm-file1 "goal_src/jak2/pc/snd/file1.wav")
+)
+
+(when (not *debug-segment*)
+  (define mm-file1 "data/goal_src/jak2/pc/snd/file1.wav")
+)
+
 (define frong-rndmod "")
 (define frong-recievedmod "")
 (define frong-hint "")
