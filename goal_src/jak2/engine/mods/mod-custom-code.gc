@@ -3423,6 +3423,16 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
     (when (= mode-lighteco? #f)
       (set! power-level "IllllllllllI")
     )
+    (set! (-> *part-id-table* 220 init-specs 5 initial-valuef) 255.0);dark
+    (set! (-> *part-id-table* 220 init-specs 8 initial-valuef) 128.0);dark
+    (set! (-> *part-id-table* 216 init-specs 6 initial-valuef) 255.0);dark
+    (set! (-> *part-id-table* 188 init-specs 8 initial-valuef) 255.0);red
+    (set! (-> *part-id-table* 189 init-specs 8 initial-valuef) 255.0);red
+    (set! (-> *part-id-table* 189 init-specs 9 initial-valuef) 255.0);red
+    (set! (-> *part-id-table* 224 init-specs 8 initial-valuef) 255.0);yellow
+    (set! (-> *part-id-table* 224 init-specs 9 initial-valuef) 15.0);yellow
+    (set! (-> *part-id-table* 230 init-specs 8 initial-valuef) 255.0);yellow
+    (set! (-> *part-id-table* 211 init-specs 6 initial-valuef) 255.0);blue
   )
 
 
@@ -3457,8 +3467,13 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
   (when (= power-dur 599)
     (set! power-level "I          I")
   )
-  (when (= power-dur 600)
+  (when (and (= power-dur 600)(= mode-lighteco? #t))
     (set! power-dur 0)
+  )
+  (when (and (= power-dur 600)(= mode-lighteco? #f))
+    (set! power-dur 0)
+    (set! powered? #f)
+    (reset-gun-part)
   )
   )
 
@@ -3493,13 +3508,17 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
   (when (= power-dur 1620)
     (set! power-level "I          I")
   )
+  (when (and (= power-dur 1621)(= mode-lighteco? #t))
+    (set! power-dur 0)
+    (reset-gun-part)
   )
-
-  (when (and (= mode-lighteco? #f)(= powered? #t))
+  (when (and (= mode-lighteco? #f)(= power-dur 1621))
     (set! powered? #f)
     (set! power-dur 0)
     (reset-gun-part)
   )
+  )
+
 
 (when (= mode-lighteco? #f)
 (clear matt-str)

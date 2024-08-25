@@ -14,20 +14,20 @@
     )
 
 (define 
-    port-frong-spawn-pos 
+    forest-frong-spawn-pos 
         (new 'static 'vector 
-            :x (meters -62.8353) 
-            :y (meters 8.9) 
-            :z (meters 1323.0412) 
+            :x (meters -726.8942) 
+            :y (meters 1.0) 
+            :z (meters 648.1550) 
             :w 1.0
         )
     )
-(define 
+(define ;done
     sewer-frong-spawn-pos 
         (new 'static 'vector 
-            :x (meters 1352.5213) 
-            :y (meters -42.85) 
-            :z (meters 483.4087) 
+            :x (meters 1433.8206) 
+            :y (meters -74.6075) 
+            :z (meters 429.4915) 
             :w 1.0
         )
     )
@@ -40,21 +40,21 @@
             :w 1.0
         )
     )
-(define 
+(define ;done
     mountain-frong-spawn-pos 
         (new 'static 'vector 
-            :x (meters -741.1651) 
-            :y (meters 80.9000) 
-            :z (meters 13.4026) 
+            :x (meters -494.3472) 
+            :y (meters 42.6749) 
+            :z (meters 122.1508) 
             :w 1.0
         )
     )
 (define 
-    ruins-frong-spawn-pos 
+    ruins-frong-spawn-pos ;done
         (new 'static 'vector 
-            :x (meters 907.4705) 
-            :y (meters 0.1) 
-            :z (meters -400.1474) 
+            :x (meters 913.2606) 
+            :y (meters 27.5770) 
+            :z (meters -579.5979) 
             :w 1.0
         )
     )
@@ -67,7 +67,7 @@
             :w 1.0
         )
     )
-(define 
+(define ;done
     forest-frong-spawn-pos 
         (new 'static 'vector 
             :x (meters -598.8101) 
@@ -83,39 +83,41 @@
 (defun-extern frong-exit (none))
 (define frongv-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
 (define frongv-cam-final frong-current-pos)
-(define *frong-tracker* (the (pointer rift-ring-ingame) #f))
-#|
+(define *frong-tracker* (the (pointer c-fodder) #f))
+(define frong-win #f)
+(define frongwi 0)
+
+
 (defun frong-update ()
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;MACHINE PARAMS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(when ;display interact prompt
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;FRONG PARAMS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when 
 (and
-;(= machine-spawning? #t) look in autosavecount for this one
-(ppointer->process *machine-tracker*)
+(= in-hub? #f)
+*target*
+(= (paused?) #f)
+(= (pause-allowed?) #t)
+(ppointer->process *frong-tracker*)
 (< (vector-vector-distance (target-pos 0) frong-current-pos) machine-interact-rad)
-(= popup-shop #f)
-(= avoidc-waitb #f)
-(= frong-prompt? #f)
 )
 (set! frong-prompt? #t)
 )
 
-(when ;dont display interact prompt
+(when 
 (and
-;(= machine-spawning? #t) look in autosavecount for this one
-(ppointer->process *machine-tracker*)
+(= in-hub? #f)
+*target*
+(= (paused?) #f)
+(= (pause-allowed?) #t)
+(ppointer->process *frong-tracker*)
 (> (vector-vector-distance (target-pos 0) frong-current-pos) machine-interact-rad)
-(= popup-shop #f)
-(= frong-prompt? #t)
 )
 (set! frong-prompt? #f)
 )
 
-(when (and (= frong-prompt? #t)(= avoidc-waitb #f)(= in-frong? #f)(= (paused?) #f)(= (pause-allowed?) #t) *target* (= in-hub? #f)) ;draw interact button
+(when (= frong-prompt? #t)
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_RED>R3<COLOR_WHITE>:<COLOR_ORANGE> Talk to <COLOR_GREEN>frong"
+    (format matt-str "<COLOR_WHITE>R3: <COLOR_GREEN>colect frong"
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
     (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
@@ -127,530 +129,308 @@
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
 
-
-(when (and (= frong-ingame? #f)(= frong-prompt? #t) (cpad-pressed? 0 r3) (= avoidc-waitb #f)(= in-frong? #f)(= in-hub? #f)) ;run camera and jak position-settings
-    (frong-run)
-)
-
-(when (and (= waite-machine #t)) ;wait for camera then run machine
-    (+! waite-machinei 1)
-    (when (= waite-machinei 7)
-        (frong-exit)
-        (set! waite-machine #f)
-        (set! waite-machinei 0)
+(when (= frong-win #t)
+    (+! frongwi 1)
+    (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_GREEN>frong brother and i are together again~%u unlocked ~%<COLOR_CYAN>~s"
+    frong-recievedmod
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 60 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    (when (= frongwi 600)
+        (set! frongwi 0)
+        (set! frong-win #f)
     )
 )
 
-(when (and (= wait-machine #t)) ;wait for camera then run machine
-(+! wait-machinei 1)
-(when (= wait-machinei 50)
-    (-! (-> *game-info* fuel) 15.0)
-    (set-setting-by-param *setting-control* 'mode-name 'cam-really-fixed 0 0)
-    (set! wait-machinei 0)
-    (set! wait-machine #f)
-    (set! in-frong? #t)
-    ;(set! in-dialogue? #t)
-    ;(set! log-id (rand-vu-int-range 10 15))
-    (set! log-sec 0)
-    (set! machine-locked? #t)
-    (let ((rnd (rand-vu-int-range 1 6)))
-        (when (= rnd 1)
-            (set! di-s "Welcome to the Challenge Machine.")
-            (set! di-s2 "Here's whats on the agenda for") 
-            (set! di-s3 "today's challenge.")
-            (set! di-s4 "")
-        )
-        (when (= rnd 2)
-            (set! di-s "Greetings from the Challenge Machine!")
-            (set! di-s2 "Are you ready for a risk,") 
-            (set! di-s3 "for a reward?")
-            (set! di-s4 "")
-        )
-        (when (= rnd 3)
-            (set! di-s "This is the Challenge Machine.")
-            (set! di-s2 "Here's the gist of this stage's challenge") 
-            (set! di-s3 "")
-            (set! di-s4 "")
-        )
-        (when (= rnd 4)
-            (set! di-s "WELCOME TO CHALLENGE-MACHINE")
-            (set! di-s2 "PRESENTING (string='TODAYS-CHALLENGE')") 
-            (set! di-s3 "")
-            (set! di-s4 "")
-        )
-        (when (= rnd 5)
-            (set! di-s "Challenge Machine Updated.")
-            (set! di-s2 "Your next challenge is...") 
-            (set! di-s3 "")
-            (set! di-s4 "")
-        )
-        (when (= rnd 6)
-            (set! di-s "The Challenge Machine")
-            (set! di-s2 "Complete a random challenge") 
-            (set! di-s3 "to gain a random reward.")
-            (set! di-s4 "")
-        )
-    )
-)
-)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;LOG SECTION;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when 
 (and
-    (= in-dialogue? #t)
-    (= log-id 501)
-    (cpad-pressed? 0 x)
+(= in-hub? #f)
+*target*
+(= (paused?) #f)
+(= (pause-allowed?) #t)
+(= frong-prompt? #t)
+(cpad-pressed? 0 r3)
 )
-    (+! log-sec 1)
-    (when (= log-sec 1)
-        (set! di-s "henlo person")
-        (set! di-s2 "") 
-        (set! di-s3 "")
-        (set! di-s4 "")
-    )
-    (when (= log-sec 2)
-        (set! di-s "")
-        (set! di-s2 "") 
-        (set! di-s3 "")
-        (set! di-s4 "")
-        (set! in-dialogue? #f)
-        (set! camera-unlocked #t)
-    )
+(set! frong-current-pos 
+(new 'static 'vector 
+            :x (meters 0.0) 
+            :y (meters 0.0) 
+            :z (meters 0.0) 
+            :w 1.0
+        )
 )
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;SPAWN LOCATIONS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;CTYPORT;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(when (= (-> (level-get-target-inside *level*) name) 'ctyport)
-    (let (
-        (vec-spawn port-frong-spawn-pos)
-        (vec-offset (new-stack-vector0))
-        (which-area "ctyport")
-    )
-        (when 
-    (and
-        (= machine-spawning? #t)
-        (= machine-locked? #f)
-        (not (ppointer->process *machine-tracker*))
-        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
-    )
-        (process-spawn chip-whack-a-metal vec-spawn)
-        (set! frong-current-pos vec-spawn)
-        (set! frongv-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! frongv-cam-final (vector+! vec-offset frong-current-pos frongv-camera))
-        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
-        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
-        (let (
-            (frong-offset (new-stack-vector0))
-            )
-        (set! frong-position frong-current-pos)
-        (vector-copy! frong-position (vector+! frong-offset frong-current-pos frong-position2))
-        (when (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 2)
-            (set! frong-spawning? #t)
-        )
-        )
-    )
-
-    (when 
-    (and
-        (= machine-spawning? #t)
-        (ppointer->process *machine-tracker*)
-        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
-    )
-        (kill-by-name "chip-whack-a-metal" *default-pool*)
-        (kill-by-name "c-fodder" *default-pool*)
-        (set! *machine-tracker* #f)
-        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
-    )
-
-    (when 
-    (and
-        (ppointer->process *machine-tracker*)
-        (= machine-spawning? #f)
-    )
-        (kill-by-name "chip-whack-a-metal" *default-pool*)
-        (kill-by-name "c-fodder" *default-pool*)
-        (set! *machine-tracker* #f)
-        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
-    )
-    )
+(remove-setting-by-arg0 *setting-control* 'mode-name)
+(kill-by-name "c-fodder" *default-pool*)
+(+! (-> *game-info* auto-save-count) 10000000)
+(set! frong-prompt? #f)
+(set! frong-win #t)
+(sound-play "ammo-pickup")
 )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;SEWERS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(when (= (-> (level-get-target-inside *level*) name) 'sewer)
-    (let (
-        (vec-spawn sewer-frong-spawn-pos)
-        (vec-offset (new-stack-vector0))
-        (which-area "sewers")
+(when  ;start of when
+    (and 
+    (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 3)
+    (< (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 8)
     )
-        (when 
-    (and
-        (= machine-spawning? #t)
-        (not (ppointer->process *machine-tracker*))
-        (= machine-locked? #f)
-        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
-    )
-        (process-spawn chip-whack-a-metal vec-spawn)
-        (set! frong-current-pos vec-spawn)
-        (set! frongv-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! frongv-cam-final (vector+! vec-offset frong-current-pos frongv-camera))
-        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
-        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
-        (let (
-            (frong-offset (new-stack-vector0))
-            )
-        (set! frong-position frong-current-pos)
-        (vector-copy! frong-position (vector+! frong-offset frong-current-pos frong-position2))
-        (when (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 2)
-            (set! frong-spawning? #t)
-        )
-        )
-    )
-
-    (when 
-    (and
-        (= machine-spawning? #t)
-        (ppointer->process *machine-tracker*)
-        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
-    )
-        (kill-by-name "chip-whack-a-metal" *default-pool*)
-        (kill-by-name "c-fodder" *default-pool*)
-        (set! *machine-tracker* #f)
-        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
-    )
-
-    (when 
-    (and
-        (ppointer->process *machine-tracker*)
-        (= machine-spawning? #f)
-    )
-        (kill-by-name "chip-whack-a-metal" *default-pool*)
-        (kill-by-name "c-fodder" *default-pool*)
-        (set! *machine-tracker* #f)
-        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
-    )
-    )
-)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;STRIP;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(when (= (-> (level-get-target-inside *level*) name) 'strip)
-    (let (
-        (vec-spawn strip-frong-spawn-pos)
-        (vec-offset (new-stack-vector0))
-        (which-area "strip")
-    )
-        (when 
-    (and
-        (= machine-spawning? #t)
-        (not (ppointer->process *machine-tracker*))
-        (= machine-locked? #f)
-        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
-    )
-        (process-spawn chip-whack-a-metal vec-spawn)
-        (set! frong-current-pos vec-spawn)
-        (set! frongv-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! frongv-cam-final (vector+! vec-offset frong-current-pos frongv-camera))
-        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
-        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
-        (let (
-            (frong-offset (new-stack-vector0))
-            )
-        (set! frong-position frong-current-pos)
-        (vector-copy! frong-position (vector+! frong-offset frong-current-pos frong-position2))
-        (when (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 2)
-            (set! frong-spawning? #t)
-        )
-        )
-    )
-
-    (when 
-    (and
-        (= machine-spawning? #t)
-        (ppointer->process *machine-tracker*)
-        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
-    )
-        (kill-by-name "chip-whack-a-metal" *default-pool*)
-        (kill-by-name "c-fodder" *default-pool*)
-        (set! *machine-tracker* #f)
-        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
-    )
-
-    (when 
-    (and
-        (ppointer->process *machine-tracker*)
-        (= machine-spawning? #f)
-    )
-        (kill-by-name "chip-whack-a-metal" *default-pool*)
-        (kill-by-name "c-fodder" *default-pool*)
-        (set! *machine-tracker* #f)
-        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
-    )
-    )
-)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;MOUNTAIN;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(when (= (-> (level-get-target-inside *level*) name) 'mountain)
-    (let (
-        (vec-spawn mountain-frong-spawn-pos)
-        (vec-offset (new-stack-vector0))
-        (which-area "mountain")
-    )
-        (when 
-    (and
-        (= machine-spawning? #t)
-        (not (ppointer->process *machine-tracker*))
-        (= machine-locked? #f)
-        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
-    )
-        (process-spawn chip-whack-a-metal vec-spawn)
-        (set! frong-current-pos vec-spawn)
-        (set! frongv-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! frongv-cam-final (vector+! vec-offset frong-current-pos frongv-camera))
-        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
-        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
-        (let (
-            (frong-offset (new-stack-vector0))
-            )
-        (set! frong-position frong-current-pos)
-        (vector-copy! frong-position (vector+! frong-offset frong-current-pos frong-position2))
-        (when (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 2)
-            (set! frong-spawning? #t)
-        )
-        )
-    )
-
-    (when 
-    (and
-        (= machine-spawning? #t)
-        (ppointer->process *machine-tracker*)
-        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
-    )
-        (kill-by-name "chip-whack-a-metal" *default-pool*)
-        (kill-by-name "c-fodder" *default-pool*)
-        (set! *machine-tracker* #f)
-        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
-    )
-
-    (when 
-    (and
-        (ppointer->process *machine-tracker*)
-        (= machine-spawning? #f)
-    )
-        (kill-by-name "chip-whack-a-metal" *default-pool*)
-        (kill-by-name "c-fodder" *default-pool*)
-        (set! *machine-tracker* #f)
-        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
-    )
-    )
-)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;RUINS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(when (= (-> (level-get-target-inside *level*) name) 'ruins)
-    (let (
-        (vec-spawn ruins-machine-spawn-pos)
-        (vec-offset (new-stack-vector0))
-        (which-area "ruins")
-    )
-        (when 
-    (and
-        (= machine-spawning? #t)
-        (not (ppointer->process *machine-tracker*))
-        (= machine-locked? #f)
-        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
-    )
-        (process-spawn chip-whack-a-metal vec-spawn)
-        (set! frong-current-pos vec-spawn)
-        (set! frongv-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! frongv-cam-final (vector+! vec-offset frong-current-pos frongv-camera))
-        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
-        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
-        (let (
-            (frong-offset (new-stack-vector0))
-            )
-        (set! frong-position frong-current-pos)
-        (vector-copy! frong-position (vector+! frong-offset frong-current-pos frong-position2))
-        (when (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 2)
-            (set! frong-spawning? #t)
-        )
-        )
-    )
-
-    (when 
-    (and
-        (= machine-spawning? #t)
-        (ppointer->process *machine-tracker*)
-        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
-    )
-        (kill-by-name "chip-whack-a-metal" *default-pool*)
-        (kill-by-name "c-fodder" *default-pool*)
-        (set! *machine-tracker* #f)
-        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
-    )
-
-    (when 
-    (and
-        (ppointer->process *machine-tracker*)
-        (= machine-spawning? #f)
-    )
-        (kill-by-name "chip-whack-a-metal" *default-pool*)
-        (kill-by-name "c-fodder" *default-pool*)
-        (set! *machine-tracker* #f)
-        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
-    )
-    )
-)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;ATOLL;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;ATOLL SPAWN;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (= (-> (level-get-target-inside *level*) name) 'atoll)
-    (let (
-        (vec-spawn atoll-machine-spawn-pos)
-        (vec-offset (new-stack-vector0))
-        (which-area "atoll")
-    )
+    (let 
+        (
+        (vec-pos atoll-frong-spawn-pos)
+        )
         (when 
-    (and
-        (= machine-spawning? #t)
-        (not (ppointer->process *machine-tracker*))
-        (= machine-locked? #f)
-        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
-    )
-        (process-spawn chip-whack-a-metal vec-spawn)
-        (set! frong-current-pos vec-spawn)
-        (set! frongv-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! frongv-cam-final (vector+! vec-offset frong-current-pos frongv-camera))
-        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
-        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
-        (let (
-            (frong-offset (new-stack-vector0))
+            (and
+            (= in-hub? #f)
+            *target*
+            (= (paused?) #f)
+            (= (pause-allowed?) #t)
+            (not (ppointer->process *frong-tracker*))
+            (< (vector-vector-distance (target-pos 0) vec-pos) machine-spawn-rad)
+            (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 3)
             )
-        (set! frong-position frong-current-pos)
-        (vector-copy! frong-position (vector+! frong-offset frong-current-pos frong-position2))
-        (when (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 2)
-            (set! frong-spawning? #t)
-        )
-        )
-    )
+            (print "|||||||FRONG SPAWNED SOMEWHERE")
+            (set! frong-current-pos vec-pos)
+            ;(process-spawn c-fodder frong-current-pos)
+            (set! frong-recievedmod "All Weapons at Start")
+            (set! *frong-tracker* (process-spawn c-fodder frong-current-pos))
+            )
 
-    (when 
-    (and
-        (= machine-spawning? #t)
-        (ppointer->process *machine-tracker*)
-        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
-    )
-        (kill-by-name "chip-whack-a-metal" *default-pool*)
-        (kill-by-name "c-fodder" *default-pool*)
-        (set! *machine-tracker* #f)
-        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
-    )
-
-    (when 
-    (and
-        (ppointer->process *machine-tracker*)
-        (= machine-spawning? #f)
-    )
-        (kill-by-name "chip-whack-a-metal" *default-pool*)
-        (kill-by-name "c-fodder" *default-pool*)
-        (set! *machine-tracker* #f)
-        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
-    )
+        (when 
+            (and
+            *target*
+            (= (paused?) #f)
+            (= (pause-allowed?) #t)
+            (or 
+                (> (vector-vector-distance (target-pos 0) frong-current-pos) machine-spawn-rad)
+            )
+            (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 3)
+            (ppointer->process *frong-tracker*)
+            )
+                (print "|||||||FRONG DESPAWNED!")
+                (kill-by-name "c-fodder" *default-pool*)
+                (set! *frong-tracker* #f)
+                (set! frong-current-pos 
+                (new 'static 'vector 
+                :x (meters 0.0) 
+                :y (meters 0.0) 
+                :z (meters 0.0) 
+                :w 1.0
+                        )
+                )
+            )
     )
 )
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;SEWERS SPAWN;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (= (-> (level-get-target-inside *level*) name) 'sewer)
+    (let 
+        (
+        (vec-pos sewer-frong-spawn-pos)
+        )
+        (when 
+            (and
+            (= in-hub? #f)
+            *target*
+            (= (paused?) #f)
+            (= (pause-allowed?) #t)
+            (not (ppointer->process *frong-tracker*))
+            (< (vector-vector-distance (target-pos 0) vec-pos) machine-spawn-rad)
+            (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 4)
+            )
+            (print "|||||||FRONG SPAWNED SOMEWHERE")
+            (set! frong-current-pos vec-pos)
+            ;(process-spawn c-fodder frong-current-pos)
+            (set! frong-recievedmod "Always Apocalypse")
+            (set! *frong-tracker* (process-spawn c-fodder frong-current-pos))
+            )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;FOREST;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        (when 
+            (and
+            *target*
+            (= (paused?) #f)
+            (= (pause-allowed?) #t)
+            (or 
+                (> (vector-vector-distance (target-pos 0) frong-current-pos) machine-spawn-rad)
+            )
+            (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 4)
+            (ppointer->process *frong-tracker*)
+            )
+                (print "|||||||FRONG DESPAWNED!")
+                (kill-by-name "c-fodder" *default-pool*)
+                (set! *frong-tracker* #f)
+                (set! frong-current-pos 
+                (new 'static 'vector 
+                :x (meters 0.0) 
+                :y (meters 0.0) 
+                :z (meters 0.0) 
+                :w 1.0
+                        )
+                )
+            )
+    )
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;MOUNTAIN SPAWN;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (= (-> (level-get-target-inside *level*) name) 'mountain)
+    (let 
+        (
+        (vec-pos mountain-frong-spawn-pos)
+        )
+        (when 
+            (and
+            (= in-hub? #f)
+            *target*
+            (= (paused?) #f)
+            (= (pause-allowed?) #t)
+            (not (ppointer->process *frong-tracker*))
+            (< (vector-vector-distance (target-pos 0) vec-pos) machine-spawn-rad)
+            (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 5)
+            )
+            (print "|||||||FRONG SPAWNED SOMEWHERE")
+            (set! frong-current-pos vec-pos)
+            ;(process-spawn c-fodder frong-current-pos)
+            (set! frong-recievedmod "Everyone has Random Shot")
+            (set! *frong-tracker* (process-spawn c-fodder frong-current-pos))
+            )
+
+        (when 
+            (and
+            *target*
+            (= (paused?) #f)
+            (= (pause-allowed?) #t)
+            (or 
+                (> (vector-vector-distance (target-pos 0) frong-current-pos) machine-spawn-rad)
+            )
+            (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 5)
+            (ppointer->process *frong-tracker*)
+            )
+                (print "|||||||FRONG DESPAWNED!")
+                (kill-by-name "c-fodder" *default-pool*)
+                (set! *frong-tracker* #f)
+                (set! frong-current-pos 
+                (new 'static 'vector 
+                :x (meters 0.0) 
+                :y (meters 0.0) 
+                :z (meters 0.0) 
+                :w 1.0
+                        )
+                )
+            )
+    )
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;RUINS SPAWN;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (= (-> (level-get-target-inside *level*) name) 'ruins)
+    (let 
+        (
+        (vec-pos ruins-frong-spawn-pos)
+        )
+        (when 
+            (and
+            (= in-hub? #f)
+            *target*
+            (= (paused?) #f)
+            (= (pause-allowed?) #t)
+            (not (ppointer->process *frong-tracker*))
+            (< (vector-vector-distance (target-pos 0) vec-pos) machine-spawn-rad)
+            (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 6)
+            )
+            (print "|||||||FRONG SPAWNED SOMEWHERE")
+            (set! frong-current-pos vec-pos)
+            ;(process-spawn c-fodder frong-current-pos)
+            (set! frong-recievedmod "Always Raining Explosive Barrels")
+            (set! *frong-tracker* (process-spawn c-fodder frong-current-pos))
+            )
+
+        (when 
+            (and
+            *target*
+            (= (paused?) #f)
+            (= (pause-allowed?) #t)
+            (or 
+                (> (vector-vector-distance (target-pos 0) frong-current-pos) machine-spawn-rad)
+            )
+            (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 6)
+            (ppointer->process *frong-tracker*)
+            )
+                (print "|||||||FRONG DESPAWNED!")
+                (kill-by-name "c-fodder" *default-pool*)
+                (set! *frong-tracker* #f)
+                (set! frong-current-pos 
+                (new 'static 'vector 
+                :x (meters 0.0) 
+                :y (meters 0.0) 
+                :z (meters 0.0) 
+                :w 1.0
+                        )
+                )
+            )
+    )
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;FOREST SPAWN;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (= (-> (level-get-target-inside *level*) name) 'forest)
-    (let (
-        (vec-spawn forest-machine-spawn-pos)
-        (vec-offset (new-stack-vector0))
-        (which-area "forest")
-    )
+    (let 
+        (
+        (vec-pos forest-frong-spawn-pos)
+        )
         (when 
-    (and
-        (= machine-spawning? #t)
-        (not (ppointer->process *machine-tracker*))
-        (= machine-locked? #f)
-        (< (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
-    )
-        (process-spawn chip-whack-a-metal vec-spawn)
-        (set! frong-current-pos vec-spawn)
-        (set! frongv-camera (new 'static 'vector :x (meters 0) :y (meters 7) :z (meters 10)))
-        (vector-copy! frongv-cam-final (vector+! vec-offset frong-current-pos frongv-camera))
-        (set! *machine-tracker* (process-spawn chip-whack-a-metal vec-spawn))
-        (format #t "~%[!!!] spawned process chip-whack-a-metal in ~s~%" which-area)
-        (let (
-            (frong-offset (new-stack-vector0))
+            (and
+            (= in-hub? #f)
+            *target*
+            (= (paused?) #f)
+            (= (pause-allowed?) #t)
+            (not (ppointer->process *frong-tracker*))
+            (< (vector-vector-distance (target-pos 0) vec-pos) machine-spawn-rad)
+            (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 7)
             )
-        (set! frong-position frong-current-pos)
-        (vector-copy! frong-position (vector+! frong-offset frong-current-pos frong-position2))
-        (when (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 2)
-            (set! frong-spawning? #t)
-        )
-        )
-    )
+            (print "|||||||FRONG SPAWNED SOMEWHERE")
+            (set! frong-current-pos vec-pos)
+            ;(process-spawn c-fodder frong-current-pos)
+            (set! frong-recievedmod "Random Modifier Every Level~%<COLOR_ORANGE>u found them all! thank u!")
+            (set! *frong-tracker* (process-spawn c-fodder frong-current-pos))
+            )
 
-    (when 
-    (and
-        (= machine-spawning? #t)
-        (ppointer->process *machine-tracker*)
-        (> (vector-vector-distance (target-pos 0) vec-spawn) machine-spawn-rad)
-    )
-        (kill-by-name "chip-whack-a-metal" *default-pool*)
-        (kill-by-name "c-fodder" *default-pool*)
-        (set! *machine-tracker* #f)
-        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
-    )
-
-    (when 
-    (and
-        (ppointer->process *machine-tracker*)
-        (= machine-spawning? #f)
-    )
-        (kill-by-name "chip-whack-a-metal" *default-pool*)
-        (kill-by-name "c-fodder" *default-pool*)
-        (set! *machine-tracker* #f)
-        (format #t "~%[!!!] killed chip-whack-a-metal in ~s~%" which-area)
-    )
+        (when 
+            (and
+            *target*
+            (= (paused?) #f)
+            (= (pause-allowed?) #t)
+            (or 
+                (> (vector-vector-distance (target-pos 0) frong-current-pos) machine-spawn-rad)
+            )
+            (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 7)
+            (ppointer->process *frong-tracker*)
+            )
+                (print "|||||||FRONG DESPAWNED!")
+                (kill-by-name "c-fodder" *default-pool*)
+                (set! *frong-tracker* #f)
+                (set! frong-current-pos 
+                (new 'static 'vector 
+                :x (meters 0.0) 
+                :y (meters 0.0) 
+                :z (meters 0.0) 
+                :w 1.0
+                        )
+                )
+            )
     )
 )
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+);end of when
+
 (none)
 )
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
-
-(defun frong-run ()
-    (process-grab? *target* #f)
-    (set-setting-by-param *setting-control* 'mode-name 'cam-really-fixed 0 0)
-    (send-event *camera* 'teleport-to-vector-start-string frongv-cam-final)
-    (set! wait-machine #t)
-    (set! frong-prompt? #f)
-    (none)
-)
-
-(defun frong-exit ()
-    (remove-setting-by-arg0 *setting-control* 'mode-name)
-    (process-release? *target*)
-    (set! log-id 0)
-    (set! log-sec 0)
-    (set! in-dialogue? #f)
-    (set! in-frong? #f)
-    (none)
-)|#

@@ -408,6 +408,7 @@
       (when (>= (-> *game-info* karma) 5.0)
         (set! powered? #t)
         (set! power-dur 0)
+        (color-light-eco)
         (play-sound-file sound-eco-grab-white (the int (* (-> *setting-control* user-current sfx-volume) 100)))
       )
       (when (= challenge-mission 6)

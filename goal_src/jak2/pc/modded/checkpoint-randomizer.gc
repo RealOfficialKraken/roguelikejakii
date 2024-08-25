@@ -549,6 +549,7 @@
       (set! (-> *part-id-table* 189 init-specs 9 initial-valuef) 96.0)
       (set! (-> *part-id-table* 211 init-specs 6 initial-valuef) 0.0);blue
       (set! crit-part #f)
+      (print "(reset-gun-part)")
     (none)
     )
 

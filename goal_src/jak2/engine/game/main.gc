@@ -876,7 +876,7 @@
     (machine-update) ;;rogue-like-change
     (check-stat!)
     (frong-checker!)
-    ;(frong-update)
+    (frong-update)
     (when *debug-segment*
       (debug-texting)
     )

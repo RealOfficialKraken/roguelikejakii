@@ -66,6 +66,8 @@
 (define unlock-rngmods? #f)
 
 (define frong-rndmod "")
+(define frong-recievedmod "")
+(define frong-hint "")
 (define-extern challenge-string string)
 ;(define unlock-infiniteammo? #f)
 
