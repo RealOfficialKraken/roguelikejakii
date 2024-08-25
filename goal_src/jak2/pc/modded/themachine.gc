@@ -1412,7 +1412,38 @@
         )
 
         (when (= rnd 1)
-            (set! roll-randomitem #t)
+            (let 
+            (
+                (tier-select (rand-vu-int-range 1 2))
+                )
+                (when 
+                (and 
+                (rand-vu-percent? (/ luck 2))
+                (>= (-> *game-info* total-trys) 7)
+                )
+                (set! tier-select 3)
+                )
+                (when 
+                (and 
+                (rand-vu-percent? (/ luck 4))
+                (>= (-> *game-info* total-trys) 9)
+                )
+                (set! tier-select 4)
+                )
+                (when (= tier-select 1)
+                (set! board-tier 1)
+                )
+                (when (= tier-select 2)
+                (set! board-tier 2)
+                )
+                (when (= tier-select 3)
+                (set! board-tier 3)
+                )
+                (when (= tier-select 4)
+                (set! board-tier 4)
+                )
+                (set! roll-randomitem #t)
+            )
             (set! reward-string "a random item!")
         )
         (when (= rnd 2)
