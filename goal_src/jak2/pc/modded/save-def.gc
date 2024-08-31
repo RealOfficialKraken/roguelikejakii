@@ -845,7 +845,6 @@
         (when 
         (and
         (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 3)
-        (= in-frongmenu? #t)
         (not (string= frong-hint "look around for frankje, i last saw him in atoll"))
         )
             (set! frong-hint "look around for frankje, i last saw him in atoll")
@@ -854,7 +853,6 @@
         (when 
         (and
         (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 4)
-        (= in-frongmenu? #t)
         (not (string= frong-hint "my frend jakeje was last seen in the sewer"))
         )
             (set! frong-hint "my frend jakeje was last seen in the sewer")
@@ -863,7 +861,6 @@
         (when 
         (and
         (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 5)
-        (= in-frongmenu? #t)
         (not (string= frong-hint "go find joj, the ancient monk frongje, at the mountain"))
         )
             (set! frong-hint "go find joj, the ancient monk frongje, at the mountain")
@@ -872,7 +869,6 @@
         (when 
         (and
         (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 6)
-        (= in-frongmenu? #t)
         (not (string= frong-hint "my borther papysus, he is lost at the ruins"))
         )
             (set! frong-hint "my borther papysus, he is lost at the ruins")
@@ -881,7 +877,6 @@
         (when 
         (and
         (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 7)
-        (= in-frongmenu? #t)
         (not (string= frong-hint "wizard of ancient legend, bob, is in the forest"))
         )
             (set! frong-hint "wizard of ancient legend, bob, is in the forest")
@@ -890,7 +885,6 @@
         (when 
         (and
         (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 8)
-        (= in-frongmenu? #t)
         (not (string= frong-hint ""))
         )
             (set! frong-hint "")

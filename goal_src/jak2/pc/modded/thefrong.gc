@@ -133,7 +133,7 @@
     (+! frongwi 1)
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_GREEN>frong brother and i are together again~%u unlocked ~%<COLOR_CYAN>~s"
+    (format matt-str "<COLOR_GREEN>thank, friendje!~%u unlocked ~%<COLOR_CYAN>~s"
     frong-recievedmod
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
