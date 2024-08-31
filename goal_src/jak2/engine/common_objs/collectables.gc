@@ -2404,6 +2404,13 @@ This commonly includes things such as:
   (none)
   )
 
+  (defun spawn-eco-cell-atoll ()
+    (birth-pickup-at-point (new 'static 'vector :x (meters 665.46) :y (meters 46.25) :z (meters -932.50)  :w 1.0) (pickup-type eco-yellow) 1.0 #f *target* (the-as fact-info #f))
+    (birth-pickup-at-point (new 'static 'vector :x (meters 647.35) :y (meters 46.25) :z (meters -947.45)  :w 1.0) (pickup-type eco-blue) 1.0 #f *target* (the-as fact-info #f))
+    (birth-pickup-at-point (new 'static 'vector :x (meters 644.10) :y (meters 69.12) :z (meters -951.64)  :w 1.0) (pickup-type eco-red) 1.0 #f *target* (the-as fact-info #f))
+    (none)
+  )
+
 (defbehavior birth-pickup-at-point process ((arg0 vector) (arg1 pickup-type) (arg2 float) (arg3 symbol) (arg4 process-tree) (arg5 fact-info))
   (local-vars (sv-32 vector) (sv-36 float) (sv-40 (pointer process)) (sv-48 int) (sv-56 fact-info) (sv-64 int))
   (set! sv-32 (new-stack-vector0))

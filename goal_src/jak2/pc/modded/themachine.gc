@@ -645,7 +645,6 @@
         (set! waite-machine #t)
         (set! in-dialogue? #f)
         (play-sound-file sound-endofworld (the int (* (-> *setting-control* user-current sfx-volume) 100)))
-        (set! (-> *mood-control* overide-weather-flag) #t)
         (send-event (ppointer->process *time-of-day*) 'change 'ratio 240.0) 
         (set! (-> *time-of-day-context* overide-enable) #f)
         (set! (-> *mood-control* overide-weather-flag) #t)
