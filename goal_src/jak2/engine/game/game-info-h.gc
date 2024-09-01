@@ -69,7 +69,7 @@
 (define menu-music #f)
 (define mm-sec 0)
 (when *debug-segment*
-  (define mm-file1 "goal_src/jak2/pc/snd/file1.wav")
+  (define mm-file1 "goal_src/jak2/pc/snd/file17.wav")
 )
 
 (when (not *debug-segment*)
