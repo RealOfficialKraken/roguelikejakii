@@ -90,6 +90,7 @@
 
 (defun frong-update ()
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;FRONG PARAMS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+#|
 (when 
 (and
 (= in-hub? #f)
@@ -117,7 +118,7 @@
 (when (= frong-prompt? #t)
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>R3: <COLOR_GREEN>colect frong"
+    (format matt-str "<COLOR_GREEN>ey fren, "
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
     (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
@@ -127,27 +128,6 @@
       (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 0 245 0.0 (font-color default) (font-flags shadow kerning large))))
         (set! (-> font-ctx scale) 0.325)
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
-)
-
-(when (= frong-win #t)
-    (+! frongwi 1)
-    (clear matt-str)
-    (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_GREEN>thank, friendje!~%u unlocked ~%<COLOR_CYAN>~s"
-    frong-recievedmod
-    )
-    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
-    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
-      ;; reset bucket settings prior to drawing - font won't do self for us, and
-      ;; draw-raw-image can sometimes mess them up. (intro sequence)
-      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 60 0.0 (font-color default) (font-flags middle shadow kerning large))))
-        (set! (-> font-ctx scale) 0.325)
-        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
-    (when (= frongwi 600)
-        (set! frongwi 0)
-        (set! frong-win #f)
-    )
 )
 
 (when 
@@ -175,7 +155,28 @@
 (sound-play "ammo-pickup")
 )
 
+|#
 
+(when (= frong-win #t)
+    (+! frongwi 1)
+    (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_GREEN>thank, friendje!~%u unlocked ~%<COLOR_CYAN>~s"
+    frong-recievedmod
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 60 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    (when (= frongwi 600)
+        (set! frongwi 0)
+        (set! frong-win #f)
+    )
+)
 (when  ;start of when
     (and 
     (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 3)

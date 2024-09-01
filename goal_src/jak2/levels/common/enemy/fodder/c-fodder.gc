@@ -1,7 +1,7 @@
 ;;-*-Lisp-*-
 (in-package goal)
 
-;; name: fodder.gc
+;; name: c-fodder.gc
 ;; name in dgo: fodder
 ;; dgos: ATO, SEB, SWB, RUI
 
@@ -778,6 +778,18 @@
         )
       )
     )
+    (when 
+      (and
+      (>= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 3)
+      (ppointer->process *c-fodder-tracker*)
+      (= in-hub? #f)
+      )
+        (set! frong-win #t)
+        (+! (-> *game-info* auto-save-count) 10000000)
+        (sound-play "ammo-pickup")
+        (kill-by-name "c-fodder" *default-pool*)
+        (set! *c-fodder-tracker* #f)
+      )
   #t
   )
 
