@@ -1215,14 +1215,6 @@ This commonly includes things such as:
 Eco Shard spawned in a crate nearby!
 ")
     )
-    (when (rand-vu-percent? (/ luck 50))
-      (set! (-> this fact pickup-type) (pickup-type board))
-      (set! (-> this fact pickup-amount) 1.0)
-      (print "
-      
-Random Item spawned in a crate nearby!
-")
-    )
     (when ;drop weapon once per act (on chance)
     (and
   (= enemy-drop-weapon-once #f)

@@ -473,7 +473,7 @@
     (((pickup-type board))
       (sound-play "ammo-pickup")
       (set! roll-randomitem #t)
-        (when (and (= board-dropped? #t)(= enemy-drop-weapon-once #t))
+        (when (and (= board-dropped? #t)(= board1-collected? #f)(= enemy-drop-weapon-once #t))
           (set! board1-collected? #t)
         )
         (when (= enemy-drop-weapon-once #f)

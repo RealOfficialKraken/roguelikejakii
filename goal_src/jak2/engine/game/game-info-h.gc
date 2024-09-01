@@ -236,7 +236,7 @@
 (defun-extern weight-add (float))
 (define rapid-fire-blue #f)
 (define rapid-fire-int 0)
-
+;intro
 (define ohshit #f)
 (define ohshiti 0)
 (define waitdie-tutorial #f)
@@ -385,6 +385,7 @@
 (define board-get #f)
 (define board-i 0)
 (define board-type-display "")
+(define board-ina-crate #f)
 (define firstitem-dropped? #f)
 
 (define krew-completed-mission? #f)
