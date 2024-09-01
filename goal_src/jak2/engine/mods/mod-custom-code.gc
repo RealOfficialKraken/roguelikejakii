@@ -5802,7 +5802,7 @@ Here are the shop IDs
     (+! eppy-i 1)
     (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>Welcome to <COLOR_CYAN>Rogue-Like<COLOR_RED> Jak II~%<COLOR_RED>Flashing lights imminent, if you have Epilepsy,~%turn away and dont move until sound becomes completely silent"
+    (format matt-str "<COLOR_WHITE>Welcome to <COLOR_CYAN>Rogue-Like<COLOR_RED> Jak II~%<COLOR_RED>Flashing lights imminent, if you have Epilepsy,~%turn away and dont move until sound becomes completely silent~%~%<COLOR_GREEN>Thank you! :)"
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
     (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
