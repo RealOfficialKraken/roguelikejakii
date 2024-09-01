@@ -184,10 +184,10 @@
     :run-anim 7
     :taunt-anim -1
     :run-travel-speed (meters 7.5)
-    :run-acceleration (meters 1)
+    :run-acceleration (meters 0)
     :run-turning-acceleration (meters 100)
-    :walk-travel-speed (meters 4)
-    :walk-acceleration (meters 1)
+    :walk-travel-speed (meters 0)
+    :walk-acceleration (meters 0)
     :walk-turning-acceleration (meters 3)
     :maximum-rotation-rate (degrees 360)
     :notice-nav-radius (meters 1.5)
