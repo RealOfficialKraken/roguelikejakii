@@ -7,6 +7,9 @@
 
 ;; DECOMP BEGINS
 
+(define *c-fodder-tracker* (the (pointer c-fodder) #f))
+(define-extern frong-win symbol)
+
 (defskelgroup c-skel-fodder fodder fodder-lod0-jg -1
               ((fodder-lod0-mg (meters 20)) (fodder-lod1-mg (meters 999999)))
               :bounds (static-spherem 0 0 0 2)
@@ -964,7 +967,7 @@
   (focus-test? arg0 mech)
   )
 
-  (define *c-fodder-tracker* (the (pointer c-fodder) #f))
+
 
   (defbehavior c-fodder-init-by-other c-fodder ((vec vector))
     (init-enemy-collision! self)
