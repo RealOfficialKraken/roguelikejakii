@@ -73,7 +73,7 @@
 )
 
 (when (not *debug-segment*)
-  (define mm-file1 "data/goal_src/jak2/pc/snd/file1.wav")
+  (define mm-file1 "data/goal_src/jak2/pc/snd/file17.wav")
 )
 
 (define frong-rndmod "")
@@ -230,6 +230,8 @@
 (define w-cb 0)
 
 (define vin-shop-s "")
+(define epilepsy-warning #f)
+(define eppy-i 0)
 
 (define p-explode-shot #f)
 

@@ -544,6 +544,9 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 )
   (+! tutoriali 1)
   (set! intro?i 0)
+  (when (= tutoriali 1)
+    (set! epilepsy-warning #t)
+  )
   (when (= tutoriali 1600)
     (send-event *target* 'continue (get-continue-by-name *game-info* "ctyport-hiphog"))
     (set! ohshit #t)
@@ -5793,6 +5796,27 @@ Here are the shop IDs
 (when (pickup-collectable! (-> *target* fact) (pickup-type board) 1.0 (the-as handle #f))
   (+! (-> *game-info* total-deaths) 1)
 )|#
+
+(when 
+  (= epilepsy-warning #t)
+    (+! eppy-i 1)
+    (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_WHITE>Welcome to <COLOR_CYAN>Rogue-Like<COLOR_RED> Jak II~%<COLOR_RED>Flashing lights imminent, if you have Epilepsy,~%turn away and dont move until sound becomes completely silent"
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 255 0 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+    (when (= eppy-i 1200)
+      (set! eppy-i 0)
+      (set! epilepsy-warning #f)
+    )
+  )
 
 (when (and (= teleport-hiphog #t)(= (paused?) #f)(= teleport-back? #f)(= already-teleported? #f))
   (clear matt-str)
