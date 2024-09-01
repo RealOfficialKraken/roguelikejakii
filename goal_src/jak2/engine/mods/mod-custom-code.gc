@@ -432,7 +432,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 )
 
 ;plays menu music in consite
-(let ((mm-file1 "data/goal_src/jak2/pc/snd/file1.wav"))
+#|(let ((mm-file1 "data/goal_src/jak2/pc/snd/file1.wav"))
   (when (and (= menu-music #t)(= in-hub? #t))
     (+! mm-sec 1)
     (when (= mm-sec 1)
@@ -442,7 +442,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
       (set! mm-sec 0)
     )
   )
-)
+)|#
 
 (when (and (>= (-> *game-info* fuel) menu-value)(= vin-shop #t)(cpad-pressed? 0 r1))
   (-! (-> *game-info* fuel) menu-value)
