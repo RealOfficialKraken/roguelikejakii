@@ -76,6 +76,10 @@
   (define mm-file1 "file17.wav")
 )|#
 
+(define dm-frong-occur #f)
+(define dm-frongi 0)
+(define dm-string "")
+
 (define frong-rndmod "")
 (define frong-recievedmod "")
 (define frong-hint "")

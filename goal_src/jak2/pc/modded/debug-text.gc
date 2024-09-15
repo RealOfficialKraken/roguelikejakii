@@ -5,7 +5,29 @@
 
 (declare-file (debug))
 
+
 (defun debug-texting ()
+(when (= dm-frong-occur #t)
+  (+! dm-frongi 1)
+  (clear matt-str)
+      (clear *pc-encoded-matt-str*)
+      (format matt-str "<COLOR_RED>--DEBUG MSG--~%<COLOR_YELLOW>~S"
+      dm-string
+      )
+      (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+      (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+        ;; reset bucket settings prior to drawing - font won't do self for us, and
+        ;; draw-raw-image can sometimes mess them up. (intro sequence)
+        (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 175 0.0 (font-color default) (font-flags middle shadow kerning large))))
+          (set! (-> font-ctx scale) 0.325)
+          (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+  (when (= dm-frongi 600)
+    (set! dm-frong-occur #f)
+    (set! dm-frongi 0)
+  )
+)
+
 (when 
 (and 
 (= in-debug? #t) 

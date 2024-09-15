@@ -7193,7 +7193,6 @@ Here are the shop IDs
 
 (when 
 (and 
-(not *scene-player*)
 (= avoidc-waitb #f)
 (= run-in-progress #t)
 (= (-> *game-info* karma) 3.0)
@@ -7210,7 +7209,6 @@ Here are the shop IDs
 
 (when 
 (and 
-(not *scene-player*)
 (= avoidc-waitb #f)
 (= run-in-progress #t)
 (= (-> *game-info* karma) 3.0)
@@ -7226,7 +7224,6 @@ Here are the shop IDs
 
 (when 
 (and 
-(not *scene-player*)
 (= avoidc-waitb #f)
 (= run-in-progress #t)
 (>= (-> *game-info* karma) 4.0)
@@ -7240,7 +7237,6 @@ Here are the shop IDs
 
 (when 
 (and 
-(not *scene-player*)
 (= avoidc-waitb #f)
 (= run-in-progress #t)
 (>= (-> *game-info* karma) 4.0)
@@ -7277,7 +7273,7 @@ Here are the shop IDs
         (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
 )
 
-(when (= stat-menu-intro #t)
+(when (and (= stat-menu-intro #t)(not *scene-player*))
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
     (format matt-str "<COLOR_WHITE>Vin:~%<COLOR_ORANGE>Jak, I've done it! You should now be able to see your stats.~%All of these will influence your current run.~%Make sure you keep tabs on these."
@@ -7297,6 +7293,7 @@ Here are the shop IDs
 (and
  (= stat-menu #t)
  (= mode-rngmods? #f)
+ (not *scene-player*)
  (= in-cheat #f)
  (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 0)
 )
@@ -7319,6 +7316,7 @@ Here are the shop IDs
 (when 
 (and
  (= stat-menu #t)
+ (not *scene-player*)
  (= mode-rngmods? #f)
  (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 0)
 )
@@ -7341,6 +7339,7 @@ Here are the shop IDs
 (when 
 (and
  (= stat-menu #t)
+ (not *scene-player*)
  (= mode-rngmods? #t)
  (!= (/ (mod (-> *game-info* auto-save-count) 1000000000) 100000000) 0)
 )
@@ -7364,6 +7363,7 @@ Here are the shop IDs
 (when 
 (and 
 (= stat-menu #t)
+(not *scene-player*)
 (!= (-> *game-info* karma) 6.0)
 )
   (clear matt-str)
@@ -7405,6 +7405,7 @@ Here are the shop IDs
 (when 
 (and 
 (= stat-menu #t)
+(not *scene-player*)
 (not *debug-segment*)
 (= (-> *game-info* karma) 6.0)
 )
@@ -7448,6 +7449,7 @@ Here are the shop IDs
 (and 
 (= stat-menu #t)
 (= in-cheat #f) 
+(not *scene-player*)
 (= (-> *game-info* karma) 6.0)
 *debug-segment* 
 )

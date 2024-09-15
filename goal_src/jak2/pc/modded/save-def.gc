@@ -423,6 +423,10 @@
         (= (/ (mod (-> *game-info* auto-save-count) 100000000) 10000000) 0)
         )
             (+! (-> *game-info* auto-save-count) 10000000)
+            (when *debug-segment*
+                (set! dm-string "Frong Integer ticked for the first time")
+                (set! dm-frong-occur #t)
+            )
             (set! autosave-delayed #t)
         )
         
