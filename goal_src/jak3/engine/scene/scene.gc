@@ -817,6 +817,10 @@
              )
     (let ((v1-9 (-> self skel root-channel 0 frame-group)))
       (when v1-9
+        ;; og:preserve-this send a movie-no-subtitle message so the pc subtitle system at least knows there's a movie playing
+        (#when PC_PORT
+            (if (= (-> self type) scene-player)
+                (send-event (ppointer->process *subtitle3*) 'movie-no-subtitle (-> (the scene-player self) anim name) #f (ja-aframe-num 0))))
         (let ((gp-0 (res-lump-struct (-> v1-9 extra) 'subtitle-range (array subtitle-range))))
           (when gp-0
             (let ((f30-0 (ja-aframe-num 0))
@@ -865,7 +869,14 @@
                              (+! (-> s2-0 origin y) 1.0)
                              (set! (-> s2-0 color) (font-color default))
                              (set! (-> s2-0 flags) (font-flags shadow kerning middle middle-vert large))
-                             (print-game-text (the-as string s3-0) s2-0 #f 44 (bucket-id hud-draw-pris2))
+                             ;; og:preserve-this subtitle3
+                             (#if PC_PORT
+                                  (if (or (!= (-> self type) scene-player)
+                                          (not (send-event (ppointer->process *subtitle3*) 'movie (-> (the scene-player self) anim name) s3-0 f30-0)))
+                                      (print-game-text (the-as string s3-0) s2-0 #f 44 (bucket-id hud-draw-pris2)))
+
+                                  (print-game-text (the-as string s3-0) s2-0 #f 44 (bucket-id hud-draw-pris2)))
+                             ; (print-game-text (the-as string s3-0) s2-0 #f 44 (bucket-id hud-draw-pris2))
                              (gui-control-method-12
                                *gui-control*
                                self
@@ -905,8 +916,6 @@
 (defstate wait (scene-player)
   :virtual #t
   :enter (behavior ((arg0 symbol))
-    (format 0 "scene-player: skipping scene~%")
-    (set! (-> self aborted?) #t)
     (set-time! (-> self state-time))
     (if (= (-> *game-info* demo-state) 101)
         (set-setting! 'audio-language #f 0.0 5)
@@ -928,7 +937,7 @@
             ((and *target*
                   (zero? (-> self scene-index))
                   (or (not (-> self scene))
-                      (!= (status-of-level-and-borrows *level* (-> gp-0 vis-nick) #f) 'active)
+                      (!= (level-status? *level* (-> gp-0 vis-nick) #f) 'active)
                       (logtest? (-> self scene scene-flags) (scene-flags scf5))
                       )
                   )
@@ -1076,7 +1085,7 @@
                    (dotimes (s4-1 10)
                      (when (not (or (not (-> gp-1 want s4-1 name))
                                     (not (-> gp-1 want s4-1 display?))
-                                    (= (status-of-level-and-borrows *level* (-> gp-1 want s4-1 name) 'all) 'active)
+                                    (= (level-status? *level* (-> gp-1 want s4-1 name) 'all) 'active)
                                     )
                                 )
                        (set! v1-124 #t)
@@ -1158,7 +1167,6 @@
                           )
                         )
                     )
-                  (not (-> self aborted?))
                   )
         (set-blackout-frames (seconds 0.1))
         (suspend)
@@ -1204,11 +1212,7 @@
         #x33001
         #t
         )
-      (let ((gp-0 (current-time)))
-        (until (time-elapsed? gp-0 (seconds 0.05))
-          (suspend)
-          )
-        )
+      (suspend-for (seconds 0.05))
       (set! (-> *setting-control* user-current bg-a) 0.0)
       (remove-setting! 'movie)
       (remove-setting! 'movie-name)
@@ -1541,16 +1545,13 @@
         (the-as
           (function process-drawable symbol)
           (if (logtest? (-> self scene scene-flags) (scene-flags scf1))
-              (lambda :behavior scene-player
-                ()
-                (when (cpad-pressed? 0 triangle)
-                  (set! (-> self aborted?) #t)
-                  (logclear! (-> *cpad-list* cpads 0 button0-abs 0) (pad-buttons triangle))
-                  (logclear! (-> *cpad-list* cpads 0 button0-rel 0) (pad-buttons triangle))
-                  #t
-                  )
-                (none)
-                )
+              (lambda :behavior scene-player () (when (cpad-pressed? 0 triangle)
+                                                  (set! (-> self aborted?) #t)
+                                                  (logclear! (-> *cpad-list* cpads 0 button0-abs 0) (pad-buttons triangle))
+                                                  (logclear! (-> *cpad-list* cpads 0 button0-rel 0) (pad-buttons triangle))
+                                                  #t
+                                                  )
+                                             )
               false-func
               )
           )
@@ -1576,10 +1577,6 @@
             )
           )
         )
-      )
-    (#when PC_PORT ;; og:preserve-this until overlord2 is done
-      (backup-load-state-and-set-cmds *load-state* (-> self anim command-list))
-      (restore-load-state-and-cleanup *load-state*)
       )
     (if (and (-> self wait) *target* (focus-test? *target* grabbed))
         (go-virtual release)

@@ -1024,8 +1024,8 @@
                         )
                       (.sub.vf vf1 vf3 vf2)
                       (.mul.vf vf1 vf1 vf1)
-                      (.add.y.vf vf1 vf1 vf1 :mask #b1)
-                      (.add.z.vf vf1 vf1 vf1 :mask #b1)
+                      (.add.y.vf.x vf1 vf1 vf1)
+                      (.add.z.vf.x vf1 vf1 vf1)
                       (.mov a2-5 vf1)
                       (let ((f0-2 a2-5)
                             (f1-1 (+ (-> a1-5 world-sphere w) (-> gp-0 w)))
@@ -1065,8 +1065,8 @@
                         )
                       (.sub.vf vf1 vf3 vf2)
                       (.mul.vf vf1 vf1 vf1)
-                      (.add.y.vf vf1 vf1 vf1 :mask #b1)
-                      (.add.z.vf vf1 vf1 vf1 :mask #b1)
+                      (.add.y.vf.x vf1 vf1 vf1)
+                      (.add.z.vf.x vf1 vf1 vf1)
                       (.mov a2-12 vf1)
                       (let ((f0-3 a2-12)
                             (f1-5 (+ (-> a1-17 world-sphere w) (-> gp-0 w)))
@@ -1995,11 +1995,11 @@
 ;; WARN: Return type mismatch int vs none.
 (defmethod init-from-entity! ((this battle) (arg0 entity-actor))
   "Typically the method that does the initial setup on the process, potentially using the [[entity-actor]] provided as part of that.
-This commonly includes things such as:
-- stack size
-- collision information
-- loading the skeleton group / bones
-- sounds"
+   This commonly includes things such as:
+   - stack size
+   - collision information
+   - loading the skeleton group / bones
+   - sounds"
   (logior! (-> this mask) (process-mask enemy))
   (let ((s4-0 (new 'process 'trsqv)))
     (set! (-> this root) s4-0)

@@ -573,7 +573,9 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 (when (= wait-vinspawn #t)
   (+! waitspawn 1)
   (when (= waitspawn 300)
-  (process-spawn c-vin-npc (new 'static 'vector :x (meters 755.3596) :y (meters 18.15) :z (meters 907.9631)))
+  (when (< (-> *game-info* karma) 6.0)
+    (process-spawn c-vin-npc (new 'static 'vector :x (meters 755.3596) :y (meters 18.15) :z (meters 907.9631)))
+  )
   (set! vin-spawned? #t)
   (set! waitspawn 0)
   (set! wait-vinspawn #f)
@@ -2906,23 +2908,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 
 (when (= re-wait #t)
   (+! re-i 1)
-  (when 
-    (and
-    (= please-reward #t) 
-    (!= act-stage 1)
-    (!= act-stage 5)
-    (!= act-stage 10)
-    (!= act-stage 15)
-    (!= act-stage 16)
-    (!= act-stage 17)
-    (!= act-stage 18)
-    (!= act-stage 19)
-    (!= act-stage 20)
-    (= re-i 500)
-    )
-      (set! reward-orbs #t)
-      (set! please-reward #f)
-      (when (= mode-challenge? #t)
+  (when (and (= mode-challenge? #t) (= re-i 300))
     (set! challenge-mission (rand-vu-int-range 1 6))
     (when (= challenge-mission 1)
       (set! challenge-string "No Damage or Bonks")
@@ -2943,6 +2929,22 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
       (set! challenge-string "Do not collect a single pickup")
     )
   )
+  (when 
+    (and
+    (= please-reward #t) 
+    (!= act-stage 1)
+    (!= act-stage 5)
+    (!= act-stage 10)
+    (!= act-stage 15)
+    (!= act-stage 16)
+    (!= act-stage 17)
+    (!= act-stage 18)
+    (!= act-stage 19)
+    (!= act-stage 20)
+    (= re-i 500)
+    )
+      (set! reward-orbs #t)
+      (set! please-reward #f)
     )
     (set! already-teleported? #f)
     (when (= re-i 501)
@@ -3772,7 +3774,9 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
   (persist-with-delay *setting-control* 'gun (seconds 0.5) 'gun #f 0.0 0)
 )
 (when (= vin-shop-waiti 5)
-    (process-spawn c-vin-npc (new 'static 'vector :x (meters 744.3240) :y (meters 18.5) :z (meters 917.0076)))
+    (when (< (-> *game-info* karma) 6.0)
+      (process-spawn c-vin-npc (new 'static 'vector :x (meters 744.3240) :y (meters 18.5) :z (meters 917.0076)))
+    )
     (send-event *camera* 'teleport-to-vector-start-string (new 'static 'vector :x (meters 744.0518) :y (meters 22.6945) :z (meters 920.7569)))
     (set! (-> *target* cam-user-mode) 'fixed)
     (set-setting-by-param *setting-control* 'mode-name 'cam-really-fixed 0 0)
@@ -3979,7 +3983,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
         (off (new 'static 'vector :x (meters 0.0) :y (meters 25.0) :z (meters 0.0) :w 1.0))
       )
         (vector-copy! newvec (vector+! newvec off (target-pos 0)))
-        (process-spawn c-dig-bomb-crate newvec)
+        ;(process-spawn c-dig-bomb-crate newvec)
       )
     )
   (when (= barreli 180)
@@ -3997,7 +4001,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
         (off (new 'static 'vector :x (meters 0.0) :y (meters 25.0) :z (meters 0.0) :w 1.0))
       )
         (vector-copy! newvec (vector+! newvec off (target-pos 0)))
-        (process-spawn c-dig-bomb-crate newvec)
+        ;(process-spawn c-dig-bomb-crate newvec)
       )
     )
     (when (= barreli 300)
@@ -4064,7 +4068,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
     (set! in-frongmenu? #f)
     (set! mm-sec 0)
     (set! menu-music #f)
-    (stop-sound-file)
+    ;(stop-sound-file)
     (set-setting-by-param *setting-control* 'mode-name 'cam-eye 0 0)
   )
   (when (= waite-frame 5)
@@ -4269,7 +4273,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
   (set! display-run #f)
   (set! avoidc-wait 0)
   (kill-by-name "grenadier" *default-pool*)
-  (stop-sound-file)
+  ;(stop-sound-file)
 )
 
 (when ;Same as above but with Extra life!
@@ -6234,7 +6238,7 @@ Here are the shop IDs
 
 (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>INFO:~%<COLOR_ORANGE>You cannot do that while in a run!~%<COLOR_ORANGE>Please restart the game, then load the save from the main menu."
+    (format matt-str "<COLOR_WHITE>INFO:~%<COLOR_ORANGE>You cannot do that while in a run!"
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
     (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
@@ -6260,7 +6264,7 @@ Here are the shop IDs
 
 (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>INFO:~%<COLOR_ORANGE>Please restart the game, then load the save from the main menu."
+    (format matt-str "<COLOR_WHITE>INFO:~%<COLOR_ORANGE>You cannot do that while in a run!"
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
     (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
@@ -7903,8 +7907,8 @@ Here are the shop IDs
     (clear *pc-encoded-matt-str*)
     (format matt-str "
     <COLOR_RED>Don't act like you're the hero here
-    ~%You did all of Vin's work for him, and now he's left me
-    ~%with this gross vessel you're seeing on me.
+    ~%You have no idea how long I've waited for this
+    ~%To have this much dark eco again
     ~%
     ~%You have to understand, I'm only trying to put myself
     ~%back together again.

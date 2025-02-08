@@ -353,6 +353,14 @@ frong-display9 "Infinite Ammo"
     )
 )
 
+(when
+(and
+(= praxisboss-ammo #t)
+(not (task-node-open? (game-task-node palace-boss-battle)))
+)
+(set! praxisboss-ammo #f)
+)
+
 (when ;praxis boss w/ blue gun
 (and
 (= in-hub? #f)

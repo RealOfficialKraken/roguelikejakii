@@ -123,7 +123,7 @@
 ;; WARN: Return type mismatch int vs none.
 (defmethod play-communicator-speech! ((this talker-speech-class))
   "Plays the provided [[talker-speech-class]]
-@TODO - understand the array from [[game-info]] better"
+   @TODO - understand the array from [[game-info]] better"
   (set! (-> *game-info* unknown-pad6 (+ (* (-> this speech) 2) 1)) (the-as uint #xffff))
   0
   (none)
@@ -363,10 +363,7 @@
 (defstate idle (talker)
   :virtual #t
   :code (behavior ()
-    (let ((gp-0 (current-time)))
-      (until (time-elapsed? gp-0 (the-as time-frame (-> self message delay)))
-        (suspend)
-        )
+    (suspend-for (the-as time-frame (-> self message delay))
       )
     (case (-> self message channel)
       (((gui-channel voicebox))
@@ -479,7 +476,7 @@
                         )
                       (begin
                         (dotimes (s5-2 4)
-                          (when (and (string-charp= (-> self message name) (the-as (pointer uint8) (-> *sound-iop-info* stream-name s5-2)))
+                          (when (and (string-charp= (-> self message name) (-> *sound-iop-info* stream-name s5-2 name))
                                      (= (-> self voice-id) (-> *sound-iop-info* stream-id s5-2))
                                      (logtest? (-> *sound-iop-info* stream-status s5-2) (stream-status ststatus-six))
                                      )
@@ -533,10 +530,7 @@
         )
       )
     (when (and (logtest? (-> self message flags) 8) (not (-> self save?)))
-      (let ((gp-2 (current-time)))
-        (until (time-elapsed? gp-2 (seconds 1))
-          (suspend)
-          )
+      (suspend-for (seconds 1)
         )
       (set! (-> self save?) #t)
       (auto-save-user)

@@ -140,7 +140,7 @@
 ;; definition for method 10 of type carry-info
 (defmethod distance-from-destination ((this carry-info) (arg0 carry-info))
   "Returns the distance from the current `point` and the provided [[carry-info]]'s `point`.
-Returns `-1.0` if it exceeds the maximum allowed"
+   Returns `-1.0` if it exceeds the maximum allowed"
   (let* ((f28-0 (vector-y-angle (vector-! (new 'stack-no-clear 'vector) (-> arg0 point) (-> this point))))
          (f30-0 (fabs (deg-diff f28-0 (vector-y-angle (-> this normal)))))
          (f28-1 (fabs (deg-diff (+ 32768.0 f28-0) (vector-y-angle (-> arg0 normal)))))
@@ -389,7 +389,7 @@ Returns `-1.0` if it exceeds the maximum allowed"
             (set! (-> s5-1 quad 2) a1-3)
             (set! (-> s5-1 trans quad) a2-4)
             )
-          (vector-normalize! (the-as vector (-> s5-1 vector)) 1.0)
+          (vector-normalize! (-> s5-1 vector 0) 1.0)
           (vector-normalize! (-> s5-1 vector 1) 1.0)
           (vector-normalize! (-> s5-1 vector 2) 1.0)
           (vector-reset! (-> s5-1 trans))

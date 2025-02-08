@@ -112,10 +112,22 @@ void extract_art_groups_from_level(const ObjectFileDB& db,
                                    std::map<std::string, level_tools::ArtData>& art_group_data) {
   if (db.obj_files_by_dgo.count(dgo_name)) {
     const auto& files = db.obj_files_by_dgo.at(dgo_name);
+    MercSwapInfo swapped_info;
+    // build list of models to replace
+    auto merc_replacements_path = file_util::get_jak_project_dir() / "custom_assets" /
+                                  game_version_names[db.version()] / "merc_replacements";
+    if (file_util::file_exists(merc_replacements_path.string())) {
+      auto custom_models =
+          file_util::find_files_in_dir(merc_replacements_path, std::regex(".*\\.glb"));
+      for (auto& mdl : custom_models) {
+        swapped_info.add_to_swap_list(mdl.stem().string());
+      }
+    }
     for (const auto& file : files) {
       if (file.name.length() > 3 && !file.name.compare(file.name.length() - 3, 3, "-ag")) {
         const auto& ag_file = db.lookup_record(file);
-        extract_merc(ag_file, tex_db, db.dts, tex_remap, level_data, false, db.version());
+        extract_merc(ag_file, tex_db, db.dts, tex_remap, level_data, false, db.version(),
+                     swapped_info);
         extract_joint_group(ag_file, db.dts, db.version(), art_group_data);
       }
     }
@@ -262,8 +274,9 @@ void extract_single_ag(const std::string& dgo_name,
   for (const auto& file : dgo) {
     if (file.name == ag_name) {
       const auto& ag_file = db.lookup_record(file);
+      MercSwapInfo swapped_info;
       extract_merc(ag_file, tex_db, db.dts, extract_tex_remap(db, dgo_name), lvl, false,
-                   db.version());
+                   db.version(), swapped_info);
     }
   }
 }
@@ -272,7 +285,8 @@ void extract_common(const ObjectFileDB& db,
                     const TextureDB& tex_db,
                     const std::string& dgo_name,
                     const fs::path& output_folder,
-                    const Config& config) {
+                    const Config& config,
+                    const std::vector<std::string>& all_dgo_names) {
   if (db.obj_files_by_dgo.count(dgo_name) == 0) {
     lg::warn("Skipping common extract for {} because the DGO was not part of the input", dgo_name);
     return;
@@ -334,26 +348,62 @@ void extract_common(const ObjectFileDB& db,
   extract_single_ag("NEB.DGO", "metalkor-fma-spinner-ag", db, tex_db, tfrag_level);
   extract_single_ag("NEB.DGO", "nestb-tail-bound-ag", db, tex_db, tfrag_level);
   extract_single_ag("NEB.DGO", "palmpilot-ag", db, tex_db, tfrag_level);
+  extract_single_ag("OUTROCST.DGO", "precursor-ag", db, tex_db, tfrag_level);
   
 
   add_all_textures_from_level(tfrag_level, "ARTSPOOL", tex_db);
   extract_art_groups_from_level(db, tex_db, {}, "ARTSPOOL", tfrag_level, art_group_data);
 
+  // copy in any art groups that were requested to be common
+  if (config.common_art_groups.size() > 0) {
+    std::unordered_set<std::string> art_groups_made_common;
+    for (const std::string& lvl_dgo_name : all_dgo_names) {
+      // exit early if we've found everything
+      if (config.common_art_groups.size() == art_groups_made_common.size()) {
+        lg::info("Found all requested art groups to be made common!");
+        break;
+      }
+
+      lg::info("Looking for common art groups in {}", lvl_dgo_name);
+      auto tex_remap = extract_tex_remap(db, lvl_dgo_name);
+      if (db.obj_files_by_dgo.count(lvl_dgo_name)) {
+        const auto& files = db.obj_files_by_dgo.at(lvl_dgo_name);
+        for (const auto& file : files) {
+          if (!art_groups_made_common.contains(file.name) && config.common_art_groups.contains(file.name)) {
+            lg::info("Art group {} was requested to be made common, we found it in {}!", file.name,
+                     lvl_dgo_name);
+            const auto& ag_file = db.lookup_record(file);
+            MercSwapInfo swapped_info;
+            extract_merc(ag_file, tex_db, db.dts, tex_remap, tfrag_level, false, db.version(), swapped_info);
+            extract_joint_group(ag_file, db.dts, db.version(), art_group_data);
+            // track found art groups so we don't borther re-processing in a later level
+            art_groups_made_common.insert(file.name);
+          }
+        }
+      }
+    }
+  }
+
   std::set<std::string> textures_we_have;
+  std::set<u32> textures_we_have_id;
 
   // put _all_ index textures in common.
   for (const auto& [id, tex] : tex_db.index_textures_by_combo_id) {
     tfrag_level.index_textures.push_back(tex);
   }
 
+  // remember which textures we already added.
+  // textures with the same name or the same ID always have the same data.
   for (const auto& t : tfrag_level.textures) {
     textures_we_have.insert(t.debug_name);
+    textures_we_have_id.insert(t.combo_id);
   }
 
+  // for common textures, add if the ID isn't there - common textures are looked up by ID.
   for (const auto& [id, normal_texture] : tex_db.textures) {
-    if (config.common_tpages.count(normal_texture.page) &&
-        !textures_we_have.count(normal_texture.name)) {
+    if (config.common_tpages.count(normal_texture.page) && !textures_we_have_id.count(id)) {
       textures_we_have.insert(normal_texture.name);
+      textures_we_have_id.insert(id);
       tfrag_level.textures.push_back(
           make_texture(id, normal_texture, tex_db.tpage_names.at(normal_texture.page), true));
     }
@@ -383,8 +433,8 @@ void extract_common(const ObjectFileDB& db,
       compressed.data(), compressed.size());
 
   if (config.rip_levels) {
-    auto file_path = file_util::get_jak_project_dir() / "glb_out" / "common.glb";
-    file_util::create_dir_if_needed_for_file(file_path);
+    auto file_path = file_util::get_jak_project_dir() / "glb_out" /
+                     game_version_names[config.game_version] / "common";
     save_level_foreground_as_gltf(tfrag_level, art_group_data, file_path);
   }
 }
@@ -421,15 +471,15 @@ void extract_from_level(const ObjectFileDB& db,
 
   if (config.rip_levels) {
     auto back_file_path = file_util::get_jak_project_dir() / "glb_out" /
-                          fmt::format("{}_background.glb", level_data.level_name);
+                          game_version_names[config.game_version] / level_data.level_name /
+                          fmt::format("{}-background.glb", level_data.level_name);
     file_util::create_dir_if_needed_for_file(back_file_path);
     save_level_background_as_gltf(level_data, back_file_path);
     auto fore_file_path = file_util::get_jak_project_dir() / "glb_out" /
-                          fmt::format("{}_foreground.glb", level_data.level_name);
-    file_util::create_dir_if_needed_for_file(fore_file_path);
+                          game_version_names[config.game_version] / level_data.level_name;
     save_level_foreground_as_gltf(level_data, art_group_data, fore_file_path);
   }
-  file_util::write_text_file(entities_folder / fmt::format("{}_actors.json", level_data.level_name),
+  file_util::write_text_file(entities_folder / fmt::format("{}-actors.json", level_data.level_name),
                              extract_actors_to_json(bsp_header.actors));
 }
 
@@ -439,7 +489,7 @@ void extract_all_levels(const ObjectFileDB& db,
                         const std::string& common_name,
                         const Config& config,
                         const fs::path& output_path) {
-  extract_common(db, tex_db, common_name, output_path, config);
+  extract_common(db, tex_db, common_name, output_path, config, dgo_names);
   auto entities_dir = file_util::get_jak_project_dir() / "decompiler_out" /
                       game_version_names[config.game_version] / "entities";
   file_util::create_dir_if_needed(entities_dir);

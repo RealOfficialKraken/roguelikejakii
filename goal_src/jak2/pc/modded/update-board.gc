@@ -1,5 +1,7 @@
 (in-package goal)
 
+;name: update-board.gc
+
 #|
 (define update-vers "(0.84)")
 (define ub-color "<COLOR_GREEN>")
@@ -37,8 +39,8 @@
 (define ub-npc-kill #f)
 (define ub-npci 0)
 
-(define update-vers "(0.90)")
-(define ub-color "<COLOR_CYAN>")
+(define update-vers "(0.91)")
+(define ub-color "<COLOR_PINK>")
 ;PAGE 1
 (define ub-1 "<COLOR_GREEN>< <COLOR_ORANGE>Added a <COLOR_CYAN>Challenge Machine<COLOR_ORANGE> to spice up runs with Tokens!")
 (define ub-2 "")
@@ -99,8 +101,8 @@
 (define ub-7-2 "<COLOR_CYAN>< <COLOR_ORANGE> Added a special <COLOR_YELLOW>collectable<COLOR_ORANGE> to unlock more modifiers,")
 (define ub-8-2 "they will drop after you <COLOR_GREEN>complete a run with any weapon<COLOR_ORANGE>.")
 (define ub-9-2 "")
-(define ub-10-2 "")
-(define ub-11-2 "")
+(define ub-10-2 "<COLOR_PINK>< <COLOR_ORANGE> dated to the latest <COLOR_YELLOW>OpenThe mod has been up<COLOR_ORANGE>GOAL version")
+(define ub-11-2 "This will allow me to finally bugfix again ;)")
 (define ub-12-2 "")
 (define ub-13-2 "")
 (define ub-14-2 "")
@@ -141,6 +143,17 @@
 (define ub-24-3 "")
 
 
+(defskelgroup skel-ubgrenadier grenadier grenadier-lod0-jg -1
+              ((grenadier-lod0-mg (meters 20)) (grenadier-lod1-mg (meters 40)) (grenadier-lod2-mg (meters 999999)))
+              :bounds (static-spherem 0 0 0 5)
+              :shadow grenadier-shadow-mg
+              :origin-joint-index 4
+              )
+(defskelgroup skel-ubcenturion centurion centurion-lod0-jg centurion-idle-ja
+              ((centurion-lod0-mg (meters 20)) (centurion-lod1-mg (meters 999999)))
+              :bounds (static-spherem 0 2.25 -0.7 6.5)
+              :shadow centurion-shadow-mg
+              )
 
 
 (defun check-update-info ()
@@ -180,7 +193,7 @@
 )
 (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>R1: <COLOR_ORANGE>Update Board ~s~s"
+    (format matt-str "<COLOR_WHITE>R1: ~sUpdate Board ~s"
     ub-color
     update-vers
     )
@@ -250,14 +263,26 @@
   (when (= ub-npci 5)
     ;(process-spawn c-kid-npc (new 'static 'vector :x (meters 744.3240) :y (meters 18.0) :z (meters 917.0076)))
     ;(process-spawn c-crocadog-npc (new 'static 'vector :x (meters 751.4117) :y (meters 18.2) :z (meters 903.3818)))
-    (process-spawn manipy
-                            :init
-                            manipy-init
-                            (new 'static 'vector :x (meters 751.4117) :y (meters 18.2) :z (meters 903.3818))
-                            #f
-                            (art-group-get-by-name *level* "skel-rapid-gunner" (the (pointer uint32) #f))
-                            #f
-                            0)
+    (let ((ent (process-spawn manipy
+      :init
+      manipy-init
+      (new 'static 'vector :x (meters 751.4117) :y (meters 18.2) :z (meters 903.3818))
+      #f
+      (art-group-get-by-name *level* "skel-crocadog-highres" (the (pointer uint32) #f))
+      #f
+      :stack-size #x18000
+      0
+    )
+    )
+    (veccy (new-stack-vector0))
+    )
+      (set! (-> veccy x) 3.0)
+      (set! (-> veccy y) 3.0)
+      (set! (-> veccy z) 3.0)
+      (send-event (ppointer->process ent) 'anim-mode 'loop)
+      (send-event (ppointer->process ent) 'art-joint-anim "crocadog-highres-idle-vinroom-ja")
+    )
+
     (send-event *camera* 'teleport-to-vector-start-string (new 'static 'vector :x (meters 749.0048) :y (meters 23.0598) :z (meters 910.0965)))
     (set! (-> *target* cam-user-mode) 'fixed)
     (set-setting-by-param *setting-control* 'mode-name 'cam-really-fixed 0 0)

@@ -21,6 +21,7 @@ struct MatchResult {
     std::unordered_map<int, Form*> forms;
     std::unordered_map<int, s64> label;
     std::unordered_map<int, s64> ints;
+    std::unordered_map<int, float> floats;
   } maps;
 
   Form* int_or_form_to_form(FormPool& pool, int key_idx) {
@@ -56,6 +57,7 @@ class Matcher {
   static Matcher integer(std::optional<int> value);
   static Matcher any_integer(int match_id = -1);
   static Matcher single(std::optional<float> value);
+  static Matcher any_single(int match_id = -1);
   static Matcher any_reg_cast_to_int_or_uint(int match_id = -1);
   static Matcher any_quoted_symbol(int match_id = -1);
   static Matcher any_symbol(int match_id = -1);
@@ -69,6 +71,7 @@ class Matcher {
                               const Matcher& false_case);
   static Matcher if_no_else(const Matcher& condition, const Matcher& true_case);
   static Matcher while_loop(const Matcher& condition, const Matcher& body);
+  static Matcher until_loop(const Matcher& condition, const Matcher& body);
   static Matcher any_constant_token(int match_id = -1);
   static Matcher constant_token(const std::string& name);
   static Matcher or_expression(const std::vector<Matcher>& elts);
@@ -90,6 +93,7 @@ class Matcher {
     INT,
     ANY_INT,
     FLOAT,
+    ANY_FLOAT,
     ANY_QUOTED_SYMBOL,
     ANY_SYMBOL,
     DEREF_OP,
@@ -100,6 +104,7 @@ class Matcher {
     IF_WITH_ELSE,
     IF_NO_ELSE,
     WHILE_LOOP,
+    UNTIL_LOOP,
     ANY_CONSTANT_TOKEN,
     CONSTANT_TOKEN,
     SC_OR,
@@ -130,6 +135,7 @@ class Matcher {
     int m_form_match;
     int m_label_out_id;
     int m_int_out_id;
+    int m_float_out_id;
   };
   std::optional<int> m_int_match;
   std::optional<float> m_float_match;
