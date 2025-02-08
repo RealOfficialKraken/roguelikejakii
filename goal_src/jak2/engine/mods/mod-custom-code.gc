@@ -338,6 +338,9 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (set! mode-rngmission? #f)
   (set! mode-lighteco? #f)
   (set! menu-music #t)
+  (set! clicked-death? #f)
+  (set! death-i 0)
+  (set! death-freeze #f)
   (set! barreli 0)
   (logclear! (-> *game-info* features) (game-feature gun-upgrade-ammo gun-upgrade-damage gun-upgrade-speed))
   (set! board2-dropped? #f)
@@ -4157,7 +4160,7 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
     (set! skip-intro #f)
   )
   (when (> waits-frame 60)
-    (when (= display-death-screen #t)
+    (when (= (-> *game-info* karma) 0.0)
       (set! in-menu #t)
       (set! camera-locked #t)
       (set! pause-menu-blocked? #t)
@@ -4261,8 +4264,192 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 (= (-> *target* fact health) 0.0)
 (= in-game? #t)
 (= p-actual-clone #f)
+(= death-freeze #f)
 *target*
 )
+  (set! death-freeze #t)
+  (set! death-i 0)
+  ;(stop-sound-file)
+)
+
+(when
+(and
+*target*
+(= death-freeze #t)
+)
+(+! death-i 1)
+(when (= death-i 1)
+  (set! temp-skullgemamount (-> *game-info* gem))
+  (play-sound-file sound-quick-death (the int (* (-> *setting-control* user-current sfx-volume) 100)))
+)
+(when (and (>= death-i 10) (= clicked-death? #f) (= (pause-allowed?) #t))
+  (set-master-mode 'freeze)
+)
+(when 
+  (and 
+    (!= (-> *game-info* karma) 6.0)
+    (>= (-> *game-info* karma) 2.0)
+    (= win-lose #f)
+    (>= death-i 70)
+  )
+  (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_WHITE>Welcome to<COLOR_RED> Roguelike Jak II<COLOR_WHITE>!
+~%<COLOR_BLUE>Made by Kraken
+~%
+~%
+<COLOR_RED>~%You Died!
+~%<COLOR_WHITE>Skulls Gems turned into Tokens:
+~%<COLOR_YELLOW>~d
+~%
+~%
+~%
+~%<COLOR_WHITE>Progress:
+~%<COLOR_GREEN> Act ~d <COLOR_YELLOW>Stage ~d
+~%
+~%
+~%
+~%
+<COLOR_WHITE>Current Tokens:
+~%<COLOR_PINK>~d
+~%
+~%<COLOR_GREEN>Press <COLOR_BLUE>X<COLOR_GREEN> to Continue"
+    (the int temp-skullgemamount)
+    act-act
+    print-stage
+    (the int (-> *game-info* fuel))
+    mod-s
+    (the int menu-value)
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 25 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+(when 
+  (and 
+    (= win-lose #t)
+    (>= (-> *game-info* karma) 2.0)
+    (!= (-> *game-info* karma) 6.0)
+    (>= death-i 70)
+  )
+  (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "~%<COLOR_RED>~%The Entity found you.
+~%<COLOR_ORANGE>Explosive Yellow Shot unlocked in shops across all dimensions!
+~%
+~%<COLOR_WHITE>Skulls Gems turned into Tokens:
+~%<COLOR_YELLOW>~d
+~%
+~%
+~%<COLOR_WHITE>Progress:
+~%<COLOR_GREEN> Act ~d <COLOR_YELLOW>Stage ~d
+~%
+~%
+~%<COLOR_WHITE>Current Tokens:
+~%<COLOR_PINK>~d
+~%
+~%<COLOR_RED>The Time Loop remains broken.
+~%<COLOR_YELLOW>Hint:<COLOR_ORANGE> Try to collect important items for Vin!
+~%That way The Entity doesn't track you down
+~%
+~%<COLOR_GREEN>Press <COLOR_BLUE>X<COLOR_GREEN> to Continue"
+    (the int temp-skullgemamount)
+    act-act
+    print-stage
+    (the int (-> *game-info* fuel))
+    mod-s
+    (the int menu-value)
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 25 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+(when 
+  (and 
+    (>= (-> *game-info* karma) 6.0)
+    (>= death-i 70)
+    )
+  (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "~%<COLOR_GREEN>~%GG
+~%<COLOR_ORANGE>You defeated evil
+~%<COLOR_WHITE>Skulls Gems turned into Tokens:
+~%<COLOR_YELLOW>~d
+~%
+~%
+~%<COLOR_WHITE>Progress:
+~%<COLOR_GREEN> You frickin won
+~%
+~%
+~%<COLOR_WHITE>Current Tokens:
+~%<COLOR_PINK>~d
+~%
+~%<COLOR_ORANGE>Good job!
+~%<COLOR_WHITE>Light Eco<COLOR_ORANGE> is still present across the multiverse!
+~%<COLOR_GREEN>Entity defeated, and Time Loop restored
+~%<COLOR_ORANGE>Cheat Menu unlocked by rebooting this save in debug mode!
+~%
+~%<COLOR_GREEN>Press <COLOR_BLUE>X<COLOR_GREEN> to Continue"
+    (the int temp-skullgemamount)
+    (the int (-> *game-info* fuel))
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 25 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+(when (and (= (-> *game-info* karma) 1.0)(>= death-i 70))
+  (clear matt-str)
+    (clear *pc-encoded-matt-str*)
+    (format matt-str "<COLOR_WHITE>Welcome to<COLOR_RED> Roguelike <COLOR_ORANGE>Jak II<COLOR_WHITE>
+~%<COLOR_BLUE>Made by Kraken
+~%
+~%<COLOR_WHITE>When you <COLOR_GREEN>start your run<COLOR_WHITE>,
+~%you will be transported to the dimensions where Jak
+~%no longer exists, and you must take his place
+~%by completing missions, and fulfilling the prophecy.
+~%
+~%Jak dying means <COLOR_RED>Perma-Death<COLOR_WHITE>!
+~%Orbs will be rewarded for playing well. But if you die, you lose everything!
+~%Talk to Vin to look at his shop here. You can save up <COLOR_PINK>Tokens<COLOR_WHITE> to purchase items
+~%to put into your run. <COLOR_PINK>Tokens<COLOR_WHITE> are obtained from collecting skull gems.
+~%
+~%Everything is <COLOR_GREEN>a roll of the dice.
+~%<COLOR_WHITE>City guard counts, enemy speed, and so many more, are completely random!
+~%Any weapon can be chosen to start with. Beat the game with different 
+~%starting weapons to unlock other addative content to the game
+~%You can exit the level to <COLOR_GREEN>start your run<COLOR_WHITE>.
+~%
+~%<COLOR_BLUE>X<COLOR_GREEN> Continue"
+    )
+    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
+      ;; reset bucket settings prior to drawing - font won't do self for us, and
+      ;; draw-raw-image can sometimes mess them up. (intro sequence)
+      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 15 0.0 (font-color default) (font-flags middle shadow kerning large))))
+        (set! (-> font-ctx scale) 0.325)
+        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
+)
+(when (and (>= death-i 70)(< death-i 165) (cpad-pressed? 0 x))
+  (set! death-i 165)
+)
+(when (and (>= death-i 180) (cpad-pressed? 0 x))
+  (set-master-mode 'game)
   (set! dark-mode #f)
   (set! (-> *mood-control* overide-weather-flag) #f)
   (set! (-> *time-of-day-context* overide-enable) #f)
@@ -4272,11 +4459,15 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
   (set! avoidc-waitb #f)
   (set! display-run #f)
   (set! avoidc-wait 0)
+  (set! clicked-death? #t)
+  (when (= (-> *game-info* karma) 1.0)
+    (set! (-> *game-info* karma) 2.0)
+  )
   (kill-by-name "grenadier" *default-pool*)
-  ;(stop-sound-file)
+)
 )
 
-(when ;Same as above but with Extra life!
+(when ;Death params but with Extra life!
 (and
 (= (pause-allowed?) #t)
 (= (-> *target* fact health) 0.0)
@@ -5986,160 +6177,10 @@ Here are the shop IDs
 )
 )
 
-;menu params
-(when (and (= in-menu #t)(= (paused?) #f)(= (-> *game-info* karma) 1.0)(not (cpad-pressed? 0 x)))
-  (clear matt-str)
-    (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>Welcome to<COLOR_RED> Roguelike <COLOR_ORANGE>Jak II<COLOR_WHITE>
-~%<COLOR_BLUE>Made by Kraken
-~%
-~%<COLOR_WHITE>When you <COLOR_GREEN>start your run<COLOR_WHITE>,
-~%you will be transported to the dimensions where Jak
-~%no longer exists, and you must take his place
-~%by completing missions, and fulfilling the prophecy.
-~%
-~%Jak dying means <COLOR_RED>Perma-Death<COLOR_WHITE>!
-~%Orbs will be rewarded for playing well. But if you die, you lose everything!
-~%Talk to Vin to look at his shop here. You can save up <COLOR_PINK>Tokens<COLOR_WHITE> to purchase items
-~%to put into your run. <COLOR_PINK>Tokens<COLOR_WHITE> are obtained from collecting skull gems.
-~%
-~%Everything is <COLOR_GREEN>a roll of the dice.
-~%<COLOR_WHITE>City guard counts, enemy speed, and so many more, are completely random!
-~%Any weapon can be chosen to start with. Beat the game with different 
-~%starting weapons to unlock other addative content to the game
-~%You can exit the level to <COLOR_GREEN>start your run<COLOR_WHITE>.
-~%
-~%<COLOR_BLUE>X<COLOR_GREEN> Continue"
-    )
-    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
-    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
-      ;; reset bucket settings prior to drawing - font won't do self for us, and
-      ;; draw-raw-image can sometimes mess them up. (intro sequence)
-      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 15 0.0 (font-color default) (font-flags middle shadow kerning large))))
-        (set! (-> font-ctx scale) 0.325)
-        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
-)
-
-(when (and (= in-menu #t)(= (paused?) #f)(= win-lose #f)(!= (-> *game-info* karma) 6.0)(>= (-> *game-info* karma) 2.0)(not (cpad-pressed? 0 x)))
-  (clear matt-str)
-    (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>Welcome to<COLOR_RED> Roguelike Jak II<COLOR_WHITE>!
-~%<COLOR_BLUE>Made by Kraken
-~%
-~%
-<COLOR_RED>~%You Died!
-~%<COLOR_WHITE>Skulls Gems turned into Tokens:
-~%<COLOR_YELLOW>~d
-~%
-~%
-~%
-~%<COLOR_WHITE>Progress:
-~%<COLOR_GREEN> Act ~d <COLOR_YELLOW>Stage ~d
-~%
-~%
-~%
-~%
-<COLOR_WHITE>Current Tokens:
-~%<COLOR_PINK>~d
-~%
-~%<COLOR_GREEN>Press <COLOR_BLUE>X<COLOR_GREEN> to Continue"
-    (the int temp-skullgemamount)
-    act-act
-    print-stage
-    (the int (-> *game-info* fuel))
-    mod-s
-    (the int menu-value)
-    )
-    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
-    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
-      ;; reset bucket settings prior to drawing - font won't do self for us, and
-      ;; draw-raw-image can sometimes mess them up. (intro sequence)
-      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 25 0.0 (font-color default) (font-flags middle shadow kerning large))))
-        (set! (-> font-ctx scale) 0.325)
-        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
-)
-
-
-
-(when (and (= in-menu #t)(= (paused?) #f)(= win-lose #t)(>= (-> *game-info* karma) 2.0)(!= (-> *game-info* karma) 6.0)(not (cpad-pressed? 0 x)))
-  (clear matt-str)
-    (clear *pc-encoded-matt-str*)
-    (format matt-str "~%<COLOR_RED>~%The Entity found you.
-~%<COLOR_ORANGE>Explosive Yellow Shot unlocked in shops across all dimensions!
-~%
-~%<COLOR_WHITE>Skulls Gems turned into Tokens:
-~%<COLOR_YELLOW>~d
-~%
-~%
-~%<COLOR_WHITE>Progress:
-~%<COLOR_GREEN> Act ~d <COLOR_YELLOW>Stage ~d
-~%
-~%
-~%<COLOR_WHITE>Current Tokens:
-~%<COLOR_PINK>~d
-~%
-~%<COLOR_RED>The Time Loop remains broken.
-~%<COLOR_YELLOW>Hint:<COLOR_ORANGE> Try to collect important items for Vin!
-~%That way The Entity doesn't track you down
-~%
-~%<COLOR_GREEN>Press <COLOR_BLUE>X<COLOR_GREEN> to Continue"
-    (the int temp-skullgemamount)
-    act-act
-    print-stage
-    (the int (-> *game-info* fuel))
-    mod-s
-    (the int menu-value)
-    )
-    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
-    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
-      ;; reset bucket settings prior to drawing - font won't do self for us, and
-      ;; draw-raw-image can sometimes mess them up. (intro sequence)
-      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 25 0.0 (font-color default) (font-flags middle shadow kerning large))))
-        (set! (-> font-ctx scale) 0.325)
-        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
-)
-
-(when (and (= in-menu #t)(= (paused?) #f)(>= (-> *game-info* karma) 6.0)(not (cpad-pressed? 0 x)))
-  (clear matt-str)
-    (clear *pc-encoded-matt-str*)
-    (format matt-str "~%<COLOR_GREEN>~%GG
-~%<COLOR_ORANGE>You defeated evil
-~%<COLOR_WHITE>Skulls Gems turned into Tokens:
-~%<COLOR_YELLOW>~d
-~%
-~%
-~%<COLOR_WHITE>Progress:
-~%<COLOR_GREEN> You frickin won
-~%
-~%
-~%<COLOR_WHITE>Current Tokens:
-~%<COLOR_PINK>~d
-~%
-~%<COLOR_ORANGE>Good job!
-~%<COLOR_WHITE>Light Eco<COLOR_ORANGE> is still present across the multiverse!
-~%<COLOR_GREEN>Entity defeated, and Time Loop restored
-~%<COLOR_ORANGE>Cheat Menu unlocked by rebooting this save in debug mode!
-~%
-~%<COLOR_GREEN>Press <COLOR_BLUE>X<COLOR_GREEN> to Continue"
-    (the int temp-skullgemamount)
-    (the int (-> *game-info* fuel))
-    )
-    (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
-    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
-      ;; reset bucket settings prior to drawing - font won't do self for us, and
-      ;; draw-raw-image can sometimes mess them up. (intro sequence)
-      (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 250 25 0.0 (font-color default) (font-flags middle shadow kerning large))))
-        (set! (-> font-ctx scale) 0.325)
-        (draw-string-adv *pc-encoded-matt-str* buf font-ctx)))
-)
-
 (when (and (= in-updateboard? #f)(= in-frongmenu? #f)(= fodder-dialogue? #f)(= start-stage #t)(cpad-pressed? 0 r3))
   (set! tutorial-completed? #t)
   (set! wait-exit #t)
+  (item-refresh)
   (set! start-stage #f)
   (set! temp-orbs 0.0)
   (set! temp-health 8.0)

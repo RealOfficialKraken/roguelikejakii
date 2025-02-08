@@ -408,7 +408,7 @@
         (set! powered? #t)
         (set! power-dur 0)
         (color-light-eco)
-        (play-sound-file "goal_src/jak2/pc/snd/light-eco-grab.wav" (the int (* (-> *setting-control* user-current sfx-volume) 100)))
+        (play-sound-file sound-eco-grab-white (the int (* (-> *setting-control* user-current sfx-volume) 100)))
       )
       (when (= challenge-mission 6)
         (challenge-mission-fail)

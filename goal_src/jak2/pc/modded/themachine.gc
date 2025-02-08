@@ -1487,7 +1487,7 @@
     (set! machine-spawning? #f)
     (set! d-challenge-failed #t)
     (set! machine-prompt? #f)
-     (play-sound-file "data/goal_src/jak2/pc/snd/challenge-failed.wav" (the int (* (-> *setting-control* user-current sfx-volume) 100)))
+     (play-sound-file sound-mission-fail (the int (* (-> *setting-control* user-current sfx-volume) 100)))
     (none)
 )
 
