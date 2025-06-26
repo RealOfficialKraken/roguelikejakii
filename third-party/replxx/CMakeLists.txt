@@ -1,4 +1,3 @@
--DCMAKE_POLICY_VERSION_MINIMUM=3.5
 project(
 	replxx
 	# HOMEPAGE_URL "https://github.com/AmokHuginnsson/replxx"
