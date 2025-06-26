@@ -106,7 +106,7 @@
 (define ub-12-2 "")
 (define ub-13-2 "<COLOR_PINK>< <COLOR_ORANGE>Added a different type of death screen you get when you lose")
 (define ub-14-2 "")
-(define ub-15-2 "")
+(define ub-15-2 "<COLOR_PINK>< <COLOR_ORANGE>Fixed a bug where Upgraded Damage (x2) would just rob you of your orbs sometimes")
 (define ub-16-2 "")
 (define ub-17-2 "")
 (define ub-18-2 "")

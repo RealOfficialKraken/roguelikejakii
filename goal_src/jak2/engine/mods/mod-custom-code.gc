@@ -4415,26 +4415,27 @@ These numbers go down in order from the ids. The first 1 is to save all the 0's
 (when (and (= (-> *game-info* karma) 1.0)(>= death-i 70))
   (clear matt-str)
     (clear *pc-encoded-matt-str*)
-    (format matt-str "<COLOR_WHITE>Welcome to<COLOR_RED> Roguelike <COLOR_ORANGE>Jak II<COLOR_WHITE>
-~%<COLOR_BLUE>Made by Kraken
+    (format matt-str "<COLOR_RED>YOU DIED for the first time!~%<COLOR_WHITE>Welcome to<COLOR_RED> Roguelike <COLOR_ORANGE>Jak II<COLOR_WHITE>~%<COLOR_BLUE>Made by Kraken
 ~%
 ~%<COLOR_WHITE>When you <COLOR_GREEN>start your run<COLOR_WHITE>,
 ~%you will be transported to the dimensions where Jak
 ~%no longer exists, and you must take his place
-~%by completing missions, and fulfilling the prophecy.
+~%by completing missions, and fulfilling the prophecy to the end again.
 ~%
 ~%Jak dying means <COLOR_RED>Perma-Death<COLOR_WHITE>!
 ~%Orbs will be rewarded for playing well. But if you die, you lose everything!
-~%Talk to Vin to look at his shop here. You can save up <COLOR_PINK>Tokens<COLOR_WHITE> to purchase items
-~%to put into your run. <COLOR_PINK>Tokens<COLOR_WHITE> are obtained from collecting skull gems.
+~%Check out Vin's Shop at the hub. Save up <COLOR_PINK>Tokens<COLOR_WHITE> to purchase items
+~%to put into the HipHog shop in runs. <COLOR_ORANGE>Your Skull Gems have been converted to <COLOR_PINK>Tokens
+~%Tokens earned: ~d
 ~%
 ~%Everything is <COLOR_GREEN>a roll of the dice.
 ~%<COLOR_WHITE>City guard counts, enemy speed, and so many more, are completely random!
 ~%Any weapon can be chosen to start with. Beat the game with different 
 ~%starting weapons to unlock other addative content to the game
-~%You can exit the level to <COLOR_GREEN>start your run<COLOR_WHITE>.
+~%<COLOR_ORANGE>Good luck in the next run!
 ~%
 ~%<COLOR_BLUE>X<COLOR_GREEN> Continue"
+(the int temp-skullgemamount)
     )
     (pc-encode-utf8-string matt-str *pc-encoded-matt-str*)
     (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf)) (bucket-id debug-no-zbuf1))
@@ -5266,7 +5267,6 @@ Here are the shop IDs
       (-! (-> *game-info* skill) 20.0)
       (set! shopitem1 "(Out of Stock)")
       (set-item "damage" 1)
-      (set! (-> *game-info* task-deaths) (+ (-> *game-info* task-deaths) 100000))
       (when (= already-teleported? #f)
         (set! autosave-delayed #t)
       )
@@ -9348,64 +9348,64 @@ Here are the shop IDs
 
   (when (and (= cm-select 1)(= cm-yn #f))
     (when (and (= cm-option2 0)(= p-yellow-gun #f))
-      (+! (-> *game-info* auto-save-count) 1000000)
+      (set-item "yellow" 1)
     )
     (when (and (= cm-option2 1)(= p-explode-shot #f))
-      (+! (-> *game-info* task-deaths) 100000000)
+      (set-item "explosive" 1)
     )
     (when (and (= cm-option2 2)(= p-red-gun #f))
-      (+! (-> *game-info* task-deaths) 1)
+      (set-item "red" 1)
     )
     (when (and (= cm-option2 3)(= p-blue-gun #f))
-      (+! (-> *game-info* task-deaths) 10)
+      (set-item "blue" 1)
     )
     (when (and (= cm-option2 4)(= p-dark-gun #f))
-      (+! (-> *game-info* task-deaths) 100)
+      (set-item "dark" 1)
     )
     (when (and (= cm-option2 5)(= p-upgrade-red #f))
-      (+! (-> *game-info* task-deaths) 1000)
+      (set-item "redrof" 1)
     )
     (when (and (= cm-option2 6)(= p-upgrade-ammo #f))
-      (+! (-> *game-info* task-deaths) 10000)
+      (set-item "ammo" 1)
     )
     (when (and (= cm-option2 7)(= p-upgrade-damage #f))
-      (+! (-> *game-info* task-deaths) 100000)
+      (set-item "damage" 1)
     )
     (when (and (= cm-option2 8)(= p-upgrade-vehicles #f))
-      (+! (-> *game-info* task-deaths) 1000000)
+      (set-item "vehicles" 1)
     )
     (when (and (= cm-option2 9)(= p-double-shot #f))
-      (+! (-> *game-info* task-deaths) 10000000)
+      (set-item "double" 1)
     )
     (when (and (= cm-option2 10)(= p-clover #f))
-      (+! (-> *game-info* continue-deaths) 1)
+      (set-item "clover" 1)
     )
     (when (and (= cm-option2 11)(= p-drinkable #f))
-      (+! (-> *game-info* continue-deaths) 10)
+      (set-item "2hp" 1)
     )
     (when (and (= cm-option2 12)(= p-big-punch #f))
-      (+! (-> *game-info* continue-deaths) 100)
+      (set-item "mpunch" 1)
       (set! (-> *run-attack-mods* align-speed) 2.0)
       (set! (-> *run-attack-mods* impact-fric) 0.0)
     )
     (when (and (= cm-option2 13)(= p-sage-yellow #f))
-      (+! (-> *game-info* continue-deaths) 1000)
+      (set-item "clone" 1)
     )
     (when (and (= cm-option2 14)(= p-sage-blue #f))
-      (+! (-> *game-info* continue-deaths) 10000)
+      (set-item "weight" 1)
       (activate-weight-start)
     )
     (when (and (= cm-option2 15)(= p-sage-red #f))
-      (+! (-> *game-info* continue-deaths) 100000)
+      (set-item "rapid" 1)
     )
     (when (and (= cm-option2 16)(= p-sage-dark #f))
-      (+! (-> *game-info* continue-deaths) 1000000)
+      (set-item "darkupgrade" 1)
     )
     (when (and (= cm-option2 17)(= p-crit-hits #f))
-      (+! (-> *game-info* auto-save-count) 1)
+      (set-item "redsage" 1)
     )
     (when (and (= cm-option2 18)(= p-actual-clone #f))
-      (+! (-> *game-info* auto-save-count) 10)
+      (set-item "extralife" 1)
     )
   )
 )
