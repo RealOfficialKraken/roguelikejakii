@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5
 project(
 	replxx
 	# HOMEPAGE_URL "https://github.com/AmokHuginnsson/replxx"
