@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+
 
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
     # Enable runtime library selection via CMAKE_MSVC_RUNTIME_LIBRARY
