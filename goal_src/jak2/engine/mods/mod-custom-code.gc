@@ -261,6 +261,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (play-task (game-task drill-eggs) 'debug #f)
   (set! vin-talk 4)
   (set! wait-start #t)
+  (set! side-mission-rng (rand-vu-float-range 0.12 0.77))
   (set! act-before1 0)
   (set! act-before2 0)
   (set! act-before3 0)
@@ -342,6 +343,12 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (set! death-i 0)
   (set! death-freeze #f)
   (set! barreli 0)
+  (if (not *bbush-random*)
+    (set! *bbush-random*
+      (process-spawn bbush-random :name "bbush-random")
+    )
+    (send-event (ppointer->process *bbush-random*) 'reset! #t)
+  )
   (logclear! (-> *game-info* features) (game-feature gun-upgrade-ammo gun-upgrade-damage gun-upgrade-speed))
   (set! board2-dropped? #f)
   (set! pleasewait #f)
@@ -447,6 +454,8 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   )
 )|#
 
+
+;;vin shop unlock progression
 (when (and (>= (-> *game-info* fuel) menu-value)(= vin-shop #t)(cpad-pressed? 0 r1))
   (-! (-> *game-info* fuel) menu-value)
   (when (= (-> *game-info* total-trys) 17)
@@ -1167,9 +1176,34 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 )
 
 
-;self is the randomizer. It teleports the player to a random stage in a certain act, and then sets their task.
+;this is the randomizer. It teleports the player to a random stage in a certain act, and then sets their task.
+
+#|UPDATE FROM 2 YEARS LATER:
+-----------------------------------
+Dear Past Matt,
+
+WHAT THE FUCK ARE YOU DOING WITH YOURSELF
+THIS CODE IS ABSOLUTE FLAMING GARBAGE!
+IT RUNS EVERY FRAME!!!?!?!?!?!?!!??!?!
+WHY IS IT NOT A PROCESS??????????????????????????????????????????????????????>
+WHAT GIVES YOU ME THE RIGHT TO JUST SLAP TOGETHER ALL OF
+THIS JUMBLED MESS WHEN I KNOW IM GOING TO CLEAN IT UP LATER!!!
+WHY CANT YOU JUST BREATHE FOR A SECOND AND LISTEN TO THE DUCK FFS
+...
+
+Matt, this sucks. To better navigate your own code in the future, just try for a simpler method.
+Make a fucking process. Rewrite all of this bullshit. It's literally the worst way to call the gameplay loop.
+BUT IT WORKS IG..
+No. There's a line, AND YA CROSSED IT!
+
+Best Regards,
+Future Matt
+A.K.A. Slightly Less of a DUMBASS!
+-----------------------------------
+|#
     (when (= act1-1 #t)
-      (let (
+      (if (rand-vu-percent? side-mission-rng)
+        (let (
         (level-pick (rand-vu-int-range 1 8))
         )
         (format #t "<<<<<<<<<<<<<<<<<<<<<<<<<<Level picked: ~D" level-pick)
@@ -1250,9 +1284,18 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
           (set! (-> *game-info* skill) temp-orbs)
           (set! act-act 1)
         )
+        (when #t
+          (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
+          (set! enemy-drop-weapon-once #f)
+          (set! roll-shopitems #t)
+          (set! act-act 1)
+          (set! print-stage 1)
+        )
+      )
     )
     (when (= act1-2 #t)
-      (let (
+      (if (rand-vu-percent? side-mission-rng)
+        (let (
         (level-pick (rand-vu-int-range 1 12))
         )
         (format #t "<<<<<<<<<<<<<<<<<<<<<<<<<<Level picked: ~D" level-pick)
@@ -1372,10 +1415,17 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
           (set! (-> *target* fact health) temp-health)
           (set! (-> *game-info* skill) temp-orbs)
         )
+        (when #t
+          (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
+          (set! act-act 1)
+          (set! print-stage 2)
+        )
+      )
     )
 
     (when (= act1-3 #t)
-      (let (
+      (if (rand-vu-percent? side-mission-rng)
+        (let (
         (level-pick (rand-vu-int-range 1 12))
         )
         (format #t "<<<<<<<<<<<<<<<<<<<<<<<<<<Level picked: ~D" level-pick)
@@ -1495,6 +1545,12 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
           (set! (-> *target* fact health) temp-health)
           (set! (-> *game-info* skill) temp-orbs)
         )
+        (when #t
+          (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
+          (set! act-act 1)
+          (set! print-stage 3)
+        )
+      )
     )
 
     (when (= act1-4 #t)
@@ -1552,7 +1608,8 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 
 ;-------------------------ACT 2------------------------------
 (when (= act2-1 #t)
-      (let (
+      (if (rand-vu-percent? side-mission-rng)
+        (let (
         (level-pick (rand-vu-int-range 1 11))
         )
         (format #t "<<<<<<<<<<<<<<<<<<<<<<<<<<Level picked: ~D" level-pick)
@@ -1668,9 +1725,18 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
           (set! (-> *target* fact health) 8.0)
           (set! (-> *game-info* skill) temp-orbs)
         )
+        (when #t
+          (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
+          (set! roll-shopitems #t)
+          (set! enemy-drop-weapon-once #f)
+          (set! act-act 2)
+          (set! print-stage 1)
+        )
+      )
     )
   (when (= act2-2 #t)
-      (let (
+      (if (rand-vu-percent? side-mission-rng)
+        (let (
         (level-pick (rand-vu-int-range 1 11))
         )
         (format #t "<<<<<<<<<<<<<<<<<<<<<<<<<<Level picked: ~D" level-pick)
@@ -1782,10 +1848,17 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
           (set! (-> *target* fact health) temp-health)
           (set! (-> *game-info* skill) temp-orbs)
         )
+        (when #t
+          (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
+          (set! act-act 2)
+          (set! print-stage 2)
+        )
+      )
     )
 
     (when (= act2-3 #t)
-      (let (
+      (if (rand-vu-percent? side-mission-rng)
+        (let (
         (level-pick (rand-vu-int-range 1 11))
         )
         (format #t "<<<<<<<<<<<<<<<<<<<<<<<<<<Level picked: ~D" level-pick)
@@ -1897,6 +1970,12 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
           (set! (-> *target* fact health) temp-health)
           (set! (-> *game-info* skill) temp-orbs)
         )
+        (when #t
+          (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
+          (set! act-act 2)
+          (set! print-stage 3)
+        )
+      )
     )
 
     (when (= act2-4 #t)
@@ -1949,7 +2028,8 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 
 ;------------------------------------ACT 3----------------------------------------
 (when (= act3-1 #t)
-      (let (
+      (if (rand-vu-percent? side-mission-rng)
+        (let (
         (level-pick (rand-vu-int-range 1 9))
         )
         (format #t "<<<<<<<<<<<<<<<<<<<<<<<<<<Level picked: ~D" level-pick)
@@ -2029,11 +2109,20 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
           (set! (-> *target* fact health) 8.0)
           (set! (-> *game-info* skill) temp-orbs)
         )
+        (when #t
+          (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
+          (set! act-act 3)
+          (set! enemy-drop-weapon-once #f)
+          (set! roll-shopitems #t)
+          (set! print-stage 1)
+        )
+      )
     )
 
 
 (when (= act3-2 #t)
-      (let (
+      (if (rand-vu-percent? side-mission-rng)
+        (let (
         (level-pick (rand-vu-int-range 1 9))
         )
         (format #t "<<<<<<<<<<<<<<<<<<<<<<<<<<Level picked: ~D" level-pick)
@@ -2110,10 +2199,17 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
           (set! (-> *target* fact health) temp-health)
           (set! (-> *game-info* skill) temp-orbs)
         )
+        (when #t
+          (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
+          (set! act-act 3)
+          (set! print-stage 2)
+        )
+      )
     )
 
     (when (= act3-3 #t)
-      (let (
+      (if (rand-vu-percent? side-mission-rng)
+        (let (
         (level-pick (rand-vu-int-range 1 9))
         )
         (format #t "<<<<<<<<<<<<<<<<<<<<<<<<<<Level picked: ~D" level-pick)
@@ -2190,6 +2286,12 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
           (set! (-> *target* fact health) temp-health)
           (set! (-> *game-info* skill) temp-orbs)
         )
+        (when #t
+          (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
+          (set! act-act 3)
+          (set! print-stage 3)
+        )
+      )
     )
 
 
@@ -2257,7 +2359,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
         (set! enemy-drop-weapon-once #f)
         (update-nestmood)
         (when (= level-pick act-before4)
-            (set! level-pick (rand-vu-int-range 1 4))
+            (set! level-pick (rand-vu-int-range 1 1))
             (format #t "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Level picked the same mission! Rerolling to: ~D" level-pick)
           )
           (when (= level-pick 1)
@@ -2307,7 +2409,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
         (set! print-stage 2)
         (update-nestmood)
         (when (= level-pick act-before4)
-            (set! level-pick (rand-vu-int-range 1 4))
+            (set! level-pick (rand-vu-int-range 1 1))
             (format #t "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Level picked the same mission! Rerolling to: ~D" level-pick)
           )
           (when (= level-pick 1)
@@ -2350,7 +2452,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
 
     (when (= act4-3 #t)
       (let (
-        (level-pick (rand-vu-int-range 1 4))
+        (level-pick (rand-vu-int-range 1 1))
         )
         (format #t "<<<<<<<<<<<<<<<<<<<<<<<<<<Level picked: ~D" level-pick)
         (set! print-stage 3)

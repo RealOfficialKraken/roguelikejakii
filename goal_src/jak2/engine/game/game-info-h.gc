@@ -9,8 +9,13 @@
 (declare-type continue-point basic)
 (declare-type game-save basic)
 
+(declare-type bbush-random process)
+(define *bbush-random* (the (pointer bbush-random) #f))
+
 (defun-extern item-refresh (none))
 (defun-extern disable-hudmap (none))
+
+(define side-mission-rng (rand-vu-float-range 0.12 0.77))
 
 (define matt-str (new 'global 'string 2048 (the-as string #f)))
 (define *pc-encoded-matt-str* (new 'global 'string 2048 (the-as string #f)))

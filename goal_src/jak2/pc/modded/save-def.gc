@@ -70,6 +70,12 @@
   (set! p-sage-dark #f)
   (set! p-crit-hits #f)
   (set! p-actual-clone #f)
+  (if (not *bbush-random*)
+    (set! *bbush-random*
+      (process-spawn bbush-random :name "bbush-random")
+    )
+    (send-event (ppointer->process *bbush-random*) 'reset! #t)
+  )
 (none)
 )
 
@@ -1281,7 +1287,7 @@
 (= arg1 0)
 (= (/ (mod (-> *game-info* task-deaths) 10) 1) 1)
 )
- (-! (-> *game-info* task-deaths) 1)
+ (-! (-> *game-info* auto-save-count) 1000000)
 )
 
 (when 

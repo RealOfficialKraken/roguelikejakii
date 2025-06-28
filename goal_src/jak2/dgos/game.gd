@@ -530,4 +530,5 @@
   "frong-modifiers.o"
   "update-board.o"
   "debug-text.o"
+  "bbush-random.o"
  ))
