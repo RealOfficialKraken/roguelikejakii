@@ -6,4 +6,7 @@
 <h3 style="color: red;">Be careful! Jak keeps his HP throughout the random missions. If Jak dies, you lose all items that you bought from the in-run shop!</h3>
 <h2>The goal is to collect <strong style="color: purple;">Tokens</strong> to purchase items to put into your run, alongside the skill it takes to prevent dying, and reaching the end goal of repairing the time loop:</h2>
 <h3 style="text-align: center;">Beat Metal Kor on the final mission, and restore balance to the multiverse.</h3>
+<hr>
+<br>
+<h1>To play the mod, head <a href="https://jakmods.dev/">over here</a> see a full tutorial of how you install mods in OpenGOAL.</h1>
 <img src="Mod-Thumbnail.png" alt="A revamp of Jak II in a Roguelike Setting with custom weapons, abilities, enemies, and it's very own story." align="center">
