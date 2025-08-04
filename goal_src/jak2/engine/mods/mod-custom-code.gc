@@ -312,6 +312,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (set! nest-enemyc 55)
   (set! stat-menu #f)
   (set! dark-mode #f)
+  (set! bbush-started? #f)
   (set! (-> *mood-control* overide-weather-flag) #f)
   (set! (-> *time-of-day-context* overide-enable) #f)
   (set! in-cheat #f)
@@ -344,9 +345,7 @@ Note: it takes 1710.0 skill count to hit 40 damage with weapons using p-crit-hit
   (set! death-freeze #f)
   (set! barreli 0)
   (if (not *bbush-random*)
-    (set! *bbush-random*
-      (process-spawn bbush-random :name "bbush-random")
-    )
+    (spawn-bbushrandom)
     (send-event (ppointer->process *bbush-random*) 'reset! #t)
   )
   (logclear! (-> *game-info* features) (game-feature gun-upgrade-ammo gun-upgrade-damage gun-upgrade-speed))
@@ -1202,7 +1201,10 @@ A.K.A. Slightly Less of a DUMBASS!
 -----------------------------------
 |#
     (when (= act1-1 #t)
-      (if (rand-vu-percent? side-mission-rng)
+      (if (and
+            (rand-vu-percent? side-mission-rng)
+            (= bbush-started? #f)
+          )
         (let (
         (level-pick (rand-vu-int-range 1 8))
         )
@@ -1285,6 +1287,7 @@ A.K.A. Slightly Less of a DUMBASS!
           (set! act-act 1)
         )
         (when #t
+          (set! bbush-started? #t)
           (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
           (set! enemy-drop-weapon-once #f)
           (set! roll-shopitems #t)
@@ -1294,7 +1297,10 @@ A.K.A. Slightly Less of a DUMBASS!
       )
     )
     (when (= act1-2 #t)
-      (if (rand-vu-percent? side-mission-rng)
+      (if (and
+            (rand-vu-percent? side-mission-rng)
+            (= bbush-started? #f)
+          )
         (let (
         (level-pick (rand-vu-int-range 1 12))
         )
@@ -1416,6 +1422,7 @@ A.K.A. Slightly Less of a DUMBASS!
           (set! (-> *game-info* skill) temp-orbs)
         )
         (when #t
+          (set! bbush-started? #t)
           (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
           (set! act-act 1)
           (set! print-stage 2)
@@ -1424,7 +1431,10 @@ A.K.A. Slightly Less of a DUMBASS!
     )
 
     (when (= act1-3 #t)
-      (if (rand-vu-percent? side-mission-rng)
+      (if (and
+            (rand-vu-percent? side-mission-rng)
+            (= bbush-started? #f)
+          )
         (let (
         (level-pick (rand-vu-int-range 1 12))
         )
@@ -1546,6 +1556,7 @@ A.K.A. Slightly Less of a DUMBASS!
           (set! (-> *game-info* skill) temp-orbs)
         )
         (when #t
+          (set! bbush-started? #t)
           (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
           (set! act-act 1)
           (set! print-stage 3)
@@ -1593,6 +1604,7 @@ A.K.A. Slightly Less of a DUMBASS!
         (set! teleport-hiphog #f)
         (set! teleport-back? #f)
         (set! already-teleported? #f)
+        (set! bbush-started? #f)
         (when (and 
         (not (logtest? gp-0 (game-feature gun-red)))
         (not (logtest? gp-0 (game-feature gun-yellow)))
@@ -1608,7 +1620,10 @@ A.K.A. Slightly Less of a DUMBASS!
 
 ;-------------------------ACT 2------------------------------
 (when (= act2-1 #t)
-      (if (rand-vu-percent? side-mission-rng)
+      (if (and
+            (rand-vu-percent? side-mission-rng)
+            (= bbush-started? #f)
+          )
         (let (
         (level-pick (rand-vu-int-range 1 11))
         )
@@ -1726,6 +1741,7 @@ A.K.A. Slightly Less of a DUMBASS!
           (set! (-> *game-info* skill) temp-orbs)
         )
         (when #t
+          (set! bbush-started? #t)
           (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
           (set! roll-shopitems #t)
           (set! enemy-drop-weapon-once #f)
@@ -1735,7 +1751,10 @@ A.K.A. Slightly Less of a DUMBASS!
       )
     )
   (when (= act2-2 #t)
-      (if (rand-vu-percent? side-mission-rng)
+      (if (and
+            (rand-vu-percent? side-mission-rng)
+            (= bbush-started? #f)
+          )
         (let (
         (level-pick (rand-vu-int-range 1 11))
         )
@@ -1849,6 +1868,7 @@ A.K.A. Slightly Less of a DUMBASS!
           (set! (-> *game-info* skill) temp-orbs)
         )
         (when #t
+          (set! bbush-started? #t)
           (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
           (set! act-act 2)
           (set! print-stage 2)
@@ -1857,7 +1877,10 @@ A.K.A. Slightly Less of a DUMBASS!
     )
 
     (when (= act2-3 #t)
-      (if (rand-vu-percent? side-mission-rng)
+      (if (and
+            (rand-vu-percent? side-mission-rng)
+            (= bbush-started? #f)
+          )
         (let (
         (level-pick (rand-vu-int-range 1 11))
         )
@@ -1971,6 +1994,7 @@ A.K.A. Slightly Less of a DUMBASS!
           (set! (-> *game-info* skill) temp-orbs)
         )
         (when #t
+          (set! bbush-started? #t)
           (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
           (set! act-act 2)
           (set! print-stage 3)
@@ -2028,7 +2052,10 @@ A.K.A. Slightly Less of a DUMBASS!
 
 ;------------------------------------ACT 3----------------------------------------
 (when (= act3-1 #t)
-      (if (rand-vu-percent? side-mission-rng)
+      (if (and
+            (rand-vu-percent? side-mission-rng)
+            (= bbush-started? #f)
+          )
         (let (
         (level-pick (rand-vu-int-range 1 9))
         )
@@ -2110,6 +2137,7 @@ A.K.A. Slightly Less of a DUMBASS!
           (set! (-> *game-info* skill) temp-orbs)
         )
         (when #t
+          (set! bbush-started? #t)
           (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
           (set! act-act 3)
           (set! enemy-drop-weapon-once #f)
@@ -2121,7 +2149,10 @@ A.K.A. Slightly Less of a DUMBASS!
 
 
 (when (= act3-2 #t)
-      (if (rand-vu-percent? side-mission-rng)
+      (if (and
+            (rand-vu-percent? side-mission-rng)
+            (= bbush-started? #f)
+          )
         (let (
         (level-pick (rand-vu-int-range 1 9))
         )
@@ -2200,6 +2231,7 @@ A.K.A. Slightly Less of a DUMBASS!
           (set! (-> *game-info* skill) temp-orbs)
         )
         (when #t
+          (set! bbush-started? #t)
           (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
           (set! act-act 3)
           (set! print-stage 2)
@@ -2208,7 +2240,10 @@ A.K.A. Slightly Less of a DUMBASS!
     )
 
     (when (= act3-3 #t)
-      (if (rand-vu-percent? side-mission-rng)
+      (if (and
+            (rand-vu-percent? side-mission-rng)
+            (= bbush-started? #f)
+          )
         (let (
         (level-pick (rand-vu-int-range 1 9))
         )
@@ -2287,6 +2322,7 @@ A.K.A. Slightly Less of a DUMBASS!
           (set! (-> *game-info* skill) temp-orbs)
         )
         (when #t
+          (set! bbush-started? #t)
           (send-event (ppointer->process *bbush-random*) 'init-bbush! #t)
           (set! act-act 3)
           (set! print-stage 3)
@@ -2326,6 +2362,7 @@ A.K.A. Slightly Less of a DUMBASS!
             ;(set! avoidk-wait #t)
           )
         (set! print-stage 5)
+        (set! bbush-started? #f)
         (set! act3-5 #f)
         (set! waitenter #t)
         (set! (-> *game-info* gem) temp-skullgemamount)
@@ -2531,6 +2568,7 @@ A.K.A. Slightly Less of a DUMBASS!
           )
         
         (set! print-stage 5)
+        (set! bbush-started? #f)
         (set! act4-5 #f)
         (update-nestmood)
         (set! waitenter #t)
@@ -2923,6 +2961,7 @@ A.K.A. Slightly Less of a DUMBASS!
       (set! act4-5 #t)
       (set! board-dropped? #f)
       (set! print-stage 5)
+      (set! bbush-started? #f)
       (set! level-completed? #f)
       (when 
       (and

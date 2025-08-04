@@ -41,6 +41,10 @@
 (define final-waitb #f)
 (define final-waiti 0)
 
+(defun-extern spawn-bbushrandom (none))
+
+(define bbush-started? #f)
+
 (define starter-weapon 0)
 (define starter-display "<COLOR_YELLOW>BLASTER")
 (define gun-red-special #f)

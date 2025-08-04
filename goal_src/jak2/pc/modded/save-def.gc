@@ -71,9 +71,7 @@
   (set! p-crit-hits #f)
   (set! p-actual-clone #f)
   (if (not *bbush-random*)
-    (set! *bbush-random*
-      (process-spawn bbush-random :name "bbush-random")
-    )
+    (spawn-bbushrandom)
     (send-event (ppointer->process *bbush-random*) 'reset! #t)
   )
 (none)
