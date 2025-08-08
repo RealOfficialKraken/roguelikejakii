@@ -57,7 +57,7 @@ frong-display9 "Infinite Ammo"
     (= frong-spawning? #t)
     (= in-hub? #f)
     )
-        (when (rand-vu-percent? 0.4)
+        (when (rand-vu-percent? 1.0)
             (process-spawn c-fodder frong-position)
             (set! frong-ingame? #t)
         )

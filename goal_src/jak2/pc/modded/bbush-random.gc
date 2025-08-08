@@ -108,7 +108,7 @@
     :event bbush-random-event-handler
     :code (behavior()
         (loop
-            (when (= in-game? #f)
+            (when (= in-hub? #t)
                 (go-virtual dormant)
             )
             (when *debug-segment*
