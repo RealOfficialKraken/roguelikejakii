@@ -1155,6 +1155,22 @@
 spawned-orb-entity
 ")
   )
+  (when (rand-vu-percent? 0.2)
+    (let (
+        (gem-count 1.0)
+        (math-gem (rand-vu-int-range 1 5))
+        (vec (new-stack-vector0))
+        )
+      (set! (-> vec quad) (-> this root trans quad))
+      (+! (-> vec y) (meters 5))
+      (set! gem-count (the float math-gem))
+      (when (rand-vu-percent? luck)
+        (set! math-gem (rand-vu-int-range 1 4))
+        (*! gem-count (the float math-gem))
+      )
+      (birth-pickup-at-point vec (pickup-type gem) gem-count #f *entity-pool* (-> this fact))
+    )
+  )
   (when ;drop health when you're not at full HP off luck stat
   (and 
   (rand-vu-percent? (- luck 0.086))
