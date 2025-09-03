@@ -95,6 +95,8 @@
 (define-extern challenge-string string)
 ;(define unlock-infiniteammo? #f)
 
+(defun-extern set-run-info! (none))
+
 (defun-extern someone-fire-c-yellow process-drawable vector vector (pointer process))
 (defun-extern someone-fire-c-blue process-drawable vector vector (pointer process))
 (defun-extern someone-fire-c-red process-drawable vector vector (pointer process))
