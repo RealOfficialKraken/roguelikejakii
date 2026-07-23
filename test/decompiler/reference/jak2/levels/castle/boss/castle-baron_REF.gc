@@ -168,12 +168,7 @@
 ;; definition for method 45 of type cboss-elevator
 (defmethod commited-to-ride? ((this cboss-elevator))
   "@returns if the target is considered within the elevator area enough to begin descending/ascending"
-  (let* ((gp-0 *target*)
-         (a0-2 (if (type? gp-0 process-focusable)
-                   gp-0
-                   )
-               )
-         )
+  (let ((a0-2 (the-as target (as-type *target* process-focusable))))
     (when a0-2
       (let* ((v1-1 (get-trans a0-2 0))
              (gp-2 (vector-! (new 'stack-no-clear 'vector) v1-1 (-> this root trans)))
@@ -2737,17 +2732,7 @@
       )
     (let ((gp-2 (the int (* 300.0 (- 3.0 (* 0.5 (+ -1.0 (the float (-> self gameplay-pass)))))))))
       (when (and (-> self spawn-charge) (time-elapsed? (-> self state-time) (+ gp-2 -300)))
-        (process-spawn
-          part-tracker
-          :init part-tracker-init
-          (-> *part-group-id-table* 1204)
-          300
-          #f
-          #f
-          self
-          33
-          :to self
-          )
+        (process-spawn part-tracker :init part-tracker-init group-krew-boss-gun-charge 300 #f #f self 33 :to self)
         (set! (-> self spawn-charge) #f)
         )
       (when (and (= (-> self next-shooting-frame) 100) (time-elapsed? (-> self state-time) gp-2))
@@ -2772,12 +2757,7 @@
           (+! (-> self next-shooting-frame) 5)
           )
         )
-      (let* ((gp-5 *target*)
-             (a0-40 (if (type? gp-5 process-focusable)
-                        gp-5
-                        )
-                    )
-             )
+      (let ((a0-40 (the-as target (as-type *target* process-focusable))))
         (when a0-40
           (let ((gp-6 (new 'stack-no-clear 'projectile-init-by-other-params)))
             (let ((s4-0 (new 'stack-no-clear 'vector)))

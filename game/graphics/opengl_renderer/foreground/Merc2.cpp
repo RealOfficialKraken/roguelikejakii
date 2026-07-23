@@ -1,13 +1,8 @@
 #include "Merc2.h"
 
-#ifdef __aarch64__
-#include "third-party/sse2neon/sse2neon.h"
-#else
-#include <xmmintrin.h>
-#endif
-
 #include "common/global_profiler/GlobalProfiler.h"
 #include "common/util/fnv.h"
+#include "common/util/simd_util.h"
 
 #include "game/graphics/opengl_renderer/EyeRenderer.h"
 #include "game/graphics/opengl_renderer/background/background_common.h"
@@ -617,11 +612,11 @@ void Merc2::handle_pc_model(const DmaTransfer& setup,
   u32 first_bone = alloc_bones(bone_count, skel_matrix_buffer);
 
   // allocate lights
-  if (current_lights.w1) {
-    if (render_state->version != GameVersion::Jak3) {
-      current_lights.w1 = 0;  // force off merc fade in jak2/1 - a bunch of stuff uses this
-    }
-  }
+  // if (current_lights.w1) {
+  //   if (render_state->version != GameVersion::Jak3) {
+  //     current_lights.w1 = 0;  // force off merc fade in jak2/1 - a bunch of stuff uses this
+  //   }
+  // }
   u32 lights = alloc_lights(current_lights);
   stats->num_lights++;
 
@@ -1265,7 +1260,8 @@ void Merc2::do_draws(const Draw* draw_array,
       if (draw.texture < (int)lev->textures.size() && draw.texture >= 0) {
         glBindTexture(GL_TEXTURE_2D, lev->textures.at(draw.texture));
       } else if ((draw.texture & 0xffffff00) == 0xefffff00) {
-        if (render_state->version >= GameVersion::Jak3) {
+        if (render_state->version == GameVersion::Jak3 ||
+            render_state->version == GameVersion::JakX) {
           auto maybe_eye =
               render_state->eye_renderer->lookup_eye_texture_hash(draw.hash, (draw.texture & 1));
           if (maybe_eye) {

@@ -37,8 +37,8 @@ namespace MiniAudioLib {
 #include "common/log/log.h"
 #include "common/symbols.h"
 #include "common/util/FileUtil.h"
-#include "common/util/FontUtils.h"
 #include "common/util/Timer.h"
+#include "common/util/font/font_utils.h"
 #include "common/util/string_util.h"
 
 #include "game/external/discord.h"
@@ -50,6 +50,7 @@ namespace MiniAudioLib {
 #include "game/kernel/common/kprint.h"
 #include "game/kernel/common/kscheme.h"
 #include "game/mips2c/mips2c_table.h"
+#include "game/runtime.h"
 #include "game/sce/libcdvd_ee.h"
 #include "game/sce/libpad.h"
 #include "game/sce/libscf.h"
@@ -109,9 +110,58 @@ void InitCD() {
 
 /*!
  * Initialize the GS and display the splash screen.
- * Not yet implemented. TODO
  */
-void InitVideo() {}
+void InitVideo() {
+  if (!SplashScreen) {
+    lg::info("InitVideo: skipping splash!\n");
+    return;
+  }
+  std::map<int, std::string> lang_to_splash_map{
+      {SCE_JAPANESE_LANGUAGE, "JAP"},   {SCE_ENGLISH_LANGUAGE, "USA"},
+      {SCE_FRENCH_LANGUAGE, "FRE"},     {SCE_SPANISH_LANGUAGE, "SPA"},
+      {SCE_GERMAN_LANGUAGE, "GER"},     {SCE_ITALIAN_LANGUAGE, "ITA"},
+      {SCE_PORTUGUESE_LANGUAGE, "POR"}, {SCE_KOREAN_LANGUAGE, "KOR"},
+  };
+  auto lang = ee::sceScfGetLanguage();
+  if (!lang_to_splash_map.contains(lang)) {
+    lg::warn("InitVideo: no splash for lang {}, falling back to english...\n", lang);
+    lang = SCE_ENGLISH_LANGUAGE;
+  }
+  auto filename = "SCREEN1." + lang_to_splash_map.at(lang);
+  auto path = file_util::get_jak_project_dir() / "out" / game_version_names[g_game_version] /
+              "iso" / filename;
+  if (lang != SCE_ENGLISH_LANGUAGE && !fs::exists(path)) {
+    lg::warn("InitVideo: file {} not found, falling back to english...\n", filename);
+    path = file_util::get_jak_project_dir() / "out" / game_version_names[g_game_version] / "iso" /
+           "SCREEN1.USA";
+  }
+  if (!fs::exists(path)) {
+    lg::warn("InitVideo: splash screen not found!\n");
+    return;
+  }
+  auto data = file_util::read_binary_file(path);
+  // width is always 512, height is sometimes different (e.g. demo screens), so we infer from file
+  // size
+  constexpr int kWidth = 512;
+  if (data.size() % (kWidth * 4) != 0) {
+    lg::error("InitVideo: splash size {} not divisible by stride {}", data.size(), kWidth * 4);
+    return;
+  }
+  int kHeight = data.size() / (kWidth * 4);
+  if ((int)data.size() != kWidth * kHeight * 4) {
+    lg::error("InitVideo: unexpected size {}, expected {} for splash screen", data.size(),
+              kWidth * kHeight * 4);
+    return;
+  }
+  Gfx::g_splash.data = std::move(data);
+  Gfx::g_splash.width = kWidth;
+  Gfx::g_splash.height = kHeight;
+  Gfx::g_splash.ready.store(true);
+  SplashTimer.start();
+  while (SplashTimer.getSeconds() < SPLASH_SCREEN_TIME) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  }
+}
 
 /*!
  * Flush caches.  Does all the memory, regardless of what you specify
@@ -507,6 +557,16 @@ s32 kwrite(u64 fs, u64 buffer, s32 size) {
   return result;
 }
 
+s32 kmkdir(u64 name) {
+  char acStack_90[128];
+  if (Ptr<String>(name)->data()[4] == '/') {  // start from the fourth character?
+    sprintf(acStack_90, "%s", Ptr<String>(name)->data() + 5);
+  } else {
+    sprintf(acStack_90, "host:%s", Ptr<String>(name)->data() + 4);
+  }
+  return ee::sceMkDir(acStack_90, 0x1fd);
+}
+
 /*!
  * Close a file stream.
  */
@@ -640,6 +700,24 @@ void pc_texture_upload_now(u32 page, u32 mode) {
   }
 }
 
+void pc_force_reload_all() {
+  if (Gfx::GetCurrentRenderer()) {
+    Gfx::GetCurrentRenderer()->force_reload_all();
+  }
+}
+
+void pc_force_reload_level(u32 name) {
+  if (Gfx::GetCurrentRenderer()) {
+    Gfx::GetCurrentRenderer()->force_reload_level(std::string(Ptr<String>(name).c()->data()));
+  }
+}
+
+void pc_force_reload_common() {
+  if (Gfx::GetCurrentRenderer()) {
+    Gfx::GetCurrentRenderer()->force_reload_common();
+  }
+}
+
 void pc_texture_relocate(u32 dst, u32 src, u32 format) {
   if (Gfx::GetCurrentRenderer()) {
     Gfx::GetCurrentRenderer()->texture_relocate(dst, src, format);
@@ -653,7 +731,7 @@ u64 pc_get_mips2c(u32 name) {
 
 u64 pc_get_display_id() {
   if (Display::GetMainDisplay()) {
-    return Display::GetMainDisplay()->get_display_manager()->get_active_display_id();
+    return Display::GetMainDisplay()->get_display_manager()->get_active_display_index();
   }
   return 0;
 }
@@ -699,19 +777,19 @@ u32 pc_get_display_mode() {
   }
 }
 
-void pc_set_display_mode(u32 symptr) {
+void pc_set_display_mode(u32 symptr, u64 window_width, u64 window_height) {
   if (!Display::GetMainDisplay()) {
     return;
   }
   if (symptr == g_pc_port_funcs.intern_from_c("windowed").offset || symptr == s7.offset) {
     Display::GetMainDisplay()->get_display_manager()->enqueue_set_window_display_mode(
-        game_settings::DisplaySettings::DisplayMode::Windowed);
+        game_settings::DisplaySettings::DisplayMode::Windowed, window_width, window_height);
   } else if (symptr == g_pc_port_funcs.intern_from_c("borderless").offset) {
     Display::GetMainDisplay()->get_display_manager()->enqueue_set_window_display_mode(
-        game_settings::DisplaySettings::DisplayMode::Borderless);
+        game_settings::DisplaySettings::DisplayMode::Borderless, window_width, window_height);
   } else if (symptr == g_pc_port_funcs.intern_from_c("fullscreen").offset) {
     Display::GetMainDisplay()->get_display_manager()->enqueue_set_window_display_mode(
-        game_settings::DisplaySettings::DisplayMode::Fullscreen);
+        game_settings::DisplaySettings::DisplayMode::Fullscreen, window_width, window_height);
   }
 }
 
@@ -991,6 +1069,112 @@ void pc_set_auto_hide_cursor(u32 val) {
   }
 }
 
+u64 pc_get_pressure_sensitivity_enabled() {
+  if (Display::GetMainDisplay()) {
+    return bool_to_symbol(
+        Display::GetMainDisplay()->get_input_manager()->is_pressure_sensitivity_enabled());
+  }
+  return bool_to_symbol(false);
+}
+
+void pc_set_pressure_sensitivity_enabled(u32 val) {
+  if (Display::GetMainDisplay()) {
+    Display::GetMainDisplay()->get_input_manager()->set_pressure_sensitivity_enabled(
+        symbol_to_bool(val));
+  }
+}
+
+void pc_set_axis_scale(u32 val) {
+  if (Display::GetMainDisplay()) {
+    // wow dangerous i guess
+    Display::GetMainDisplay()->get_input_manager()->set_axis_scale(*((float*)&val));
+  }
+}
+
+u32 pc_get_axis_scale() {
+  float out = 1.33f;
+  if (Display::GetMainDisplay()) {
+    out = Display::GetMainDisplay()->get_input_manager()->axis_scale();
+  }
+  // wow dangerous i guess
+  return *((u32*)&out);
+}
+
+u64 pc_current_controller_has_pressure_sensitivity() {
+  if (Display::GetMainDisplay()) {
+    return bool_to_symbol(
+        Display::GetMainDisplay()->get_input_manager()->controller_has_pressure_sensitivity_support(
+            0));
+  }
+  return bool_to_symbol(false);
+}
+
+u64 pc_current_controller_has_trigger_effect_support() {
+  if (Display::GetMainDisplay()) {
+    return bool_to_symbol(
+        Display::GetMainDisplay()->get_input_manager()->controller_has_trigger_effect_support(0));
+  }
+  return bool_to_symbol(false);
+}
+
+u64 pc_get_trigger_effects_enabled() {
+  if (Display::GetMainDisplay()) {
+    return bool_to_symbol(
+        Display::GetMainDisplay()->get_input_manager()->are_trigger_effects_enabled());
+  }
+  return bool_to_symbol(false);
+}
+
+void pc_set_trigger_effects_enabled(u32 val) {
+  if (Display::GetMainDisplay()) {
+    Display::GetMainDisplay()->get_input_manager()->enqueue_set_trigger_effects_enabled(
+        symbol_to_bool(val));
+  }
+}
+
+void pc_clear_trigger_effect(dualsense_effects::TriggerEffectOption option) {
+  if (Display::GetMainDisplay()) {
+    Display::GetMainDisplay()->get_input_manager()->enqueue_controller_clear_trigger_effect(0,
+                                                                                            option);
+  }
+}
+
+void pc_send_trigger_effect_feedback(dualsense_effects::TriggerEffectOption option,
+                                     u8 position,
+                                     u8 strength) {
+  if (Display::GetMainDisplay()) {
+    Display::GetMainDisplay()->get_input_manager()->enqueue_controller_send_trigger_effect_feedback(
+        0, option, position, strength);
+  }
+}
+
+void pc_send_trigger_effect_vibrate(dualsense_effects::TriggerEffectOption option,
+                                    u8 position,
+                                    u8 amplitude,
+                                    u8 frequency) {
+  if (Display::GetMainDisplay()) {
+    Display::GetMainDisplay()->get_input_manager()->enqueue_controller_send_trigger_effect_vibrate(
+        0, option, position, amplitude, frequency);
+  }
+}
+
+void pc_send_trigger_effect_weapon(dualsense_effects::TriggerEffectOption option,
+                                   u8 start_position,
+                                   u8 end_position,
+                                   u8 strength) {
+  if (Display::GetMainDisplay()) {
+    Display::GetMainDisplay()->get_input_manager()->enqueue_controller_send_trigger_effect_weapon(
+        0, option, start_position, end_position, strength);
+  }
+}
+
+void pc_send_trigger_rumble(u16 left_rumble, u16 right_rumble, u32 duration_ms) {
+  if (Display::GetMainDisplay()) {
+    Display::GetMainDisplay()->get_input_manager()->enqueue_controller_send_trigger_rumble(
+        0, left_rumble, right_rumble, duration_ms);
+  }
+}
+
 void pc_set_vsync(u32 sym_val) {
   Gfx::g_global_settings.vsync = symbol_to_bool(sym_val);
 }
@@ -1011,6 +1195,11 @@ void pc_set_game_resolution(int w, int h) {
 void pc_set_letterbox(int w, int h) {
   Gfx::g_global_settings.lbox_w = w;
   Gfx::g_global_settings.lbox_h = h;
+}
+
+void pc_set_brightness_contrast(s32 color, s32 alpha) {
+  Gfx::g_global_settings.brightness_contrast_color = color;
+  Gfx::g_global_settings.brightness_contrast_alpha = alpha;
 }
 
 void pc_renderer_tree_set_lod(Gfx::RendererTreeType tree, int lod) {
@@ -1137,6 +1326,9 @@ void init_common_pc_port_functions(
   // Called from the game thread at initialization. The game thread is the only one to touch the
   // mips2c function table (through the linker and ugh this function), so no locking is needed.
   make_func_symbol_func("__pc-get-mips2c", (void*)pc_get_mips2c);
+  make_func_symbol_func("__pc-force-reload-all-levels", (void*)pc_force_reload_all);
+  make_func_symbol_func("__pc-force-reload-level", (void*)pc_force_reload_level);
+  make_func_symbol_func("__pc-force-reload-common-level", (void*)pc_force_reload_common);
 
   // -- DISPLAY RELATED --
   // Returns the name of the display with the given id or #f if not found / empty
@@ -1182,12 +1374,30 @@ void init_common_pc_port_functions(
   make_func_symbol_func("pc-stop-waiting-for-bind!", (void*)pc_stop_waiting_for_bind);
   make_func_symbol_func("pc-reset-bindings-to-defaults!", (void*)pc_reset_bindings_to_defaults);
   make_func_symbol_func("pc-set-auto-hide-cursor!", (void*)pc_set_auto_hide_cursor);
+  make_func_symbol_func("pc-get-pressure-sensitivity-enabled?",
+                        (void*)pc_get_pressure_sensitivity_enabled);
+  make_func_symbol_func("pc-set-pressure-sensitivity-enabled!",
+                        (void*)pc_set_pressure_sensitivity_enabled);
+  make_func_symbol_func("pc-set-axis-scale!", (void*)pc_set_axis_scale);
+  make_func_symbol_func("pc-get-axis-scale", (void*)pc_get_axis_scale);
+  make_func_symbol_func("pc-current-controller-has-pressure-sensitivity?",
+                        (void*)pc_current_controller_has_pressure_sensitivity);
+  make_func_symbol_func("pc-current-controller-has-trigger-effect-support?",
+                        (void*)pc_current_controller_has_trigger_effect_support);
+  make_func_symbol_func("pc-get-trigger-effects-enabled?", (void*)pc_get_trigger_effects_enabled);
+  make_func_symbol_func("pc-set-trigger-effects-enabled!", (void*)pc_set_trigger_effects_enabled);
+  make_func_symbol_func("pc-clear-trigger-effect!", (void*)pc_clear_trigger_effect);
+  make_func_symbol_func("pc-send-trigger-effect-feedback!", (void*)pc_send_trigger_effect_feedback);
+  make_func_symbol_func("pc-send-trigger-effect-vibrate!", (void*)pc_send_trigger_effect_vibrate);
+  make_func_symbol_func("pc-send-trigger-effect-weapon!", (void*)pc_send_trigger_effect_weapon);
+  make_func_symbol_func("pc-send-trigger-rumble!", (void*)pc_send_trigger_rumble);
 
   // graphics things
   make_func_symbol_func("pc-set-vsync", (void*)pc_set_vsync);
   make_func_symbol_func("pc-set-msaa", (void*)pc_set_msaa);
   make_func_symbol_func("pc-set-frame-rate", (void*)pc_set_frame_rate);
   make_func_symbol_func("pc-set-game-resolution", (void*)pc_set_game_resolution);
+  make_func_symbol_func("pc-set-brightness-contrast", (void*)pc_set_brightness_contrast);
   make_func_symbol_func("pc-set-letterbox", (void*)pc_set_letterbox);
   make_func_symbol_func("pc-renderer-tree-set-lod", (void*)pc_renderer_tree_set_lod);
   make_func_symbol_func("pc-set-collision-mode", (void*)Gfx::CollisionRendererSetMode);

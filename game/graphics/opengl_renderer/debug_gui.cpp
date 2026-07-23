@@ -1,5 +1,7 @@
 #include "debug_gui.h"
 
+#include <algorithm>
+
 #include "common/global_profiler/GlobalProfiler.h"
 #include "common/util/string_util.h"
 
@@ -9,7 +11,7 @@
 #include "game/overlord/jak3/dma.h"
 #include "game/system/hid/sdl_util.h"
 
-#include "fmt/core.h"
+#include "fmt/format.h"
 #include "third-party/imgui/imgui.h"
 #include "third-party/imgui/imgui_style.h"
 
@@ -129,9 +131,16 @@ void OpenGlDebugGui::draw(const DmaStats& dma_stats) {
     }
 
     if (ImGui::BeginMenu("Settings")) {
-      if (ImGui::TreeNode("ImGui Styling (restart required for these)")) {
-        ImGui::InputInt("Font Size", &Gfx::g_debug_settings.imgui_font_size);
-        ImGui::Checkbox("Monospaced Font", &Gfx::g_debug_settings.monospaced_font);
+      // ImGUI stuff
+      if (ImGui::TreeNode("ImGui Styling")) {
+        if (ImGui::InputFloat("Font Scale", &Gfx::g_debug_settings.imgui_font_scale)) {
+          Gfx::g_debug_settings.imgui_font_scale =
+              std::clamp(Gfx::g_debug_settings.imgui_font_scale, 0.5f, 3.0f);
+          ImGui::applyFontStyle();
+        }
+        if (ImGui::Checkbox("Monospaced Font", &Gfx::g_debug_settings.monospaced_font)) {
+          ImGui::applyFontStyle();
+        }
         if (ImGui::Checkbox("Alternate Style", &Gfx::g_debug_settings.alternate_style)) {
           if (Gfx::g_debug_settings.alternate_style) {
             ImGui::applyAlternateStyle();
@@ -142,6 +151,42 @@ void OpenGlDebugGui::draw(const DmaStats& dma_stats) {
         ImGui::TreePop();
       }
       ImGui::Checkbox("Ignore Hide ImGui Bind", &Gfx::g_debug_settings.ignore_hide_imgui);
+      // Controller Stuff
+      ImGui::Separator();
+      ImGui::Checkbox("Treat Controller Port 0 as Port 1",
+                      &Gfx::g_debug_settings.treat_pad0_as_pad1);
+      auto is_keyboard_enabled =
+          Display::GetMainDisplay()->get_input_manager()->is_keyboard_enabled();
+      if (ImGui::Checkbox("Enable Keyboard (forced on if no controllers detected)",
+                          &is_keyboard_enabled)) {
+        Display::GetMainDisplay()->get_input_manager()->enable_keyboard(is_keyboard_enabled);
+      }
+      for (int port = 0; port < 1; port++) {
+        const auto label = fmt::format("Selected Controller (Port {})", port);
+        if (ImGui::TreeNode(label.c_str())) {
+          const auto num_controllers =
+              Display::GetMainDisplay()->get_input_manager()->get_num_controllers();
+          std::unordered_map<std::string, int> controller_name_counts;
+          for (int i = 0; i < num_controllers; i++) {
+            const auto controller_name =
+                Display::GetMainDisplay()->get_input_manager()->get_controller_name(i);
+            int count = controller_name_counts[controller_name]++;
+            std::string display_name = controller_name;
+            if (count > 0) {
+              display_name = fmt::format("{} ({})", display_name, count);
+            }
+            auto is_controller_active =
+                Display::GetMainDisplay()->get_input_manager()->get_controller_index(port) == i;
+            if (ImGui::RadioButton(display_name.c_str(), is_controller_active)) {
+              Display::GetMainDisplay()->get_input_manager()->set_controller_for_port(i, port);
+            }
+          }
+          ImGui::TreePop();
+        }
+      }
+
+      // FPS Stuff
+      ImGui::Separator();
       if (ImGui::TreeNode("Frame Rate")) {
         ImGui::Checkbox("Framelimiter", &Gfx::g_global_settings.framelimiter);
         ImGui::InputFloat("Target FPS", &target_fps_input);
@@ -152,13 +197,6 @@ void OpenGlDebugGui::draw(const DmaStats& dma_stats) {
         ImGui::Checkbox("Accurate Lag Mode", &Gfx::g_global_settings.experimental_accurate_lag);
         ImGui::Checkbox("Sleep in Frame Limiter", &Gfx::g_global_settings.sleep_in_frame_limiter);
         ImGui::TreePop();
-      }
-      ImGui::Checkbox("Treat Pad0 as Pad1", &Gfx::g_debug_settings.treat_pad0_as_pad1);
-      auto is_keyboard_enabled =
-          Display::GetMainDisplay()->get_input_manager()->is_keyboard_enabled();
-      if (ImGui::Checkbox("Enable Keyboard (forced on if no controllers detected)",
-                          &is_keyboard_enabled)) {
-        Display::GetMainDisplay()->get_input_manager()->enable_keyboard(is_keyboard_enabled);
       }
       ImGui::EndMenu();
     }
@@ -233,3 +271,42 @@ void OpenGlDebugGui::draw_overlord_debug_menu() {
                 stream[1].name.chars, stream[1].idx);
   }
 }
+
+namespace ImGui {
+void applyFontStyle() {
+  ImGuiIO& io = ImGui::GetIO();
+  io.Fonts->ClearFonts();
+
+  ImFont* default_font = io.Fonts->AddFontDefault();
+  ImFont* custom_font = nullptr;
+
+  if (!Gfx::g_debug_settings.monospaced_font) {
+    std::string font_path =
+        (file_util::get_jak_project_dir() / "game" / "assets" / "fonts" / "NotoSansJP-Medium.ttf")
+            .string();
+    if (file_util::file_exists(font_path)) {
+      static const ImWchar ranges[] = {
+          0x0020, 0x00FF,  // Basic Latin + Latin Supplement
+          0x0400, 0x052F,  // Cyrillic + Cyrillic Supplement
+          0x2000, 0x206F,  // General Punctuation
+          0x2DE0, 0x2DFF,  // Cyrillic Extended-A
+          0x3000, 0x30FF,  // CJK Symbols and Punctuations, Hiragana, Katakana
+          0x3131, 0x3163,  // Korean alphabets
+          0x31F0, 0x31FF,  // Katakana Phonetic Extensions
+          0x4E00, 0x9FAF,  // CJK Ideograms
+          0xA640, 0xA69F,  // Cyrillic Extended-B
+          0xAC00, 0xD7A3,  // Korean characters
+          0xFF00, 0xFFEF,  // Half-width characters
+          0xFFFD, 0xFFFD,  // Invalid
+          0,
+      };
+      custom_font = io.Fonts->AddFontFromFileTTF(font_path.c_str(), 16, nullptr, ranges);
+    }
+  }
+  io.FontDefault = Gfx::g_debug_settings.monospaced_font
+                       ? default_font
+                       : (custom_font ? custom_font : default_font);
+
+  io.FontGlobalScale = Gfx::g_debug_settings.imgui_font_scale;
+}
+}  // namespace ImGui

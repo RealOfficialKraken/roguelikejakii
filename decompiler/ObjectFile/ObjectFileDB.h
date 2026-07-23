@@ -21,7 +21,7 @@
 #include "decompiler/data/TextureDB.h"
 #include "decompiler/util/DecompilerTypeSystem.h"
 
-#include "fmt/core.h"
+#include "fmt/format.h"
 
 namespace decompiler {
 /*!
@@ -81,12 +81,15 @@ struct LetRewriteStats {
   int launch_particles = 0;
   int call_parent_state_handler = 0;
   int suspend_for = 0;
+  int font_method = 0;
+  int light_trail_tracker_spawn = 0;
 
   int total() const {
     return dotimes + countdown + abs + abs2 + unused + ja + case_no_else + case_with_else +
            set_vector + set_vector2 + send_event + font_context_meth + proc_new + attack_info +
            vector_dot + rand_float_gen + set_let + with_dma_buf_add_bucket + dma_buffer_add_gs_set +
-           launch_particles + call_parent_state_handler + suspend_for;
+           launch_particles + call_parent_state_handler + suspend_for + font_method +
+           light_trail_tracker_spawn;
   }
 
   std::string print() const {
@@ -115,6 +118,8 @@ struct LetRewriteStats {
     out += fmt::format("  launch_particles: {}\n", launch_particles);
     out += fmt::format("  call_parent_state_handler: {}\n", call_parent_state_handler);
     out += fmt::format("  suspend_for: {}\n", suspend_for);
+    out += fmt::format("  font_method: {}\n", font_method);
+    out += fmt::format("  light_trail_tracker_spawn: {}\n", light_trail_tracker_spawn);
     return out;
   }
 
@@ -141,6 +146,7 @@ struct LetRewriteStats {
     result.launch_particles = launch_particles + other.launch_particles;
     result.call_parent_state_handler = call_parent_state_handler + other.call_parent_state_handler;
     result.suspend_for = suspend_for + other.suspend_for;
+    result.light_trail_tracker_spawn = light_trail_tracker_spawn + other.light_trail_tracker_spawn;
     return result;
   }
 
@@ -166,6 +172,7 @@ struct LetRewriteStats {
     launch_particles += other.launch_particles;
     call_parent_state_handler += other.call_parent_state_handler;
     suspend_for += other.suspend_for;
+    light_trail_tracker_spawn += other.light_trail_tracker_spawn;
     return *this;
   }
 };
@@ -188,21 +195,24 @@ class ObjectFileDB {
   void extract_art_info();
   void dump_art_info(const fs::path& output_dir);
   void dump_raw_objects(const fs::path& output_dir);
+  void dump_part_group_table(const fs::path& output_dir,
+                             const std::unordered_map<u32, std::string>& part_group_table);
   void write_object_file_words(const fs::path& output_dir, bool dump_data, bool dump_code);
   void write_disassembly(const fs::path& output_dir,
                          bool disassemble_data,
                          bool disassemble_code,
-                         bool print_hex);
+                         bool print_hex,
+                         bool dump_function_metadata);
 
   void process_object_file_data(
       ObjectFileData& data,
       const fs::path& output_dir,
-      const Config& config,
+      Config& config,
       const std::unordered_set<std::string>& skip_functions,
       const std::unordered_map<std::string, std::unordered_set<std::string>>& skip_states);
   void analyze_functions_ir2(
       const fs::path& output_dir,
-      const Config& config,
+      Config& config,
       const std::optional<std::function<void(std::string)>> prefile_callback,
       const std::optional<std::function<void()>> postfile_callback,
       const std::unordered_set<std::string>& skip_functions,
@@ -268,7 +278,7 @@ class ObjectFileDB {
                              const Config& cfg,
                              const fs::path& dump_out);
   std::string process_game_count_file();
-  std::string process_game_text_files(const Config& cfg);
+  std::string process_game_text_files(const Config& cfg, std::string text_string = "COMMON");
   std::string process_all_spool_subtitles(const Config& cfg, const fs::path& image_out);
 
   const ObjectFileData& lookup_record(const ObjectFileRecord& rec) const;

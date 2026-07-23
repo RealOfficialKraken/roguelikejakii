@@ -110,13 +110,14 @@ void clean_up_cond_with_else(FormPool& pool, FormElement* ir, const Env& env) {
  */
 void clean_up_until_loop(FormPool& pool, UntilElement* ir, const Env& env) {
   auto condition_branch = get_condition_branch(ir->condition);
-  ASSERT(condition_branch.first);
+  ASSERT_MSG(condition_branch.first, fmt::format("bad condition branch in {}\n", env.func->name()));
   if (condition_branch.first->op()->branch_delay().kind() != IR2_BranchDelay::Kind::NOP) {
     ASSERT_MSG(
         condition_branch.first->op()->branch_delay().kind() == IR2_BranchDelay::Kind::SET_REG_FALSE,
         fmt::format(
-            "bad delay slot in until loop: {} in {}\n", env.func->name(),
-            condition_branch.first->op()->branch_delay().to_form(env.file->labels, env).print()));
+            "bad delay slot in until loop: {} in {}\n",
+            condition_branch.first->op()->branch_delay().to_form(env.file->labels, env).print(),
+            env.func->name()));
     ir->false_destination = condition_branch.first->op()->branch_delay().var(0);
   }
   auto replacement = condition_branch.first->op()->get_condition_as_form(pool, env);
@@ -1430,7 +1431,7 @@ Form* try_sc_as_type_of_jak2(FormPool& pool, Function& f, const ShortCircuit* vt
   f.ir2.env.disable_def(b2_delay_op.dst(), f.warnings);
   f.ir2.env.disable_use(shift_left->expr().get_arg(0).var());
 
-  if (f.ir2.env.version != GameVersion::Jak3) {
+  if (f.ir2.env.version != GameVersion::Jak3 && f.ir2.env.version != GameVersion::JakX) {
     f.warnings.warning("Using new Jak 2 rtype-of");
   }
   return b0_ptr;
@@ -1574,6 +1575,7 @@ Form* try_sc_as_type_of(FormPool& pool, Function& f, const ShortCircuit* vtx, Ga
       return try_sc_as_type_of_jak1(pool, f, vtx);
     case GameVersion::Jak2:
     case GameVersion::Jak3:
+    case GameVersion::JakX:
       return try_sc_as_type_of_jak2(pool, f, vtx);
     default:
       ASSERT(false);
@@ -1973,7 +1975,8 @@ void clean_up_while_loops(FormPool& pool, Form* sequence, const Env& env) {
 
       auto condition_branch = get_condition_branch(form_as_while->condition);
 
-      ASSERT(condition_branch.first);
+      ASSERT_MSG(condition_branch.first,
+                 fmt::format("bad conditional branch in {}\n", env.func->name()));
       ASSERT(condition_branch.first->op()->branch_delay().kind() == IR2_BranchDelay::Kind::NOP);
       // printf("got while condition branch %s\n", condition_branch.first->print(file).c_str());
       auto replacement = condition_branch.first->op()->get_condition_as_form(pool, env);

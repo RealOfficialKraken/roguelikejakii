@@ -23,7 +23,7 @@
 
 #include "decompiler/ObjectFile/ObjectFileDB.h"
 
-#include "fmt/core.h"
+#include "fmt/format.h"
 
 namespace decompiler {
 namespace {
@@ -354,6 +354,9 @@ TexturePage read_texture_page(ObjectFileData& data,
       break;
     case GameVersion::Jak3:
       ASSERT(tpage.info.major_version == versions::jak3::TX_PAGE_VERSION);
+      break;
+    case GameVersion::JakX:
+      ASSERT(tpage.info.major_version == versions::jakx::TX_PAGE_VERSION);
       break;
     default:
       ASSERT(false);

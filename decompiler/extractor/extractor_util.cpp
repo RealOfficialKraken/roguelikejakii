@@ -83,9 +83,12 @@ extractor_iso_database() {
            {{18445016742498932084U,  // hash of ELF
              {"Jak II",              // canonical name
               GAME_TERRITORY_SCEA,
-              593,                                           // number of files
-              {4835330407820245819U, 5223305410190549348U},  // iso hash
-              "ntsc_v1",                                     // decompiler config
+              593,  // number of files
+              {
+                  3212700152698192932U,  // NTSC-U v1
+                  18208811100399420450U  // NTSC-U V2
+              },                         // iso hash(es)
+              "ntsc_v1",                 // decompiler config
               "jak2",
               {}}}}},
           // Jak 2 PAL
@@ -93,9 +96,9 @@ extractor_iso_database() {
            {{18188891052467821088U,  // hash of ELF
              {"Jak II: Renegade",    // canonical name
               GAME_TERRITORY_SCEE,
-              593,                     // number of files
-              {8410801891219727031U},  // iso hash
-              "pal",                   // decompiler config
+              593,                      // number of files
+              {15637648662558474533U},  // iso hash
+              "pal",                    // decompiler config
               "jak2",
               {}}}}},
           // Jak 2 NTSC-J
@@ -103,9 +106,9 @@ extractor_iso_database() {
            {{7409991384254810731U,      // hash of ELF
              {"ジャックＸダクスター2",  // canonical name
               GAME_TERRITORY_SCEI,
-              593,                     // number of files
-              {1686904681401593185U},  // iso hash
-              "jp",                    // decompiler config
+              593,                    // number of files
+              {709902535083998969U},  // iso hash
+              "jp",                   // decompiler config
               "jak2",
               {}}}}},
           // Jak 2 NTSC-K
@@ -114,18 +117,48 @@ extractor_iso_database() {
              {"Jak II",             // canonical name
               GAME_TERRITORY_SCEI,
               593,                     // number of files
-              {4637199624374114440U},  // iso hash
+              {7504500484091955379U},  // iso hash
               "ko",                    // decompiler config
               "jak2",
               {}}}}},
           // Jak 3 NTSC-U
-          {"SCUS-97330",            // serial from ELF name
+          {"SCUS-97330",           // serial from ELF name
            {{4975852519304227343,  // hash of ELF
              {"Jak 3",             // canonical name
               GAME_TERRITORY_SCEA,
+              749,                  // number of files
+              {61426067393410901},  // iso hash
+              "ntsc_v1",            // decompiler config
+              "jak3",
+              {}}}}},
+          // // Jak 3 NTSC-U (Greatest Hits)
+          {"SCUS-97516",           // serial from ELF name
+           {{4975852519304227343,  // hash of ELF
+             {"Jak 3",             // canonical name
+              GAME_TERRITORY_SCEA,
+              749,                  // number of files
+              {61426067393410901},  // iso hash
+              "ntsc_v1",            // decompiler config
+              "jak3",
+              {}}}}},
+          // Jak 3 NTSC-K
+          {"SCKA-20040",            // serial from ELF name
+           {{10389946801578948532,  // hash of ELF
+             {"잭 3",               // canonical name
+              GAME_TERRITORY_SCEI,
               749,                     // number of files
-              {1197801364027358161},  // iso hash
-              "ntsc_v1",                    // decompiler config
+              {15744436203314864205},  // iso hash
+              "ko",                    // decompiler config
+              "jak3",
+              {}}}}},
+          // Jak 3 PAL
+          {"SCES-52460",           // serial from ELF name
+           {{1406394940700478958,  // hash of ELF
+             {"Jak 3",             // canonical name
+              GAME_TERRITORY_SCEE,
+              746,                    // number of files
+              {9845530557249070761},  // iso hash
+              "pal",                  // decompiler config
               "jak3",
               {}}}}},
       };

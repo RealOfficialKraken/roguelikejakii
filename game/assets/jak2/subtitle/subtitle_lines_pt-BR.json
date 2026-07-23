@@ -94,7 +94,7 @@
       "Cara, você está batendo nas pessoas!"
     ],
     "agnt015": [
-      "Olhe aonde você está indo!"
+      "Olhe onde você está indo!"
     ],
     "agnt016": [
       "Vamos lá, cara!"
@@ -130,7 +130,7 @@
       "Pegue um com dois assentos, pode ser?"
     ],
     "agnt027": [
-      "Pegue um veículo maior."
+      "Pegue outro veículo."
     ],
     "agnt028": [
       "Eles estão atrás de nós."
@@ -154,7 +154,7 @@
       "Você tem certeza de que está do nosso lado?"
     ],
     "agnt035": [
-      "Vire, Vire!"
+      "Vire, VIRE!"
     ],
     "agnt036": [
       "Boa jogada."
@@ -343,7 +343,7 @@
       "Boa condução, agora vá salvar o resto dos nossos rapazes."
     ],
     "agnt098": [
-      "OK, estou fora daqui!"
+      "OK, estou caindo fora!"
     ],
     "agnt099": [
       "Vejo vocês na próxima reunião!"
@@ -2007,7 +2007,7 @@
     ],
     "cityv177": [
       "Atenção, todos os cidadãos:",
-      "A Corrida de 3ª Classe está prestes a começar."
+      "A Corrida de 3º Classe está prestes a começar."
     ],
     "cityv178": [
       "Deseja tentar o recorde do circuito?"
@@ -2721,7 +2721,7 @@
       "É isso! Você conseguiu!"
     ],
     "ds305": [
-      "Atire no interruptor para mudar a esteira de coveiro",
+      "Atire no interruptor para mudar a esteira transportadora",
       "direção!"
     ],
     "ds306": [
@@ -2870,7 +2870,7 @@
       "O último poço está onde salvamos Vin!"
     ],
     "ds479": [
-      "Agora ele está vulnerável!\n"
+      "Agora ele está vulnerável!"
     ],
     "ds480": [
       "Tire ele!"
@@ -7577,7 +7577,7 @@
     "tor001": [
       "A operação foi um sucesso.",
       "Todos os membros do subsolo estão seguros.",
-      "Volte para o esconderijo; tenho uma nova missão para você",
+      "Volte para o esconderijo, tenho uma nova missão para você",
       "Enquanto esperamos que este alerta pare."
     ],
     "tor002": [
@@ -7849,7 +7849,7 @@
     "guard": "Guarda krimzon",
     "guard-a": "Guarda A",
     "guard-b": "Guarda B",
-    "jak": "Guarda B",
+    "jak": "Jak",
     "jinx": "Jinx",
     "keira": "Keira",
     "keira-before-class-3": "Mecânica ",

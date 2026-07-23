@@ -108,6 +108,7 @@ struct Config {
   std::string all_types_file;
 
   bool disassemble_code = false;
+  bool dump_function_metadata = false;
   bool decompile_code = false;
   bool format_code = false;
   bool write_scripts = false;
@@ -119,9 +120,11 @@ struct Config {
   bool process_art_groups = false;
   bool process_subtitle_text = false;
   bool process_subtitle_images = false;
+  bool process_part_group_table = false;
   bool dump_art_group_info = false;
   bool dump_joint_geo_info = false;
   bool dump_tex_info = false;
+  bool dump_part_group_table = false;
   bool rip_levels = false;
   bool extract_collision = false;
   bool find_functions = false;
@@ -186,6 +189,7 @@ struct Config {
   std::unordered_map<u32, TexInfo> texture_info_dump;
   std::unordered_map<std::string, std::string> joint_node_hacks;
   std::unordered_map<std::string, int> process_stack_size_overrides;
+  std::unordered_map<u32, std::string> part_group_table;
 
   std::unordered_map<std::string, std::vector<std::string>> import_deps_by_file;
 

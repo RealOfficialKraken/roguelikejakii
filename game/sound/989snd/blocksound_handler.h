@@ -27,7 +27,8 @@ class BlockSoundHandler : public SoundHandler {
                     s32 sfx_pan,
                     SndPlayParams& params,
                     u32 sound_id,
-                    s32 start_tick);
+                    s32 start_tick,
+                    u32 owner);
 
   ~BlockSoundHandler() override;
   bool Tick() override;
@@ -48,7 +49,8 @@ class BlockSoundHandler : public SoundHandler {
   void UpdatePitch();
 
   SoundHandler* CheckInstanceLimit(const std::map<u32, std::unique_ptr<SoundHandler>>& handlers,
-                                   s32 vol) override;
+                                   s32 vol,
+                                   bool parent) override;
 
   bool m_paused{false};
 
@@ -59,7 +61,8 @@ class BlockSoundHandler : public SoundHandler {
   u32 m_grains_to_skip{0};
   bool m_skip_grains{false};
 
-  SFXBlock::SFX& m_sfx;
+  SFXBlock::SFX* m_sfx = nullptr;
+  SFXBlock::SFX* m_orig_sfx = nullptr;
   VoiceManager& m_vm;
 
   std::list<std::weak_ptr<BlockSoundVoice>> m_voices;

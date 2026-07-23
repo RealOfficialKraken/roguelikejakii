@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstring>
 
+#include "989_plugins/plugin_strv.h"
 #include "game/overlord/jak2/vag.h"
 #include "game/sce/iop.h"
 
@@ -295,6 +296,7 @@ u32 StreamListThread() {
     do {
       SleepThread();
     } while (RequestedStreamsList.unk2_init0 != 0);
+    HandlePluginRequests();
     uVar8 = 0;
     WaitSema(RequestedStreamsList.sema);
     iVar1 = RequestedStreamsList.elt_count;
@@ -407,15 +409,20 @@ u32 StreamListThread() {
       }
       uVar9 = uVar9 + 1;
     } while (uVar9 < 4);
+
     SignalSema(EEStreamsList.sema);
     RequestedStreamsList.unk2_init0 = 1;
     SignalSema(RequestedStreamsList.sema);
+
     WaitSema(EEPlayList.sema);
     CheckPlayList(&EEPlayList);
     SignalSema(EEPlayList.sema);
-    WaitSema(LfoList.sema);
-    CheckLfoList(&LfoList);
-    SignalSema(LfoList.sema);
+
+    // FIXME LfoList hasn't been initialised because of unimplemented
+    // streamlfo functions.
+    // WaitSema(LfoList.sema);
+    // CheckLfoList(&LfoList);
+    // SignalSema(LfoList.sema);
   } while (true);
   return 0;
 }

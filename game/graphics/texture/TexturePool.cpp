@@ -12,7 +12,7 @@
 #include "game/graphics/texture/jak2_tpage_dir.h"
 #include "game/graphics/texture/jak3_tpage_dir.h"
 
-#include "fmt/core.h"
+#include "fmt/format.h"
 #include "third-party/imgui/imgui.h"
 
 namespace {
@@ -148,10 +148,10 @@ void TexturePool::refresh_links(GpuTexture& texture) {
 void TexturePool::unload_texture(PcTextureId tex_id, u64 gpu_id) {
   auto* tex = m_loaded_textures.lookup_existing(tex_id);
   ASSERT(tex);
-  if (tex->is_common) {
-    ASSERT(false);
-    return;
-  }
+  // if (tex->is_common) {
+  //   ASSERT(false);
+  //   return;
+  // }
   ASSERT_MSG(!tex->is_placeholder,
              fmt::format("trying to unload something that was already placholdered: {} {}\n",
                          get_debug_texture_name(tex_id), tex->gpu_textures.size()));
@@ -314,6 +314,7 @@ const std::vector<u32>& get_tpage_dir(GameVersion version) {
     case GameVersion::Jak2:
       return get_jak2_tpage_dir();
     case GameVersion::Jak3:
+    case GameVersion::JakX:
       return get_jak3_tpage_dir();
     default:
       ASSERT(false);
@@ -382,7 +383,7 @@ void TexturePool::draw_debug_for_tex(const std::string& name, GpuTexture* tex, u
   if (ImGui::TreeNode(fmt::format("{}) {}", slot, name).c_str())) {
     ImGui::Text("P: %s sz: %d x %d", get_debug_texture_name(tex->tex_id).c_str(), tex->w, tex->h);
     if (!tex->is_placeholder) {
-      ImGui::Image((void*)(u64)tex->gpu_textures.at(0).gl, ImVec2(tex->w, tex->h));
+      ImGui::Image((ImTextureID)(intptr_t)tex->gpu_textures.at(0).gl, ImVec2(tex->w, tex->h));
     } else {
       ImGui::Text("PLACEHOLDER");
     }
@@ -401,6 +402,7 @@ PcTextureId TexturePool::allocate_pc_port_texture(GameVersion version) {
     case GameVersion::Jak2:
       return PcTextureId(get_jak2_tpage_dir().size() - 1, m_next_pc_texture_to_allocate++);
     case GameVersion::Jak3:
+    case GameVersion::JakX:
       return PcTextureId(get_jak3_tpage_dir().size() - 1, m_next_pc_texture_to_allocate++);
     default:
       ASSERT_NOT_REACHED();

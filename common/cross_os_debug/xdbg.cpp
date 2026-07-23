@@ -11,7 +11,7 @@
 #include "common/goal_constants.h"
 #include "common/util/Timer.h"
 
-#include "fmt/core.h"
+#include "fmt/format.h"
 
 #ifdef __linux
 #include <fcntl.h>
@@ -714,7 +714,9 @@ bool break_now(const ThreadID& tid) {
 bool cont_now(const ThreadID& tid) {
   return false;
 }
-bool open_memory(const ThreadID& tid, MemoryHandle* out);
+bool open_memory(const ThreadID& tid, MemoryHandle* out) {
+  return false;
+}
 bool close_memory(const ThreadID& tid, MemoryHandle* handle) {
   return false;
 }

@@ -30,11 +30,14 @@
 #include "game/system/hid/input_manager.h"
 #include "game/system/hid/sdl_util.h"
 
-#include "fmt/core.h"
-#include "third-party/SDL/include/SDL.h"
+#include "fmt/format.h"
+#include "third-party/SDL/include/SDL3/SDL.h"
+#include "third-party/SDL/include/SDL3/SDL_hints.h"
+#include "third-party/SDL/include/SDL3/SDL_version.h"
 #include "third-party/imgui/imgui.h"
+#include "third-party/imgui/imgui_freetype.h"
 #include "third-party/imgui/imgui_impl_opengl3.h"
-#include "third-party/imgui/imgui_impl_sdl.h"
+#include "third-party/imgui/imgui_impl_sdl3.h"
 #include "third-party/imgui/imgui_style.h"
 #define STBI_WINDOWS_UTF8
 #include "common/util/dialogs.h"
@@ -46,7 +49,8 @@ constexpr bool run_dma_copy = false;
 
 constexpr PerGameVersion<int> fr3_level_count(jak1::LEVEL_TOTAL,
                                               jak2::LEVEL_TOTAL,
-                                              jak3::LEVEL_TOTAL);
+                                              jak3::LEVEL_TOTAL,
+                                              jakx::LEVEL_TOTAL);
 
 struct GraphicsData {
   // vsync
@@ -101,7 +105,7 @@ static int gl_init(GfxGlobalSettings& settings) {
     auto p = scoped_prof("startup::sdl::init_sdl");
     // remove SDL garbage from hooking signal handler.
     SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
       sdl_util::log_error("Could not initialize SDL, exiting");
       dialogs::create_error_message_dialog("Critical Error Encountered",
                                            "Could not initialize SDL, exiting");
@@ -111,13 +115,11 @@ static int gl_init(GfxGlobalSettings& settings) {
 
   {
     auto p = scoped_prof("startup::sdl::get_version_info");
-    SDL_version compiled;
-    SDL_VERSION(&compiled);
-    SDL_version linked;
-    SDL_GetVersion(&linked);
-    lg::info("SDL Initialized, compiled with version - {}.{}.{} | linked with version - {}.{}.{}",
-             compiled.major, compiled.minor, compiled.patch, linked.major, linked.minor,
-             linked.patch);
+
+    auto compiled_sdl_version = SDL_VERSION;
+    auto linked_sdl_version = SDL_GetVersion();
+    lg::info("SDL Initialized, compiled with version - {} | linked with version - {}",
+             compiled_sdl_version, linked_sdl_version);
   }
 
   {
@@ -162,33 +164,7 @@ static void init_imgui(SDL_Window* window,
   g_gfx_data->imgui_filename = file_util::get_file_path({"imgui.ini"});
   g_gfx_data->imgui_log_filename = file_util::get_file_path({"imgui_log.txt"});
   ImGuiIO& io = ImGui::GetIO();
-  io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;  // We manage the mouse cursor!
-  if (!Gfx::g_debug_settings.monospaced_font) {
-    // TODO - add or switch to Noto since it supports the entire unicode range
-    std::string font_path =
-        (file_util::get_jak_project_dir() / "game" / "assets" / "fonts" / "NotoSansJP-Medium.ttf")
-            .string();
-    if (file_util::file_exists(font_path)) {
-      static const ImWchar ranges[] = {
-          0x0020, 0x00FF,  // Basic Latin + Latin Supplement
-          0x0400, 0x052F,  // Cyrillic + Cyrillic Supplement
-          0x2000, 0x206F,  // General Punctuation
-          0x2DE0, 0x2DFF,  // Cyrillic Extended-A
-          0x3000, 0x30FF,  // CJK Symbols and Punctuations, Hiragana, Katakana
-          0x3131, 0x3163,  // Korean alphabets
-          0x31F0, 0x31FF,  // Katakana Phonetic Extensions
-          0x4E00, 0x9FAF,  // CJK Ideograms
-          0xA640, 0xA69F,  // Cyrillic Extended-B
-          0xAC00, 0xD7A3,  // Korean characters
-          0xFF00, 0xFFEF,  // Half-width characters
-          0xFFFD, 0xFFFD,  // Invalid
-          0,
-      };
-      io.Fonts->AddFontFromFileTTF(font_path.c_str(), Gfx::g_debug_settings.imgui_font_size,
-                                   nullptr, ranges);
-    }
-  }
-
+  io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
   io.IniFilename = g_gfx_data->imgui_filename.c_str();
   io.LogFilename = g_gfx_data->imgui_log_filename.c_str();
 
@@ -196,8 +172,10 @@ static void init_imgui(SDL_Window* window,
     ImGui::applyAlternateStyle();
   }
 
+  ImGui::applyFontStyle();
+
   // set up to get inputs for this window
-  ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
+  ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
 
   // NOTE: imgui's setup calls functions that may fail intentionally, and attempts to disable error
   // reporting so these errors are invisible. But it does not work, and some weird X11 default
@@ -217,13 +195,9 @@ static std::shared_ptr<GfxDisplay> gl_make_display(int width,
   // Setup the window
   prof().instant_event("ROOT");
   prof().begin_event("startup::sdl::create_window");
-  // TODO - SDL2 doesn't seem to support HDR (and neither does windows)
-  //   Related -
-  //   https://answers.microsoft.com/en-us/windows/forum/all/hdr-monitor-low-brightness-after-exiting-full/999f7ee9-7ba3-4f9c-b812-bbeb9ff8dcc1
-  SDL_Window* window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                        width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-  // TODO - rendering code on hiDPI/Retina displays is not adequate, solve it properly so that
-  // `SDL_WINDOW_ALLOW_HIGHDPI` can be added back to the window flags.
+  SDL_Window* window =
+      SDL_CreateWindow(title, width, height,
+                       SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
   prof().end_event();
   if (!window) {
     sdl_util::log_error("gl_make_display failed - Could not create display window");
@@ -249,7 +223,7 @@ static std::shared_ptr<GfxDisplay> gl_make_display(int width,
 
   {
     auto p = scoped_prof("startup::sdl::assign_context");
-    if (SDL_GL_MakeCurrent(window, gl_context) != 0) {
+    if (!SDL_GL_MakeCurrent(window, gl_context)) {
       sdl_util::log_error("gl_make_display failed - Could not associated context with window");
       dialogs::create_error_message_dialog("Critical Error Encountered",
                                            "Unable to create OpenGL window with context.\nOpenGOAL "
@@ -285,14 +259,9 @@ static std::shared_ptr<GfxDisplay> gl_make_display(int width,
   {
     auto p = scoped_prof("startup::sdl::window_extras");
     float dpi = 1.0f;
-    int window_display_idx = SDL_GetWindowDisplayIndex(window);
-    if (window_display_idx >= 0) {
-      SDL_GetDisplayDPI(window_display_idx, &dpi, NULL, NULL);
-      dpi /= 96.0f;
-
-      if (dpi <= 0.0f) {
-        dpi = 1.0f;
-      }
+    float display_scale = SDL_GetWindowDisplayScale(window);
+    if (display_scale > 0.0) {
+      dpi = display_scale * 96.0f;
     }
 
     // Setup Window Icon
@@ -306,10 +275,14 @@ static std::shared_ptr<GfxDisplay> gl_make_display(int width,
       auto icon_data = stbi_load(image_path.string().c_str(), &icon_width, &icon_height, nullptr,
                                  STBI_rgb_alpha);
       if (icon_data) {
-        SDL_Surface* icon_surf = SDL_CreateRGBSurfaceWithFormatFrom(
-            (void*)icon_data, icon_width, icon_height, 32, 4 * icon_width, SDL_PIXELFORMAT_RGBA32);
-        SDL_SetWindowIcon(window, icon_surf);
-        SDL_FreeSurface(icon_surf);
+        SDL_Surface* icon_surf = SDL_CreateSurfaceFrom(
+            icon_width, icon_height, SDL_PIXELFORMAT_RGBA32, (void*)icon_data, 4 * icon_width);
+        if (!icon_surf) {
+          sdl_util::log_error("unable to generate surface from app icon data");
+        } else {
+          SDL_SetWindowIcon(window, icon_surf);
+          SDL_DestroySurface(icon_surf);
+        }
         stbi_image_free(icon_data);
       } else {
         lg::error("Could not load icon for OpenGL window, couldn't load image data");
@@ -341,32 +314,151 @@ GLDisplay::GLDisplay(SDL_Window* window, SDL_GLContext gl_context, bool is_main)
     : m_window(window),
       m_gl_context(gl_context),
       m_display_manager(std::make_shared<DisplayManager>(window)),
-      m_input_manager(std::make_shared<InputManager>()) {
+      m_input_manager(std::make_shared<InputManager>(window)) {
   m_main = is_main;
   m_display_manager->set_input_manager(m_input_manager);
   // Register commands
-  m_input_manager->register_command(CommandBinding::Source::KEYBOARD,
-                                    CommandBinding(Gfx::g_debug_settings.hide_imgui_key, [&]() {
-                                      if (!Gfx::g_debug_settings.ignore_hide_imgui) {
-                                        set_imgui_visible(!is_imgui_visible());
-                                      }
-                                    }));
+  m_input_manager->register_command(
+      CommandBinding::Source::KEYBOARD,
+      CommandBinding(Gfx::g_debug_settings.hide_imgui_key, [&](const SDL_Event& event) {
+        if (event.type == SDL_EVENT_KEY_DOWN && event.key.repeat == 0) {
+          if (!Gfx::g_debug_settings.ignore_hide_imgui) {
+            set_imgui_visible(!is_imgui_visible());
+          }
+        }
+      }));
+  ;
   m_input_manager->register_command(
       CommandBinding::Source::KEYBOARD,
       CommandBinding(SDLK_F2, [&]() { m_take_screenshot_next_frame = true; }));
+
+  const auto& bind = Gfx::g_debug_settings.toggle_fullscreen_key;
+
+  m_input_manager->register_command(
+      CommandBinding::Source::KEYBOARD,
+      CommandBinding(bind.key, bind.modifiers, [&](const SDL_Event& event) {
+        if (event.type == SDL_EVENT_KEY_DOWN && event.key.repeat == 0 &&
+            bind.modifiers.has_necessary_modifiers(SDL_GetModState())) {
+          m_display_manager->toggle_display_mode();
+        }
+      }));
+}
+
+void GLDisplay::init_splash() {
+  if (m_splash_program)
+    return;
+  if (!Gfx::g_splash.ready.load())
+    return;
+
+  auto shader_folder = "game/graphics/opengl_renderer/shaders";
+  auto vert_src =
+      file_util::read_text_file(file_util::get_file_path({shader_folder, "splash.vert"}));
+  auto frag_src =
+      file_util::read_text_file(file_util::get_file_path({shader_folder, "splash.frag"}));
+
+  constexpr int len = 1024;
+  GLint compile_ok;
+  char err[len];
+
+  auto compile_shader = [](GLenum type, const char* src, GLint& compile_ok, char* err) -> GLuint {
+    GLuint s = glCreateShader(type);
+    glShaderSource(s, 1, &src, nullptr);
+    glCompileShader(s);
+    glGetShaderiv(s, GL_COMPILE_STATUS, &compile_ok);
+    if (!compile_ok) {
+      glGetShaderInfoLog(s, len, nullptr, err);
+      lg::error("splash shader compile failed: {}\n", err);
+      glDeleteShader(s);
+      return 0;
+    }
+    return s;
+  };
+
+  GLuint vs = compile_shader(GL_VERTEX_SHADER, vert_src.c_str(), compile_ok, err);
+  GLuint fs = compile_shader(GL_FRAGMENT_SHADER, frag_src.c_str(), compile_ok, err);
+  if (!vs || !fs) {
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+    return;
+  }
+
+  m_splash_program = glCreateProgram();
+  glAttachShader(m_splash_program, vs);
+  glAttachShader(m_splash_program, fs);
+  glLinkProgram(m_splash_program);
+  glDeleteShader(vs);
+  glDeleteShader(fs);
+
+  glGetProgramiv(m_splash_program, GL_LINK_STATUS, &compile_ok);
+  if (!compile_ok) {
+    glGetProgramInfoLog(m_splash_program, len, nullptr, err);
+    lg::error("Failed to link splash shader:\n{}", err);
+    glDeleteProgram(m_splash_program);
+    m_splash_program = 0;
+    return;
+  }
+
+  if (!Gfx::g_splash.data.empty()) {
+    glGenTextures(1, &m_splash_texture);
+    glBindTexture(GL_TEXTURE_2D, m_splash_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Gfx::g_splash.width, Gfx::g_splash.height, 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, Gfx::g_splash.data.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    Gfx::g_splash.data.clear();
+    Gfx::g_splash.data.shrink_to_fit();
+  }
+
+  glGenVertexArrays(1, &m_splash_vao);
+}
+
+void GLDisplay::draw_splash(int fb_w, int fb_h) {
+  if (!m_splash_program || !m_splash_texture)
+    return;
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glClearColor(0.f, 0.f, 0.f, 1.f);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glViewport(0, 0, fb_w, fb_h);
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_BLEND);
+  glUseProgram(m_splash_program);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, m_splash_texture);
+  glUniform1i(glGetUniformLocation(m_splash_program, "splash_tex"), 0);
+  glUniform2f(glGetUniformLocation(m_splash_program, "u_res"), fb_w, fb_h);
+  glUniform2f(glGetUniformLocation(m_splash_program, "u_tex"), Gfx::g_splash.width,
+              Gfx::g_splash.height);
+  glBindVertexArray(m_splash_vao);
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+  glBindVertexArray(0);
 }
 
 GLDisplay::~GLDisplay() {
+  if (m_splash_texture)
+    glDeleteTextures(1, &m_splash_texture);
+  if (m_splash_program)
+    glDeleteProgram(m_splash_program);
+  if (m_splash_vao)
+    glDeleteVertexArrays(1, &m_splash_vao);
   // Cleanup ImGUI
   ImGuiIO& io = ImGui::GetIO();
   io.IniFilename = nullptr;
   io.LogFilename = nullptr;
   ImGui_ImplOpenGL3_Shutdown();
-  ImGui_ImplSDL2_Shutdown();
+  ImGui_ImplSDL3_Shutdown();
   ImGui::DestroyContext();
   // Cleanup SDL
-  SDL_GL_DeleteContext(m_gl_context);
+  SDL_GL_DestroyContext(m_gl_context);
   SDL_DestroyWindow(m_window);
+  // cleanup SDL related sub-systems before we quit SDL
+  if (m_display_manager) {
+    m_display_manager.reset();
+  }
+  if (m_input_manager) {
+    m_input_manager.reset();
+  }
+  // now quit SDL
   SDL_Quit();
   if (m_main) {
     gl_exit();
@@ -380,6 +472,8 @@ void render_game_frame(int game_width,
                        int draw_region_width,
                        int draw_region_height,
                        int msaa_samples,
+                       int brightness_contrast_color,
+                       int brightness_contrast_alpha,
                        bool take_screenshot) {
   // wait for a copied chain.
   bool got_chain = false;
@@ -401,6 +495,8 @@ void render_game_frame(int game_width,
     options.draw_region_width = draw_region_width;
     options.draw_region_height = draw_region_height;
     options.msaa_samples = msaa_samples;
+    options.brightness_contrast_color = brightness_contrast_color;
+    options.brightness_contrast_alpha = brightness_contrast_alpha;
     options.draw_render_debug_window = g_gfx_data->debug_gui.should_draw_render_debug();
     options.draw_profiler_window = g_gfx_data->debug_gui.should_draw_profiler();
     options.draw_loader_window = g_gfx_data->debug_gui.should_draw_loader_menu();
@@ -467,7 +563,7 @@ void render_game_frame(int game_width,
 void GLDisplay::process_sdl_events() {
   SDL_Event evt;
   while (SDL_PollEvent(&evt) != 0) {
-    if (evt.type == SDL_QUIT) {
+    if (evt.type == SDL_EVENT_QUIT) {
       m_should_quit = true;
     }
     {
@@ -477,7 +573,7 @@ void GLDisplay::process_sdl_events() {
     if (!m_should_quit) {
       {
         auto p = scoped_prof("imgui-sdl-process");
-        ImGui_ImplSDL2_ProcessEvent(&evt);
+        ImGui_ImplSDL3_ProcessEvent(&evt);
       }
     }
     {
@@ -528,13 +624,13 @@ void GLDisplay::render() {
   {
     auto p = scoped_prof("imgui-new-frame");
     ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
   }
 
   // framebuffer size
   int fbuf_w, fbuf_h;
-  SDL_GL_GetDrawableSize(m_window, &fbuf_w, &fbuf_h);
+  SDL_GetWindowSizeInPixels(m_window, &fbuf_w, &fbuf_h);
 
   // render game!
   g_gfx_data->debug_gui.master_enable = is_imgui_visible();
@@ -551,9 +647,21 @@ void GLDisplay::render() {
     // set the size of the visible/playable portion of the game in the window
     get_display_manager()->set_game_size(Gfx::g_global_settings.lbox_w,
                                          Gfx::g_global_settings.lbox_h);
+
+    // draw splash screen on startup if requested
+    if (SplashScreen && DiskBoot && !m_splash_program) {
+      init_splash();
+    }
+    if (SplashScreen && Gfx::g_splash.ready.load() &&
+        SplashTimer.getSeconds() < SPLASH_SCREEN_TIME) {
+      draw_splash(fbuf_w, fbuf_h);
+    }
+
     render_game_frame(
         game_res_w, game_res_h, fbuf_w, fbuf_h, Gfx::g_global_settings.lbox_w,
         Gfx::g_global_settings.lbox_h, Gfx::g_global_settings.msaa_samples,
+        Gfx::g_global_settings.brightness_contrast_color,
+        Gfx::g_global_settings.brightness_contrast_alpha,
         m_take_screenshot_next_frame && g_gfx_data->debug_gui.screenshot_hotkey_enabled);
     // If we took a screenshot, stop taking them now!
     if (m_take_screenshot_next_frame) {
@@ -595,7 +703,7 @@ void GLDisplay::render() {
   if (Gfx::g_global_settings.vsync != Gfx::g_global_settings.old_vsync) {
     Gfx::g_global_settings.old_vsync = Gfx::g_global_settings.vsync;
     // NOTE - -1 can be used for adaptive vsync, maybe useful for Jak 2+?
-    // https://wiki.libsdl.org/SDL2/SDL_GL_SetSwapInterval
+    // https://wiki.libsdl.org/SDL3/SDL_GL_SetSwapInterval
     SDL_GL_SetSwapInterval(Gfx::g_global_settings.vsync);
   }
 
@@ -726,22 +834,37 @@ void gl_set_active_levels(const std::vector<std::string>& levels) {
   g_gfx_data->loader->set_active_levels(levels);
 }
 
+void gl_force_reload_all() {
+  g_gfx_data->loader->request_reload_all();
+}
+
+void gl_force_reload_level(const std::string& name) {
+  g_gfx_data->loader->request_reload_level(name);
+}
+
+void gl_force_reload_common() {
+  g_gfx_data->loader->request_reload_common();
+}
+
 void gl_set_pmode_alp(float val) {
   g_gfx_data->pmode_alp = val;
 }
 
 const GfxRendererModule gRendererOpenGL = {
-    gl_init,                // init
-    gl_make_display,        // make_display
-    gl_exit,                // exit
-    gl_vsync,               // vsync
-    gl_sync_path,           // sync_path
-    gl_send_chain,          // send_chain
-    gl_texture_upload_now,  // texture_upload_now
-    gl_texture_relocate,    // texture_relocate
-    gl_set_levels,          // set_levels
-    gl_set_active_levels,   // set_active_levels
-    gl_set_pmode_alp,       // set_pmode_alp
-    GfxPipeline::OpenGL,    // pipeline
-    "OpenGL 4.3"            // name
+    gl_init,                 // init
+    gl_make_display,         // make_display
+    gl_exit,                 // exit
+    gl_vsync,                // vsync
+    gl_sync_path,            // sync_path
+    gl_send_chain,           // send_chain
+    gl_texture_upload_now,   // texture_upload_now
+    gl_texture_relocate,     // texture_relocate
+    gl_set_levels,           // set_levels
+    gl_set_active_levels,    // set_active_levels
+    gl_force_reload_all,     // force_reload_all
+    gl_force_reload_level,   // force_reload_level
+    gl_force_reload_common,  // force_reload_common
+    gl_set_pmode_alp,        // set_pmode_alp
+    GfxPipeline::OpenGL,     // pipeline
+    "OpenGL 4.3"             // name
 };

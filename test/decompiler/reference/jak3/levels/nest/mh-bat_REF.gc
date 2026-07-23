@@ -1181,18 +1181,13 @@
              )
         (seek! (-> self pitch-angle) f0-3 (* 32768.0 (seconds-per-frame)))
         )
-      (vector-rotate-around-axis!
-        gp-0
-        (the-as quaternion *y-vector*)
-        (-> self pitch-angle)
-        (-> self rotation-matrix rvec)
-        )
+      (vector-rotate-around-axis! gp-0 *y-vector* (-> self pitch-angle) (-> self rotation-matrix rvec))
       (let* ((v1-17 (vector-flatten! (new 'stack-no-clear 'vector) s5-0 *y-vector*))
              (f0-9 (lerp-scale -15473.777 15473.777 (vector-dot (-> self rotation-matrix rvec) v1-17) 163840.0 -163840.0))
              )
         (seek! (-> self bank-angle) f0-9 (* 10922.667 (seconds-per-frame)))
         )
-      (vector-rotate-around-axis! gp-0 (the-as quaternion gp-0) (-> self bank-angle) (-> self rotation-matrix fvec))
+      (vector-rotate-around-axis! gp-0 gp-0 (-> self bank-angle) (-> self rotation-matrix fvec))
       )
     )
   0
@@ -1459,15 +1454,9 @@
         )
       (vector<-cspace! (-> gp-0 trans) (joint-node mh-bat-lod0-jg jaw))
       )
-    (if (logtest? (-> *part-group-id-table* 635 flags) (sp-group-flag sp13))
-        (part-tracker-spawn
-          part-tracker-subsampler
-          :to self
-          :group (-> *part-group-id-table* 635)
-          :target self
-          :mat-joint 36
-          )
-        (part-tracker-spawn part-tracker :to self :group (-> *part-group-id-table* 635) :target self :mat-joint 36)
+    (if (logtest? (-> group-mh-bat-charge-up flags) (sp-group-flag sp13))
+        (part-tracker-spawn part-tracker-subsampler :to self :group group-mh-bat-charge-up :target self :mat-joint 36)
+        (part-tracker-spawn part-tracker :to self :group group-mh-bat-charge-up :target self :mat-joint 36)
         )
     )
   :trans (behavior ()

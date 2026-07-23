@@ -503,56 +503,29 @@
 ;; INFO: Used lq/sq
 ;; WARN: Return type mismatch object vs none.
 (defbehavior target-board-green-eco-attack target ((arg0 symbol))
-  (local-vars (v1-14 float) (v1-25 float))
-  (rlet ((acc :class vf)
-         (vf0 :class vf)
-         (vf1 :class vf)
-         (vf2 :class vf)
-         )
-    (init-vf0-vector)
-    (let ((gp-0 (new 'stack-no-clear 'vector)))
-      (cond
-        (arg0
-          (vector-copy! gp-0 (-> self control trans))
-          (set! (-> gp-0 w) 49152.0)
-          )
-        (else
-          (vector-normalize! (vector-z-quaternion! gp-0 (-> self control quat)) -12288.0)
-          (vector+! gp-0 gp-0 (-> self control trans))
-          (set! (-> gp-0 w) 24576.0)
-          )
+  (let ((gp-0 (new 'stack-no-clear 'vector)))
+    (cond
+      (arg0
+        (vector-copy! gp-0 (-> self control trans))
+        (set! (-> gp-0 w) 49152.0)
         )
-      (let ((s5-1 (new 'stack-no-clear 'array 'collide-shape 384)))
-        (countdown (s4-0 (fill-actor-list-for-box *actor-hash* gp-0 s5-1 384))
-          (let* ((s3-0 (-> s5-1 s4-0))
-                 (v1-10 (if (type? s3-0 collide-shape)
-                            s3-0
-                            )
-                        )
-                 )
-            (when v1-10
-              (let* ((s3-1 (-> v1-10 process))
-                     (a0-11 (if (type? s3-1 process-focusable)
-                                s3-1
-                                )
-                            )
-                     )
-                (when a0-11
-                  (when (!= *target* a0-11)
-                    (let ((v1-13 (vector-! (new 'stack-no-clear 'vector) (-> a0-11 root trans) gp-0)))
-                      0.0
-                      (.lvf vf1 (&-> v1-13 quad))
-                      )
-                    (.add.w.vf.x vf2 vf0 vf0)
-                    (.mul.vf vf1 vf1 vf1)
-                    (.mul.x.vf.x acc vf2 vf1)
-                    (.add.mul.y.vf.x acc vf2 vf1 acc)
-                    (.add.mul.z.vf.x vf1 vf2 vf1 acc)
-                    (.mov v1-14 vf1)
-                    (let ((f0-3 v1-14)
-                          (f1-0 (-> gp-0 w))
-                          )
-                      (if (>= (* f1-0 f1-0) f0-3)
+      (else
+        (vector-normalize! (vector-z-quaternion! gp-0 (-> self control quat)) -12288.0)
+        (vector+! gp-0 gp-0 (-> self control trans))
+        (set! (-> gp-0 w) 24576.0)
+        )
+      )
+    (let ((s5-1 (new 'stack-no-clear 'array 'collide-shape 384)))
+      (countdown (s4-0 (fill-actor-list-for-box *actor-hash* gp-0 s5-1 384))
+        (let ((v1-10 (as-type (-> s5-1 s4-0) collide-shape)))
+          (when v1-10
+            (let ((a0-11 (as-type (-> v1-10 process) process-focusable)))
+              (when a0-11
+                (when (!= *target* a0-11)
+                  (let ((v1-13 (vector-! (new 'stack-no-clear 'vector) (-> a0-11 root trans) gp-0)))
+                    0.0
+                    (let ((f0-3 (vector-length-squared v1-13)))
+                      (if (>= (square (-> gp-0 w)) f0-3)
                           (send-event a0-11 'green-eco-attack)
                           )
                       )
@@ -563,28 +536,14 @@
             )
           )
         )
-      (let* ((s4-1 *target*)
-             (s5-2 (if (type? s4-1 process-focusable)
-                       s4-1
-                       )
-                   )
-             )
-        (when (and s5-2 (< (vector-vector-distance (get-trans s5-2 0) gp-0) (-> gp-0 w)))
-          (when (!= *target* s5-2)
-            (let ((v1-24 (vector-! (new 'stack-no-clear 'vector) (-> s5-2 control trans) gp-0)))
-              0.0
-              (.lvf vf1 (&-> v1-24 quad))
-              )
-            (.add.w.vf.x vf2 vf0 vf0)
-            (.mul.vf vf1 vf1 vf1)
-            (.mul.x.vf.x acc vf2 vf1)
-            (.add.mul.y.vf.x acc vf2 vf1 acc)
-            (.add.mul.z.vf.x vf1 vf2 vf1 acc)
-            (.mov v1-25 vf1)
-            (let ((f0-6 v1-25)
-                  (f1-4 (-> gp-0 w))
-                  )
-              (if (>= (* f1-4 f1-4) f0-6)
+      )
+    (let ((s5-2 (the-as target (as-type *target* process-focusable))))
+      (when (and s5-2 (< (vector-vector-distance (get-trans s5-2 0) gp-0) (-> gp-0 w)))
+        (when (!= *target* s5-2)
+          (let ((v1-24 (vector-! (new 'stack-no-clear 'vector) (-> s5-2 control trans) gp-0)))
+            0.0
+            (let ((f0-6 (vector-length-squared v1-24)))
+              (if (>= (square (-> gp-0 w)) f0-6)
                   (send-event s5-2 'green-eco-attack)
                   )
               )
@@ -592,8 +551,8 @@
           )
         )
       )
-    (none)
     )
+  (none)
   )
 
 ;; definition for function target-board-green-eco-use
@@ -695,15 +654,15 @@
                     )
               (case (-> self control danger-mode)
                 (('board-spin)
-                 (if (logtest? (-> *part-group-id-table* 184 flags) (sp-group-flag sp13))
+                 (if (logtest? (-> group-board-spin-attack flags) (sp-group-flag sp13))
                      (part-tracker-spawn
                        part-tracker-subsampler
                        :to self
-                       :group (-> *part-group-id-table* 184)
+                       :group group-board-spin-attack
                        :target self
                        :mat-joint 37
                        )
-                     (part-tracker-spawn part-tracker :to self :group (-> *part-group-id-table* 184) :target self :mat-joint 37)
+                     (part-tracker-spawn part-tracker :to self :group group-board-spin-attack :target self :mat-joint 37)
                      )
                  )
                 )
@@ -894,10 +853,10 @@
       (set! (-> self board upper-body) (new 'process 'joint-mod (joint-mod-mode flex-blend) self 5))
       )
   (if (zero? (-> self board effect-part))
-      (set! (-> self board effect-part) (create-launch-control (-> *part-group-id-table* 185) self))
+      (set! (-> self board effect-part) (create-launch-control group-target-board self))
       )
   (if (zero? (-> self board charge-part))
-      (set! (-> self board charge-part) (create-launch-control (-> *part-group-id-table* 186) self))
+      (set! (-> self board charge-part) (create-launch-control group-target-board-duck-charge self))
       )
   (mode-set! (-> self board main) (joint-mod-mode flex-blend))
   (mode-set! (-> self board upper-body) (joint-mod-mode flex-blend))
@@ -1578,13 +1537,13 @@
      (set! (-> self board shock-offset) -3072.0)
      (set! (-> self board shock-offsetv) 0.0)
      (cond
-       ((logtest? (-> *part-group-id-table* 23 flags) (sp-group-flag sp13))
+       ((logtest? (-> group-land-poof-stn flags) (sp-group-flag sp13))
         (vector-copy! (-> *launch-matrix* trans) (-> self control trans))
-        (part-tracker-spawn part-tracker-subsampler :to self :group (-> *part-group-id-table* 23))
+        (part-tracker-spawn part-tracker-subsampler :to self :group group-land-poof-stn)
         )
        (else
          (vector-copy! (-> *launch-matrix* trans) (-> self control trans))
-         (part-tracker-spawn part-tracker :to self :group (-> *part-group-id-table* 23))
+         (part-tracker-spawn part-tracker :to self :group group-land-poof-stn)
          )
        )
      )
@@ -2249,30 +2208,24 @@
                    (focus-test? self board)
                    (< 0.0 (-> self fact eco-green))
                    )
-              (if (logtest? (-> *part-group-id-table* 187 flags) (sp-group-flag sp13))
+              (if (logtest? (-> group-board-green-eco-zap-attack flags) (sp-group-flag sp13))
                   (part-tracker-spawn
                     part-tracker-subsampler
                     :to self
-                    :group (-> *part-group-id-table* 187)
+                    :group group-board-green-eco-zap-attack
                     :target self
                     :mat-joint 37
                     )
-                  (part-tracker-spawn part-tracker :to self :group (-> *part-group-id-table* 187) :target self :mat-joint 37)
+                  (part-tracker-spawn part-tracker :to self :group group-board-green-eco-zap-attack :target self :mat-joint 37)
                   )
               (target-board-green-eco-attack #t)
               (target-board-green-eco-use 5.0)
               )
-             ((logtest? (-> *part-group-id-table* 188 flags) (sp-group-flag sp13))
-              (part-tracker-spawn
-                part-tracker-subsampler
-                :to self
-                :group (-> *part-group-id-table* 188)
-                :target self
-                :mat-joint 37
-                )
+             ((logtest? (-> group-board-zap-attack flags) (sp-group-flag sp13))
+              (part-tracker-spawn part-tracker-subsampler :to self :group group-board-zap-attack :target self :mat-joint 37)
               )
              (else
-               (part-tracker-spawn part-tracker :to self :group (-> *part-group-id-table* 188) :target self :mat-joint 37)
+               (part-tracker-spawn part-tracker :to self :group group-board-zap-attack :target self :mat-joint 37)
                )
              )
            (target-timed-invulnerable (-> *TARGET_BOARD-bank* zap-duration) self 2)
@@ -2370,7 +2323,6 @@
 ;; WARN: Found some very strange gotos. Check result carefully, this is not well tested.
 ;; INFO: Used lq/sq
 (defbehavior target-board-compute-edge target ()
-  (local-vars (sv-752 int))
   (let ((s4-0 *edge-grab-info*)
         (gp-0 (new 'stack-no-clear 'vector))
         )
@@ -2562,8 +2514,8 @@
                    )
                  (s3-8 (new 'stack-no-clear 'collide-query))
                  (f26-0 81920.0)
+                 (sv-752 8)
                  )
-            (set! sv-752 8)
             (let ((v1-205 s3-8))
               (set! (-> v1-205 radius) 1228.8)
               (set! (-> v1-205 collide-with)

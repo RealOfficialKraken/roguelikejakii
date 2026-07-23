@@ -6,7 +6,7 @@
 
 #include "sfxblock.h"
 
-#include "fmt/core.h"
+#include "fmt/format.h"
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -137,12 +137,13 @@ u32 Player::PlaySound(BankHandle bank_id, u32 sound_id, s32 vol, s32 pan, s32 pm
     return 0;
   }
 
-  auto handler = bank->MakeHandler(mVmanager, sound_id, vol, pan, pm, pb, GetTick());
+  u32 handle = mHandleAllocator.GetId();
+  auto handler = bank->MakeHandler(mVmanager, sound_id, vol, pan, pm, pb, GetTick(), handle);
   if (!handler.has_value()) {
     return 0;
   }
 
-  auto handler_to_stop = handler.value()->CheckInstanceLimit(mHandlers, vol);
+  auto handler_to_stop = handler.value()->CheckInstanceLimit(mHandlers, vol, true);
   if (handler_to_stop) {
     handler_to_stop->Stop();
     if (handler_to_stop == handler.value().get()) {
@@ -150,7 +151,7 @@ u32 Player::PlaySound(BankHandle bank_id, u32 sound_id, s32 vol, s32 pan, s32 pm
     }
   }
 
-  u32 handle = mHandleAllocator.GetId();
+  handler.value()->m_sound_handle = handle;
   mHandlers.emplace(handle, std::move(handler.value()));
   // fmt::print("play_sound {}:{} - {}\n", bank_id, sound_id, handle);
 
@@ -228,6 +229,15 @@ void Player::SetSoundReg(u32 sound_id, u8 reg, u8 value) {
 
   auto* handler = mHandlers.at(sound_id).get();
   handler->SetRegister(reg, value);
+}
+
+u8 Player::GetSoundGroup(u32 sound_id) {
+  std::scoped_lock lock(mTickLock);
+  auto handler = mHandlers.find(sound_id);
+  if (handler == mHandlers.end()) {
+    return 0;
+  }
+  return handler->second->Group();
 }
 
 bool Player::SoundStillActive(u32 sound_id) {

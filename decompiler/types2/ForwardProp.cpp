@@ -747,6 +747,13 @@ void types2_for_logior(types2::Type& type_out,
     return;
   }
 
+  if (arg0_type.typespec().base_type() == "pointer" &&
+      arg1_type.typespec().base_type() == "pointer") {
+    env.func->warnings.warning("Using logior on pointers");
+    type_out.type = TP_Type::make_from_ts("int");
+    return;
+  }
+
   if (common_int2_case(type_out, dts, arg0_type, arg1_type)) {
     return;
   }
@@ -1611,6 +1618,7 @@ void types2_for_expr(types2::Type& type_out,
     case SimpleExpression::Kind::VECTOR_3_DOT:
     case SimpleExpression::Kind::VECTOR_4_DOT:
     case SimpleExpression::Kind::VECTOR_LENGTH:
+    case SimpleExpression::Kind::VECTOR_LENGTH_SQUARED:
       types2_for_vectors_in_float_out(type_out, expr, input_types, dts, extras);
       break;
     case SimpleExpression::Kind::VECTOR_CROSS:
@@ -1623,6 +1631,7 @@ void types2_for_expr(types2::Type& type_out,
       types2_for_vector_float_product(type_out, expr, input_types, dts, extras);
       break;
     case SimpleExpression::Kind::VECTOR_PLUS_FLOAT_TIMES:
+    case SimpleExpression::Kind::VECTOR_PLUS_TIMES:
       types2_for_vector_plus_float_times(type_out, expr, input_types, dts, extras);
       break;
     case SimpleExpression::Kind::PCPYLD:
@@ -1969,6 +1978,7 @@ bool load_var_op_determine_type(types2::Type& type_out,
               art_get_by_name_method_id = 10;
               break;
             case GameVersion::Jak3:
+            case GameVersion::JakX:
               art_get_by_name_method_id = 11;
               break;
             default:

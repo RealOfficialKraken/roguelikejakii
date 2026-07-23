@@ -14,6 +14,8 @@
 #include "goalc/build_level/jak1/FileInfo.h"
 #include "goalc/build_level/jak1/LevelFile.h"
 
+#include "fmt/ranges.h"
+
 namespace jak1 {
 bool run_build_level(const std::string& input_file,
                      const std::string& bsp_output_file,
@@ -46,32 +48,61 @@ bool run_build_level(const std::string& input_file,
   // unk zero
   // name
   file.name = level_json.at("long_name").get<std::string>();
+  ASSERT_MSG(file.name.size() <= 10,
+             fmt::format("long_name over 10 characters ({} characters): '{}'", file.name.size(),
+                         file.name));
   // nick
   file.nickname = level_json.at("nickname").get<std::string>();
   // vis infos
   // actors
+  std::vector<u32> aid_list;
   std::vector<EntityActor> actors;
   auto dts = decompiler::DecompilerTypeSystem(GameVersion::Jak1);
   dts.parse_type_defs({"decompiler", "config", "jak1", "all-types.gc"});
   add_actors_from_json(level_json.at("actors"), actors, level_json.value("base_id", 1234), dts);
-  std::sort(actors.begin(), actors.end(), [](auto& a, auto& b) { return a.aid < b.aid; });
-  auto duplicates = std::adjacent_find(actors.begin(), actors.end(),
-                                       [](auto& a, auto& b) { return a.aid == b.aid; });
-  ASSERT_MSG(duplicates == actors.end(),
+  std::ranges::sort(actors, [](auto& a, auto& b) { return a.aid < b.aid; });
+  for (auto& actor : actors) {
+    aid_list.push_back(actor.aid);
+  }
+  auto duplicate_actors =
+      std::ranges::adjacent_find(actors, [](auto& a, auto& b) { return a.aid == b.aid; });
+  ASSERT_MSG(duplicate_actors == actors.end(),
              fmt::format("Actor IDs must be unique. Found at least two actors with ID {}",
-                         duplicates->aid));
+                         duplicate_actors->aid));
   file.actors = std::move(actors);
   // ambients
   std::vector<EntityAmbient> ambients;
-  jak1::add_ambients_from_json(level_json.at("ambients"), ambients,
-                               level_json.value("base_id", 12345), dts);
+  add_ambients_from_json(level_json.at("ambients"), ambients, level_json.value("base_id", 12345),
+                         dts);
   file.ambients = std::move(ambients);
   auto& ambient_drawable_tree = file.drawable_trees.ambients.emplace_back();
   (void)ambient_drawable_tree;
   // cameras
+  if (level_json.contains("cameras")) {
+    std::vector<EntityCamera> cameras;
+    add_cameras_from_json(
+        level_json.at("cameras"), cameras,
+        std::max(level_json.value("base_id", 2345), (int)*std::ranges::max_element(aid_list)), dts);
+    std::ranges::sort(cameras, [](auto& a, auto& b) { return a.aid < b.aid; });
+    for (auto& cam : cameras) {
+      aid_list.push_back(cam.aid);
+    }
+    std::ranges::sort(aid_list, [](auto& a, auto& b) { return a < b; });
+    auto duplicate_cams =
+        std::ranges::adjacent_find(cameras, [](auto& a, auto& b) { return a.aid == b.aid; });
+    ASSERT_MSG(
+        duplicate_cams == cameras.end(),
+        fmt::format("Actor IDs must be unique. Found at least two camera entities with ID {}",
+                    duplicate_cams->aid));
+    auto duplicate_aids =
+        std::ranges::adjacent_find(aid_list, [](auto& a, auto& b) { return a == b; });
+    ASSERT_MSG(duplicate_aids == aid_list.end(),
+               fmt::format("Actor IDs must be unique. Found one actor and camera entity with ID {}",
+                           *duplicate_aids));
+    file.cameras = std::move(cameras);
+  }
   // nodes
   // boxes
-  // ambients
   // subdivs
   // adgifs
   // actor birth
@@ -191,6 +222,9 @@ bool run_build_level(const std::string& input_file,
       for (auto& dgo : config.dgo_names) {
         // remove "DGO/" prefix
         const auto& dgo_name = dgo.substr(4);
+        ASSERT_MSG(
+            db.obj_files_by_dgo.contains(dgo_name),
+            fmt::format("{} DGO expected to be part of the ObjectDB but it is not!", dgo_name));
         const auto& files = db.obj_files_by_dgo.at(dgo_name);
         auto art_groups =
             find_art_groups(processed_art_groups,
@@ -212,6 +246,12 @@ bool run_build_level(const std::string& input_file,
               file.texture_remap_table.resize(tex_remap.size());
               memcpy(file.texture_remap_table.data(), level_file.texture_remap_table.data(),
                      tex_remap.size() * sizeof(level_tools::TextureRemap));
+              if (!tpages.empty()) {
+                file.texture_ids.resize(tpages.size());
+                for (size_t i = 0; i < tpages.size(); ++i) {
+                  file.texture_ids[i] = tpages[i] << 20;
+                }
+              }
             }
             if (is_sky_bsp) {
               // copy adgif data from bsp
@@ -273,7 +313,7 @@ bool run_build_level(const std::string& input_file,
               if (tex_db.tpage_names.at(tex.page) == tpage_name) {
                 lg::info("custom level: adding texture {} (tpage {})", tex.name, tex.page);
                 tex_names.push_back(tex.name);
-                pc_level.textures.push_back(make_texture(id, tex, tpage_name, true));
+                pc_level.textures.push_back(make_texture(id, tex_db, true));
                 processed_textures[tpage_name].push_back(tex.name);
               }
             }
@@ -310,7 +350,7 @@ bool run_build_level(const std::string& input_file,
             if (db_tpage_name == wanted_tpage_name && tex.name == wanted_tex) {
               lg::info("custom level: adding texture {} from tpage {} ({})", tex.name, tex.page,
                        db_tpage_name);
-              pc_level.textures.push_back(make_texture(id, tex, db_tpage_name, true));
+              pc_level.textures.push_back(make_texture(id, tex_db, true));
               processed_textures[db_tpage_name].push_back(tex.name);
             }
         }

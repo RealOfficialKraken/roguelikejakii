@@ -3,6 +3,8 @@
 #include <set>
 #include <thread>
 
+#include "extract_anim.h"
+
 #include "common/log/log.h"
 #include "common/util/FileUtil.h"
 #include "common/util/SimpleThreadGroup.h"
@@ -59,18 +61,17 @@ bool is_valid_bsp(const decompiler::LinkedObjectFile& file) {
   return true;
 }
 
-tfrag3::Texture make_texture(u32 id,
-                             const TextureDB::TextureData& tex,
-                             const std::string& tpage_name,
-                             bool pool_load) {
+tfrag3::Texture make_texture(u32 id, const TextureDB& tex_db, bool pool_load) {
+  const auto& tex = tex_db.textures.at(id);
+  auto resolved = tex_db.resolve_texture(id);
+
   tfrag3::Texture new_tex;
   new_tex.combo_id = id;
-  new_tex.w = tex.w;
-  new_tex.h = tex.h;
-  new_tex.debug_tpage_name = tpage_name;
+  new_tex.w = resolved.w;
+  new_tex.h = resolved.h;
+  new_tex.debug_tpage_name = tex_db.tpage_names.at(tex.page);
   new_tex.debug_name = tex.name;
-  new_tex.data = tex.rgba_bytes;
-  new_tex.combo_id = id;
+  new_tex.data = std::move(resolved.rgba);
   new_tex.load_to_pool = pool_load;
   return new_tex;
 }
@@ -78,12 +79,13 @@ tfrag3::Texture make_texture(u32 id,
 void add_all_textures_from_level(tfrag3::Level& lev,
                                  const std::string& level_name,
                                  const TextureDB& tex_db) {
-  const auto& level_it = tex_db.texture_ids_per_level.find(level_name);
-  if (level_it != tex_db.texture_ids_per_level.end()) {
-    for (auto id : level_it->second) {
-      const auto& tex = tex_db.textures.at(id);
-      lev.textures.push_back(make_texture(id, tex, tex_db.tpage_names.at(tex.page), true));
-    }
+  auto level_it = tex_db.texture_ids_per_level.find(level_name);
+  if (level_it == tex_db.texture_ids_per_level.end()) {
+    return;
+  }
+
+  for (auto id : level_it->second) {
+    lev.textures.push_back(make_texture(id, tex_db, true));
   }
 }
 
@@ -129,6 +131,7 @@ void extract_art_groups_from_level(const ObjectFileDB& db,
         extract_merc(ag_file, tex_db, db.dts, tex_remap, level_data, false, db.version(),
                      swapped_info);
         extract_joint_group(ag_file, db.dts, db.version(), art_group_data);
+        extract_animations(ag_file, db.dts, db.version(), art_group_data);
       }
     }
   }
@@ -265,22 +268,6 @@ level_tools::BspHeader extract_bsp_from_level(const ObjectFileDB& db,
  * Even though GAME.CGO isn't technically a level, the decompiler/loader treat it like one,
  * but the bsp stuff is just empty. It will contain only textures/art groups.
  */
-void extract_single_ag(const std::string& dgo_name,
-                       const std::string& ag_name,
-                       const ObjectFileDB& db,
-                       const TextureDB& tex_db,
-                       tfrag3::Level& lvl) {
-  auto dgo = db.obj_files_by_dgo.at(dgo_name);
-  for (const auto& file : dgo) {
-    if (file.name == ag_name) {
-      const auto& ag_file = db.lookup_record(file);
-      MercSwapInfo swapped_info;
-      extract_merc(ag_file, tex_db, db.dts, extract_tex_remap(db, dgo_name), lvl, false,
-                   db.version(), swapped_info);
-    }
-  }
-}
-
 void extract_common(const ObjectFileDB& db,
                     const TextureDB& tex_db,
                     const std::string& dgo_name,
@@ -303,53 +290,6 @@ void extract_common(const ObjectFileDB& db,
   std::map<std::string, level_tools::ArtData> art_group_data;
   add_all_textures_from_level(tfrag_level, dgo_name, tex_db);
   extract_art_groups_from_level(db, tex_db, {}, dgo_name, tfrag_level, art_group_data);
-
-  extract_single_ag("DG1.DGO", "dig-bomb-crate-cylinder-ag", db, tex_db, tfrag_level);
-  extract_single_ag("DG1.DGO", "dig-bomb-crate-ag", db, tex_db, tfrag_level);
-  extract_single_ag("RUI.DGO", "fodder-ag", db, tex_db, tfrag_level);
-  extract_single_ag("RUI.DGO", "grenadier-ag", db, tex_db, tfrag_level);
-  extract_single_ag("RUI.DGO", "amphibian-ag", db, tex_db, tfrag_level);
-  extract_single_ag("RUI.DGO", "rapid-gunner-ag", db, tex_db, tfrag_level);
-  extract_single_ag("RUI.DGO", "grunt-ag", db, tex_db, tfrag_level);
-  extract_single_ag("ONINTENT.DGO", "onin-highres-ag", db, tex_db, tfrag_level);
-  extract_single_ag("ONINTENT.DGO", "onin-brain-ag", db, tex_db, tfrag_level);
-  extract_single_ag("FOR.DGO", "predator-ag", db, tex_db, tfrag_level);
-  extract_single_ag("RUI.DGO", "flitter-ag", db, tex_db, tfrag_level);
-  extract_single_ag("MTX.DGO", "rhino-ag", db, tex_db, tfrag_level);
-  extract_single_ag("DRI.DGO", "centurion-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NES.DGO", "mammoth-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NES.DGO", "flying-spider-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NES.DGO", "mantis-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NES.DGO", "mammoth-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "rift-ring-in-game-ag", db, tex_db, tfrag_level);
-  extract_single_ag("VIN.DGO", "vin-ag", db, tex_db, tfrag_level);
-  extract_single_ag("VIN.DGO", "crocadog-highres-ag", db, tex_db, tfrag_level);
-  extract_single_ag("VIN.DGO", "kid-highres-ag", db, tex_db, tfrag_level);
-  extract_single_ag("VIN.DGO", "vin-turbine-ag", db, tex_db, tfrag_level);
-  extract_single_ag("FOB.DGO", "transport-ag", db, tex_db, tfrag_level);
-  extract_single_ag("CAS.DGO", "crimson-guard-ag", db, tex_db, tfrag_level);
-  extract_single_ag("CAS.DGO", "roboguard-ag", db, tex_db, tfrag_level);
-  extract_single_ag("SAG.DGO", "torn-highres-ag", db, tex_db, tfrag_level);
-  extract_single_ag("HIPHOG.DGO", "hip-whack-a-metal-ag", db, tex_db, tfrag_level);
-  extract_single_ag("HIPHOG.DGO", "hip-mole-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "metalkor-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "metalkor-lowtorso-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "metalkor-legs-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "metalkor-explode-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "wasp-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "metalkor-bomb-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "metalkor-wings-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "metalkor-egg-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "metalkor-distort-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "metalkor-rays-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "precursor-stone-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "particleman-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "kid-nestb+0-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "metalkor-fma-spinner-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "nestb-tail-bound-ag", db, tex_db, tfrag_level);
-  extract_single_ag("NEB.DGO", "palmpilot-ag", db, tex_db, tfrag_level);
-  extract_single_ag("OUTROCST.DGO", "precursor-ag", db, tex_db, tfrag_level);
-  
 
   add_all_textures_from_level(tfrag_level, "ARTSPOOL", tex_db);
   extract_art_groups_from_level(db, tex_db, {}, "ARTSPOOL", tfrag_level, art_group_data);
@@ -404,8 +344,7 @@ void extract_common(const ObjectFileDB& db,
     if (config.common_tpages.count(normal_texture.page) && !textures_we_have_id.count(id)) {
       textures_we_have.insert(normal_texture.name);
       textures_we_have_id.insert(id);
-      tfrag_level.textures.push_back(
-          make_texture(id, normal_texture, tex_db.tpage_names.at(normal_texture.page), true));
+      tfrag_level.textures.push_back(make_texture(id, tex_db, true));
     }
   }
 
@@ -414,13 +353,16 @@ void extract_common(const ObjectFileDB& db,
     if (config.animated_textures.count(normal_texture.name) &&
         !textures_we_have.count(normal_texture.name)) {
       textures_we_have.insert(normal_texture.name);
-      tfrag_level.textures.push_back(
-          make_texture(id, normal_texture, tex_db.tpage_names.at(normal_texture.page), false));
+      tfrag_level.textures.push_back(make_texture(id, tex_db, false));
     }
   }
 
   Serializer ser;
   tfrag_level.serialize(ser);
+  if (!config.rip_levels) {
+    tfrag_level.textures.clear();
+    tfrag_level.textures.shrink_to_fit();
+  }
   auto compressed =
       compression::compress_zstd(ser.get_save_result().first, ser.get_save_result().second);
 
@@ -433,9 +375,10 @@ void extract_common(const ObjectFileDB& db,
       compressed.data(), compressed.size());
 
   if (config.rip_levels) {
-    auto file_path = file_util::get_jak_project_dir() / "glb_out" /
-                     game_version_names[config.game_version] / "common";
-    save_level_foreground_as_gltf(tfrag_level, art_group_data, file_path);
+    auto file_path = file_util::get_jak_project_dir() / "decompiler_out" /
+                     game_version_names[config.game_version] / "levels" / "common";
+    save_level_foreground_as_gltf(tfrag_level, art_group_data, file_path,
+                                  tex_db.animated_tex_output_to_anim_slot);
   }
 }
 
@@ -460,6 +403,10 @@ void extract_from_level(const ObjectFileDB& db,
 
   Serializer ser;
   level_data.serialize(ser);
+  if (!config.rip_levels) {
+    level_data.textures.clear();
+    level_data.textures.shrink_to_fit();
+  }
   auto compressed =
       compression::compress_zstd(ser.get_save_result().first, ser.get_save_result().second);
   lg::info("stats for {}", level_data.level_name);
@@ -470,17 +417,24 @@ void extract_from_level(const ObjectFileDB& db,
                                compressed.data(), compressed.size());
 
   if (config.rip_levels) {
-    auto back_file_path = file_util::get_jak_project_dir() / "glb_out" /
-                          game_version_names[config.game_version] / level_data.level_name /
+    auto back_file_path = file_util::get_jak_project_dir() / "decompiler_out" /
+                          game_version_names[config.game_version] / "levels" /
+                          level_data.level_name /
                           fmt::format("{}-background.glb", level_data.level_name);
     file_util::create_dir_if_needed_for_file(back_file_path);
     save_level_background_as_gltf(level_data, back_file_path);
-    auto fore_file_path = file_util::get_jak_project_dir() / "glb_out" /
-                          game_version_names[config.game_version] / level_data.level_name;
-    save_level_foreground_as_gltf(level_data, art_group_data, fore_file_path);
+    auto fore_file_path = file_util::get_jak_project_dir() / "decompiler_out" /
+                          game_version_names[config.game_version] / "levels" /
+                          level_data.level_name;
+    save_level_foreground_as_gltf(level_data, art_group_data, fore_file_path,
+                                  tex_db.animated_tex_output_to_anim_slot);
   }
   file_util::write_text_file(entities_folder / fmt::format("{}-actors.json", level_data.level_name),
                              extract_actors_to_json(bsp_header.actors));
+  if (config.game_version == GameVersion::Jak1)
+    file_util::write_text_file(
+        entities_folder / fmt::format("{}-ambients.json", level_data.level_name),
+        extract_ambients_to_json(bsp_header.ambients));
 }
 
 void extract_all_levels(const ObjectFileDB& db,
@@ -493,12 +447,18 @@ void extract_all_levels(const ObjectFileDB& db,
   auto entities_dir = file_util::get_jak_project_dir() / "decompiler_out" /
                       game_version_names[config.game_version] / "entities";
   file_util::create_dir_if_needed(entities_dir);
+
+  int num_workers = dgo_names.size();
+  if (tex_db.replace_texture_dir) {
+    num_workers = 1;
+  }
+
   SimpleThreadGroup threads;
   threads.run(
       [&](int idx) {
         extract_from_level(db, tex_db, dgo_names[idx], config, output_path, entities_dir);
       },
-      dgo_names.size());
+      dgo_names.size(), num_workers);
   threads.join();
 }
 

@@ -162,11 +162,7 @@
 
 ;; definition for method 37 of type neo-juicer-shot
 (defmethod deal-damage! ((this neo-juicer-shot) (arg0 process) (arg1 event-message-block))
-  (let ((a0-2 (if (type? arg0 process-focusable)
-                  arg0
-                  )
-              )
-        )
+  (let ((a0-2 (as-type arg0 process-focusable)))
     (when a0-2
       (set! (-> this victim) (process->handle a0-2))
       #t
@@ -225,13 +221,13 @@
 (defmethod projectile-method-26 ((this neo-juicer-shot))
   (projectile-method-25 this)
   (cond
-    ((logtest? (-> *part-group-id-table* 1524 flags) (sp-group-flag sp13))
+    ((logtest? (-> group-neo-juicer-shot-hit flags) (sp-group-flag sp13))
      (vector-copy! (-> *launch-matrix* trans) (-> this root trans))
-     (part-tracker-spawn part-tracker-subsampler :to *entity-pool* :group (-> *part-group-id-table* 1524))
+     (part-tracker-spawn part-tracker-subsampler :to *entity-pool* :group group-neo-juicer-shot-hit)
      )
     (else
       (vector-copy! (-> *launch-matrix* trans) (-> this root trans))
-      (part-tracker-spawn part-tracker :to *entity-pool* :group (-> *part-group-id-table* 1524))
+      (part-tracker-spawn part-tracker :to *entity-pool* :group group-neo-juicer-shot-hit)
       )
     )
   0
@@ -810,11 +806,7 @@
                      )
                 )
            (zero? (rnd-int this 3))
-           (let ((f0-0 (vector-vector-distance-squared (-> this root trans) (target-pos 0)))
-                 (f1-0 32768.0)
-                 )
-             (>= f0-0 (* f1-0 f1-0))
-             )
+           (>= (vector-vector-distance-squared (-> this root trans) (target-pos 0)) (square 32768.0))
            )
       (go-die this)
       (go (method-of-object this knocked))

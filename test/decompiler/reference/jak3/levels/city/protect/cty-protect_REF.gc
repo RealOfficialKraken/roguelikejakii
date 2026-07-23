@@ -547,8 +547,7 @@
         (let ((f28-0 (/ (-> *target* fact health) (-> *target* fact health-max))))
           0.0
           (let* ((f0-9 (lerp 0.3 0.5 f30-0))
-                 (f1-2 (- 1.0 f28-0))
-                 (f1-3 (* f1-2 f1-2))
+                 (f1-3 (square (- 1.0 f28-0)))
                  (f30-1 (lerp 0.0 f0-9 f1-3))
                  (v1-13 (/ (the-as int (rand-uint31-gen *random-generator*)) 256))
                  (v1-14 (the-as number (logior #x3f800000 v1-13)))
@@ -569,14 +568,13 @@
           )
         )
       )
-    (let* ((s4-1
-             (ppointer->process (process-spawn crate (-> this entity) s5-0 'blue s4-0 :name "crate" :to *entity-pool*))
-             )
-           (s5-1 (if (type? s4-1 process-focusable)
-                     s4-1
-                     )
-                 )
-           )
+    (let ((s5-1
+            (as-type
+              (ppointer->process (process-spawn crate (-> this entity) s5-0 'blue s4-0 :name "crate" :to *entity-pool*))
+              process-focusable
+              )
+            )
+          )
       (let ((a0-18 s5-1))
         (if a0-18
             (process-entity-set! a0-18 (-> this dummy-ent))

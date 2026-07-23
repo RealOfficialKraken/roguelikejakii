@@ -13,6 +13,8 @@
 #include "common/goal_constants.h"
 #include "common/util/Assert.h"
 
+#include "goalc/emitter/InstructionSet.h"
+
 namespace emitter {
 
 enum class HWRegKind : u8 { GPR, XMM, INVALID };
@@ -60,9 +62,6 @@ enum X86_REG : s8 {
   XMM15,  // saved
 };
 
-// TODO - i think it'll be better to make some sort of abstraction
-// mapping between x86 and arm, but just using this enum as a place to prototype
-// the registers to use.
 enum ARM64_REG : s8 {
   X0,  // arg 0, caller-saved RDI
   X1,  // arg 1, caller-saved RSI
@@ -82,14 +81,17 @@ enum ARM64_REG : s8 {
   X13,  // temp, not-saved
   X14,  // temp, not-saved
   X15,  // temp, not-saved
-  X16,  // temp, not-saved
-  X17,  // temp, not-saved
+  // temp, not-saved - Conventionally used for linker/veneer/temporary values (we will reserve this
+  // one atleast)
+  X16,
+  // temp, not-saved - Conventionally used for linker/veneer/temporary values
+  X17,
   X18,  // temp, not-saved
 
-  x19,  // saved TODO purpose?, R12
-  x20,  // pp, R13
-  x21,  // st, R14
-  x22,  // offset, TODO purpose?, R15
+  X19,  // saved TODO purpose?, R12
+  X20,  // pp, R13
+  X21,  // st, R14
+  X22,  // offset, TODO purpose?, R15
   X23,  // unused, callee saved
   X24,  // unused, callee saved
   X25,  // unused, callee saved
@@ -104,38 +106,39 @@ enum ARM64_REG : s8 {
   // quadword registers, equivalent to XMMs
   // the convention in arm64 is the callee preserves all Q values
   // at the same time though, the caller should not depend on this convention!
-  Q0,
-  Q1,
-  Q2,
-  Q3,
-  Q4,
-  Q5,
-  Q6,
-  Q7,
-  Q8,
-  Q9,
-  Q10,
-  Q11,
-  Q12,
-  Q13,
-  Q14,
-  Q15,
-  Q16,
-  Q17,
-  Q18,
-  Q19,
-  Q20,
-  Q21,
-  Q22,
-  Q23,
-  Q24,
-  Q25,
-  Q26,
-  Q27,
-  Q28,
-  Q29,
-  Q30,
-  Q31
+  V0 = 0,
+  V1,
+  V2,
+  V3,
+  V4,
+  V5,
+  V6,
+  V7,
+  V8,
+  V9,
+  V10,
+  V11,
+  V12,
+  V13,
+  V14,
+  V15,
+  // TODO ARM - we'll want to check at runtime if the platform has 16 V registers, or 32
+  V16,
+  V17,
+  V18,
+  V19,
+  V20,
+  V21,
+  V22,
+  V23,
+  V24,
+  V25,
+  V26,
+  V27,
+  V28,
+  V29,
+  V30,
+  V31,
 };
 
 class Register {
@@ -145,14 +148,47 @@ class Register {
   // intentionally not explicit so we can use X86_REGs in place of Registers
   Register(int id) : m_id(id) {}
 
-  bool is_xmm() const { return m_id >= XMM0 && m_id <= XMM15; }
+  // TODO ARM64 - this assertion isn't as useful for ARM
+  // since Q/V registers are not unique in terms of their id
+  // instead it is the instruction itself that deduces what set of registers to use
+  bool is_128bit_simd(emitter::InstructionSet instr_set) const {
+    if (instr_set == emitter::InstructionSet::X86) {
+      return m_id >= XMM0 && m_id <= XMM15;
+    } else if (instr_set == emitter::InstructionSet::ARM64) {
+      return m_id >= V0 && m_id <= V31;
+    } else {
+      ASSERT_MSG(false, "is_128bit_simd: instruction set not supported");
+    }
+  }
 
-  bool is_gpr() const { return m_id >= RAX && m_id <= R15; }
+  bool is_xmm(emitter::InstructionSet instr_set) const {
+    if (instr_set == emitter::InstructionSet::X86) {
+      return m_id >= XMM0 && m_id <= XMM15;
+    } else if (instr_set == emitter::InstructionSet::ARM64) {
+      return false;
+    } else {
+      ASSERT_MSG(false, "is_xmm: instruction set not supported");
+    }
+  }
 
-  int hw_id() const {
-    if (is_xmm()) {
+  bool is_gpr(emitter::InstructionSet instr_set) const {
+    if (instr_set == emitter::InstructionSet::X86) {
+      return m_id >= RAX && m_id <= R15;
+    } else if (instr_set == emitter::InstructionSet::ARM64) {
+      return (m_id >= X0 && m_id <= X30) || m_id == SP;
+    } else {
+      ASSERT_MSG(false, "is_gpr: instruction set not supported");
+    }
+  }
+
+  int hw_id(emitter::InstructionSet instr_set) const {
+    // ARM64 does not require the concept of a hw_id
+    if (instr_set != emitter::InstructionSet::X86) {
+      ASSERT_MSG(false, "hw_id is only applicable for x86");
+    }
+    if (is_xmm(instr_set)) {
       return m_id - XMM0;
-    } else if (is_gpr()) {
+    } else if (is_gpr(instr_set)) {
       return m_id - RAX;
     } else {
       ASSERT(false);

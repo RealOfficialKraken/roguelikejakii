@@ -889,19 +889,9 @@
   :code (behavior ((arg0 handle))
     (set! (-> self target) arg0)
     (until #f
-      (let* ((gp-0 (handle->process (-> self target)))
-             (v1-3 (if (type? gp-0 process-drawable)
-                       gp-0
-                       )
-                   )
-             )
+      (let ((v1-3 (as-type (handle->process (-> self target)) process-drawable)))
         (when v1-3
-          (let* ((gp-1 (-> (the-as process-drawable v1-3) root))
-                 (v1-4 (if (type? gp-1 collide-shape)
-                           gp-1
-                           )
-                       )
-                 )
+          (let ((v1-4 (as-type (-> (the-as process-drawable v1-3) root) collide-shape)))
             (when v1-4
               (let* ((gp-2 (-> self root root-prim prim-core))
                      (a1-3 (-> (the-as collide-shape v1-4) root-prim prim-core))
@@ -1028,35 +1018,35 @@
         (cond
           ((= v1-55 'darkeco)
            (cond
-             ((logtest? (-> *part-group-id-table* 197 flags) (sp-group-flag sp13))
+             ((logtest? (-> group-dark-eco-box-explosion flags) (sp-group-flag sp13))
               (vector-copy! (-> *launch-matrix* trans) (-> self root trans))
-              (part-tracker-spawn part-tracker-subsampler :to self :group (-> *part-group-id-table* 197))
+              (part-tracker-spawn part-tracker-subsampler :to self :group group-dark-eco-box-explosion)
               )
              (else
                (vector-copy! (-> *launch-matrix* trans) (-> self root trans))
-               (part-tracker-spawn part-tracker :to self :group (-> *part-group-id-table* 197))
+               (part-tracker-spawn part-tracker :to self :group group-dark-eco-box-explosion)
                )
              )
            )
           ((or (= v1-55 'steel) (= v1-55 'iron))
            (cond
-             ((logtest? (-> *part-group-id-table* 196 flags) (sp-group-flag sp13))
+             ((logtest? (-> group-crate-steel-explode flags) (sp-group-flag sp13))
               (vector-copy! (-> *launch-matrix* trans) (-> self root trans))
-              (part-tracker-spawn part-tracker-subsampler :to self :group (-> *part-group-id-table* 196))
+              (part-tracker-spawn part-tracker-subsampler :to self :group group-crate-steel-explode)
               )
              (else
                (vector-copy! (-> *launch-matrix* trans) (-> self root trans))
-               (part-tracker-spawn part-tracker :to self :group (-> *part-group-id-table* 196))
+               (part-tracker-spawn part-tracker :to self :group group-crate-steel-explode)
                )
              )
            )
-          ((logtest? (-> *part-group-id-table* 195 flags) (sp-group-flag sp13))
+          ((logtest? (-> group-crate-explode flags) (sp-group-flag sp13))
            (vector-copy! (-> *launch-matrix* trans) (-> self root trans))
-           (part-tracker-spawn part-tracker-subsampler :to self :group (-> *part-group-id-table* 195))
+           (part-tracker-spawn part-tracker-subsampler :to self :group group-crate-explode)
            )
           (else
             (vector-copy! (-> *launch-matrix* trans) (-> self root trans))
-            (part-tracker-spawn part-tracker :to self :group (-> *part-group-id-table* 195))
+            (part-tracker-spawn part-tracker :to self :group group-crate-explode)
             )
           )
         )

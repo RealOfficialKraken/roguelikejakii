@@ -3,6 +3,7 @@
 #include "common/util/gltf_util.h"
 
 #include "decompiler/extractor/extractor_util.h"
+#include "decompiler/level_extractor/extract_collide_frags.h"
 #include "decompiler/level_extractor/extract_merc.h"
 #include "goalc/build_level/collide/jak2/collide.h"
 #include "goalc/build_level/common/Tfrag.h"
@@ -42,6 +43,9 @@ bool run_build_level(const std::string& input_file,
   // unk zero
   // name
   file.name = level_json.at("long_name").get<std::string>();
+  ASSERT_MSG(file.name.size() <= 10,
+             fmt::format("long_name over 10 characters ({} characters): '{}'", file.name.size(),
+                         file.name));
   // nick
   file.nickname = level_json.at("nickname").get<std::string>();
   // vis infos
@@ -57,9 +61,19 @@ bool run_build_level(const std::string& input_file,
              fmt::format("Actor IDs must be unique. Found at least two actors with ID {}",
                          duplicates->aid));
   file.actors = std::move(actors);
+  // actor groups
+  if (level_json.contains("actor_groups") && !level_json.at("actor_groups").empty()) {
+    add_actor_groups_from_json(level_json.at("actor_groups"), file.actors, file.actor_groups, 0);
+  }
   // cameras
   // nodes
   // regions
+  if (level_json.contains("region_trees") && !level_json.at("region_trees").empty()) {
+    file.region_array.entities = &file.actors;
+    file.region_array.actor_groups = &file.actor_groups;
+    fill_region_trees(file.region_trees, file.regions, file.region_array,
+                      level_json.at("region_trees"), level_json.value("base_region_id", 0));
+  }
   // subdivs
   // actor birth
   for (size_t i = 0; i < file.actors.size(); i++) {
@@ -86,6 +100,22 @@ bool run_build_level(const std::string& input_file,
     lg::error("No collision geometry was found");
   } else {
     file.collide_hash = construct_collide_hash(mesh_extract_out.collide.faces);
+    // for collision renderer
+    for (auto& face : mesh_extract_out.collide.faces) {
+      math::Vector4f verts[3];
+      for (int i = 0; i < 3; i++) {
+        verts[i].x() = face.v[i].x();
+        verts[i].y() = face.v[i].y();
+        verts[i].z() = face.v[i].z();
+        verts[i].w() = 1.f;
+      }
+      tfrag3::CollisionMesh::Vertex out_verts[3];
+      decompiler::set_vertices_for_tri(out_verts, verts);
+      for (auto& out : out_verts) {
+        out.pat = face.pat.val;
+        pc_level.collision.vertices.push_back(out);
+      }
+    }
   }
 
   // Save the GOAL level
@@ -148,29 +178,6 @@ bool run_build_level(const std::string& input_file,
       tex_db.replace_textures(replacements_path);
     }
 
-    // find all art groups used by the custom level in other dgos
-    if (gen_fr3 && level_json.contains("art_groups") && !level_json.at("art_groups").empty()) {
-      for (auto& dgo : config.dgo_names) {
-        std::vector<std::string> processed_art_groups;
-        // remove "DGO/" prefix
-        const auto& dgo_name = dgo.substr(4);
-        const auto& files = db.obj_files_by_dgo.at(dgo_name);
-        auto art_groups =
-            find_art_groups(processed_art_groups,
-                            level_json.at("art_groups").get<std::vector<std::string>>(), files);
-        auto tex_remap = decompiler::extract_tex_remap(db, dgo_name);
-        for (const auto& ag : art_groups) {
-          if (ag.name.length() > 3 && !ag.name.compare(ag.name.length() - 3, 3, "-ag")) {
-            const auto& ag_file = db.lookup_record(ag);
-            lg::print("custom level: extracting art group {}\n", ag_file.name_in_dgo);
-            decompiler::MercSwapInfo info;
-            decompiler::extract_merc(ag_file, tex_db, db.dts, tex_remap, pc_level, false,
-                                     db.version(), info);
-          }
-        }
-      }
-    }
-
     // add textures
     if (level_json.contains("textures") && !level_json.at("textures").empty()) {
       std::vector<std::string> processed_textures;
@@ -194,9 +201,31 @@ bool run_build_level(const std::string& input_file,
           if (tex.name == tex0) {
             lg::info("custom level: adding texture {} from tpage {} ({})", tex.name, tex.page,
                      tex_db.tpage_names.at(tex.page));
-            pc_level.textures.push_back(
-                make_texture(id, tex, tex_db.tpage_names.at(tex.page), true));
+            pc_level.textures.push_back(make_texture(id, tex_db, true));
             processed_textures.push_back(tex.name);
+          }
+        }
+      }
+    }
+
+    // find all art groups used by the custom level in other dgos
+    if (gen_fr3 && level_json.contains("art_groups") && !level_json.at("art_groups").empty()) {
+      for (auto& dgo : config.dgo_names) {
+        std::vector<std::string> processed_art_groups;
+        // remove "DGO/" prefix
+        const auto& dgo_name = dgo.substr(4);
+        const auto& files = db.obj_files_by_dgo.at(dgo_name);
+        auto art_groups =
+            find_art_groups(processed_art_groups,
+                            level_json.at("art_groups").get<std::vector<std::string>>(), files);
+        auto tex_remap = decompiler::extract_tex_remap(db, dgo_name);
+        for (const auto& ag : art_groups) {
+          if (ag.name.length() > 3 && !ag.name.compare(ag.name.length() - 3, 3, "-ag")) {
+            const auto& ag_file = db.lookup_record(ag);
+            lg::print("custom level: extracting art group {}\n", ag_file.name_in_dgo);
+            decompiler::MercSwapInfo info;
+            decompiler::extract_merc(ag_file, tex_db, db.dts, tex_remap, pc_level, false,
+                                     db.version(), info);
           }
         }
       }

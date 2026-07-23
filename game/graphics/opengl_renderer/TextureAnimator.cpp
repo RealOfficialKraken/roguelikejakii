@@ -11,6 +11,9 @@
 
 #include "third-party/imgui/imgui.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 // #define dprintf(...) printf(__VA_ARGS__)
 // #define dfmt(...) fmt::print(__VA_ARGS__)
 #define dprintf(...)
@@ -97,6 +100,18 @@ OpenGLTexturePool::OpenGLTexturePool(GameVersion version) {
                                                  {64, 64, 30},
                                                  {64, 128, 4},
                                                  {128, 128, 10},
+                                                 {256, 1, 2},
+                                                 {256, 256, 7}},
+                                                {{4, 4, 3},
+                                                 {4, 64, 6},
+                                                 {16, 16, 5},
+                                                 {32, 16, 1},
+                                                 {32, 32, 20},
+                                                 {32, 64, 1},
+                                                 {64, 32, 15},
+                                                 {64, 64, 85},
+                                                 {64, 128, 4},
+                                                 {128, 128, 185},
                                                  {256, 1, 2},
                                                  {256, 256, 7}},
                                                 {{4, 4, 3},
@@ -244,6 +259,7 @@ int output_slot_by_idx(GameVersion version, const std::string& name) {
       v = &jak2_animated_texture_slots();
       break;
     case GameVersion::Jak3:
+    case GameVersion::JakX:
       v = &jak3_animated_texture_slots();
       break;
     default:
@@ -460,6 +476,7 @@ const std::vector<std::string>& animated_texture_slots(GameVersion version) {
     case GameVersion::Jak2:
       return jak2_animated_texture_slots();
     case GameVersion::Jak3:
+    case GameVersion::JakX:
       return jak3_animated_texture_slots();
     default:
       ASSERT_NOT_REACHED();
@@ -593,6 +610,7 @@ TextureAnimator::TextureAnimator(ShaderLibrary& shaders,
       setup_texture_anims_jak2();
       break;
     case GameVersion::Jak3:
+    case GameVersion::JakX:
       setup_texture_anims_jak3();
       break;
     default:
@@ -675,7 +693,7 @@ void imgui_show_tex(GLuint tex) {
   int w, h;
   glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
   glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
-  ImGui::Image((void*)(u64)tex, ImVec2(w, h));
+  ImGui::Image((ImTextureID)(intptr_t)tex, ImVec2(w, h));
 }
 
 void TextureAnimator::draw_debug_window() {
@@ -1299,6 +1317,7 @@ void TextureAnimator::handle_texture_anim_data(DmaFollower& dma,
           }
           break;
         case GameVersion::Jak3:
+        case GameVersion::JakX:
           switch (static_cast<PcTextureAnimCodesJak3>(vif0.immediate)) {
             case PcTextureAnimCodesJak3::UPLOAD_CLUT_16_16: {
               auto p = scoped_prof("clut-16-16");

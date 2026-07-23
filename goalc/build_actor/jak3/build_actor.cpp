@@ -131,8 +131,16 @@ ArtJointAnim::ArtJointAnim(const anim::CompressedAnim& anim, const std::vector<J
   speed = 1.0f;
   artist_base = 0.0f;
   artist_step = 1.0f;
-  master_art_group_name = name;
-  master_art_group_index = 2;
+  if (!anim.master_art_group_name.empty()) {
+    master_art_group_name = anim.master_art_group_name;
+  } else {
+    master_art_group_name = name;
+  }
+  if (anim.master_art_group_index != -1) {
+    master_art_group_index = anim.master_art_group_index;
+  } else {
+    master_art_group_index = 2;
+  }
 }
 
 size_t JointAnimCompressedFrame::generate(DataObjectGenerator& gen) const {
@@ -435,23 +443,24 @@ size_t gen_dummy_extra_info(DataObjectGenerator& gen) {
   return result;
 }
 
-void generate_merc_effects(DataObjectGenerator& gen, int effect_count, int joints) {
+void generate_merc_effects(DataObjectGenerator& gen, tfrag3::MercModel* mdl, int joints) {
   struct EffectLocs {
     size_t frag_geo;
     size_t frag_ctrl;
     size_t extra_info;
   };
   std::vector<EffectLocs> locs;
-  for (int i = 0; i < effect_count; i++) {
+  for (auto& e : mdl->effects) {
     EffectLocs loc{};
-    loc.frag_geo = gen.add_word(0);    // 112-140 (effect)
-    loc.frag_ctrl = gen.add_word(0);   // 116 (frag-ctrl)
-    gen.add_word(0x0);                 // 120 (blend-data)
-    gen.add_word(0x0);                 // 124 (blend-ctrl)
-    gen.add_word(0x10000);             // 128
-    gen.add_word(0x140000);            // 132
-    gen.add_word(0x100001d);           // 136
-    loc.extra_info = gen.add_word(0);  // 140 (extra-info)
+    auto envmap = (int)e.has_envmap;
+    loc.frag_geo = gen.add_word(0);       // 112-140 (effect)
+    loc.frag_ctrl = gen.add_word(0);      // 116 (frag-ctrl)
+    gen.add_word(0x0);                    // 120 (blend-data)
+    gen.add_word(0x0);                    // 124 (blend-ctrl)
+    gen.add_word(0x10000);                // 128
+    gen.add_word(0x140000);               // 132
+    gen.add_word((envmap << 24) + 0x1d);  // 136
+    loc.extra_info = gen.add_word(0);     // 140 (extra-info)
     locs.push_back(loc);
   }
   for (auto& loc : locs) {
@@ -467,6 +476,7 @@ size_t generate_dummy_merc_ctrl(DataObjectGenerator& gen, const ArtGroup& ag) {
   size_t result = gen.current_offset_bytes();
   // excluding align and prejoint
   auto joints = ((ArtJointGeo*)ag.elts.at(0).get())->length - 2;
+  auto effect_count = ag.mdl->effects.size();
   gen.add_word(0);                                   // 4
   gen.add_ref_to_string_in_pool(ag.name + "-lod0");  // 8
   gen.add_word(joints);                              // 12 (num-joints)
@@ -484,34 +494,34 @@ size_t generate_dummy_merc_ctrl(DataObjectGenerator& gen, const ArtGroup& ag) {
   gen.add_word(0x40eb4000);                          // 60 (st-out-b)
   gen.add_word(0x4780ff80);                          // 64 (st-vif-add)
   gen.add_word(0x50000);                             // 68 ((st-int-off << 16) + st-int-scale)
-  gen.add_word(ag.merc_effect_count);                // 72 (effect-count)
+  gen.add_word(effect_count);                        // 72 (effect-count)
   gen.add_word(0x0);                                 // 76 (blend-target-count)
-  gen.add_word((0x14 * ag.merc_effect_count << 16) +
-               ag.merc_effect_count);  // 80 ((fragment-count << 16) + tri-count)
-  gen.add_word(0x130101);              // 84
-  gen.add_word(0x13001d);              // 88
-  gen.add_word(0x0);                   // 92
-  gen.add_word(0x0);                   // 96
-  gen.add_word(0x10101);               // 100
-  gen.add_word(0x130000);              // 104
-  gen.add_word(0x3f319ca9);            // 108
-  gen.add_word(0x0);                   // 112
-  gen.add_word(0x0);                   // 116
-  gen.add_word(0x0);                   // 120
-  gen.add_word(0x0);                   // 124
-  gen.add_word(0x0);                   // 128
-  gen.add_word(0x0);                   // 132
-  gen.add_word(0x0);                   // 136
-  gen.add_word(0x0);                   // 140
-  gen.add_word(0x0);                   // 144
-  gen.add_word(0x0);                   // 148
-  gen.add_word(0x0);                   // 152
-  gen.add_word(0x0);                   // 156
-  gen.add_word(0x0);                   // 160
-  gen.add_word(0x0);                   // 164
-  gen.add_word(0x0);                   // 168
-  gen.add_word(0x0);                   // 172
-  generate_merc_effects(gen, ag.merc_effect_count, joints);
+  gen.add_word((0x14 * effect_count << 16) +
+               effect_count);  // 80 ((fragment-count << 16) + tri-count)
+  gen.add_word(0x130101);      // 84
+  gen.add_word(0x13001d);      // 88
+  gen.add_word(0x0);           // 92
+  gen.add_word(0x0);           // 96
+  gen.add_word(0x10101);       // 100
+  gen.add_word(0x130000);      // 104
+  gen.add_word(0x3f319ca9);    // 108
+  gen.add_word(0x0);           // 112
+  gen.add_word(0x0);           // 116
+  gen.add_word(0x0);           // 120
+  gen.add_word(0x0);           // 124
+  gen.add_word(0x0);           // 128
+  gen.add_word(0x0);           // 132
+  gen.add_word(0x0);           // 136
+  gen.add_word(0x0);           // 140
+  gen.add_word(0x0);           // 144
+  gen.add_word(0x0);           // 148
+  gen.add_word(0x0);           // 152
+  gen.add_word(0x0);           // 156
+  gen.add_word(0x0);           // 160
+  gen.add_word(0x0);           // 164
+  gen.add_word(0x0);           // 168
+  gen.add_word(0x0);           // 172
+  generate_merc_effects(gen, ag.mdl, joints);
   return result;
 }
 
@@ -567,7 +577,7 @@ int ArtGroup::get_joint_idx(const std::string& name) {
  */
 bool run_build_actor(const std::string& mdl_name,
                      const std::string& ag_out,
-                     const BuildActorParams& params) {
+                     const BuildActorParams3& params) {
   std::string ag_name;
   if (fs::exists(file_util::get_jak_project_dir() / mdl_name)) {
     ag_name = fs::path(mdl_name).stem().string();
@@ -588,7 +598,7 @@ bool run_build_actor(const std::string& mdl_name,
   std::vector<Joint> joints;
   MercExtractData extract_data;
   extract("test", extract_data, model, all_nodes, 0, 0, 0);
-  ag.merc_effect_count = extract_data.new_model.effects.size();
+  ag.mdl = &extract_data.new_model;
   // MercSwapData out;
   // merc_convert(out, extract_data);
   // Set up joints:
@@ -598,7 +608,8 @@ bool run_build_actor(const std::string& mdl_name,
     // convert to game format
     joints = convert_joints(skeleton_joints);
     // get animation from user.
-    user_anims = process_anim(model, skeleton_joints);
+    user_anims = process_anim(model, skeleton_joints, params.master_art_group, params.master_ag_map,
+                              params.framerate);
 
   } else {
     auto identity = math::Matrix4f::identity();

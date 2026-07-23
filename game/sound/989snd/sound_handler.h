@@ -29,11 +29,14 @@ class SoundHandler {
   virtual void SetRegister(u8 /*reg*/, u8 /*value*/) {}
   virtual u32 SoundID() const { return -1; }
 
+  u32 m_sound_handle = 0;
+
   // Check if this handler violates an instance limit. If so, return pointer to the sound that
   // should be removed.
   virtual SoundHandler* CheckInstanceLimit(
       const std::map<u32, std::unique_ptr<SoundHandler>>& handlers,
-      s32 vol) {
+      s32 vol,
+      bool parent) {
     return nullptr;
   }
 };

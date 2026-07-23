@@ -15,7 +15,7 @@
 #include "common/util/math_util.h"
 
 #include "fmt/color.h"
-#include "fmt/core.h"
+#include "fmt/format.h"
 
 namespace {
 template <typename... Args>
@@ -1100,6 +1100,7 @@ void TypeSystem::add_builtin_types(GameVersion version) {
       break;
     case GameVersion::Jak2:
     case GameVersion::Jak3:
+    case GameVersion::JakX:
       symbol_type = add_builtin_structure("object", "symbol", true);
       symbol_type->override_offset(1);
       break;
